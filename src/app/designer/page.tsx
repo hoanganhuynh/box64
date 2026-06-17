@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import DesignerWizard from '@/components/designer/DesignerWizard'
+import DesignerShell from '@/components/designer/DesignerShell'
 
 export const metadata: Metadata = {
   title: 'Design Your Box | Box64',
@@ -7,17 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function DesignerPage() {
-  return (
-    <main className="min-h-screen bg-bg">
-      <div className="bg-header py-10 text-center">
-        <h1 className="font-jakarta font-extrabold text-white text-3xl sm:text-4xl">
-          Design Your Box
-        </h1>
-        <p className="text-white/50 mt-2 text-sm">
-          4 steps · Download print-ready PDF · MiniGT &amp; Poprace sizes
-        </p>
-      </div>
-      <DesignerWizard />
-    </main>
-  )
+  return <DesignerShell />
 }

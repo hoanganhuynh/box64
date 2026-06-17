@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #fff; color: #111; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; padding: 24px; line-height: 1.5; }
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #666; font-size: 12px; margin-bottom: 20px; }
+  .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #999; margin: 20px 0 8px; border-top: 1px solid #eee; padding-top: 12px; }
+  .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .arch-block { background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+  .arch-block.gold { border-left: 3px solid #b8860b; }
+  .arch-block h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #b8860b; margin-bottom: 8px; font-weight: 600; }
+  .tag { display: inline-block; background: #fff; border: 1px solid #ddd; border-radius: 3px; padding: 2px 7px; font-size: 11px; color: #444; margin: 2px; }
+  .tag.key { background: #fef9ec; border-color: #b8860b; color: #7a5a00; font-weight: 600; }
+  .flow-row { display: flex; align-items: flex-start; gap: 8px; margin: 5px 0; }
+  .flow-box { background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; padding: 4px 10px; font-size: 12px; color: #333; white-space: nowrap; font-weight: 600; }
+  .flow-box.gold { background: #fef9ec; border-color: #b8860b; color: #7a5a00; }
+  .flow-desc { font-size: 12px; color: #666; padding: 4px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .col-label { font-size: 11px; font-weight: 600; color: #333; background: #eee; border-radius: 3px; padding: 3px 8px; margin-bottom: 5px; display: block; text-align: center; }
+  .col-text { font-size: 11px; color: #555; line-height: 1.8; }
+  .note { background: #f0faf0; border: 1px solid #b0ddb0; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #2a6a2a; margin-top: 8px; }
+  .warn { background: #fffbf0; border: 1px solid #e6cc7a; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #7a5a00; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h2>System Architecture — Box64</h2>
+<p class="sub">Next.js 15 (App Router) · Vercel CDN · Supabase Singapore · TypeScript</p>
+
+<div class="section-label">Stack Layer</div>
+<div class="arch-grid">
+  <div class="arch-block gold">
+    <h4>Frontend (Vercel)</h4>
+    <span class="tag key">Next.js 15</span>
+    <span class="tag key">TypeScript</span>
+    <span class="tag">Tailwind CSS</span>
+    <span class="tag">Framer Motion</span>
+    <span class="tag key">React Three Fiber</span>
+    <span class="tag">Zustand</span>
+    <span class="tag">React Hook Form</span>
+    <span class="tag">Lucide icons</span>
+  </div>
+  <div class="arch-block gold">
+    <h4>Backend (Supabase · Singapore)</h4>
+    <span class="tag key">PostgreSQL</span>
+    <span class="tag">Row-Level Security</span>
+    <span class="tag key">Storage (ảnh xe)</span>
+    <span class="tag key">Phone OTP Auth</span>
+    <span class="tag">Edge Functions</span>
+    <span class="tag">Realtime</span>
+    <span class="tag">Auto-backup daily</span>
+  </div>
+  <div class="arch-block">
+    <h4>Payments</h4>
+    <span class="tag key">VNPay / MoMo</span> <span style="font-size:11px;color:#999">→ Vietnam</span><br style="margin:2px 0"/>
+    <span class="tag key">PayPal</span> <span style="font-size:11px;color:#999">→ SEA quốc tế</span><br/>
+    <span style="font-size:11px;color:#999;margin-top:4px;display:block">Auto-detect by shipping country</span>
+  </div>
+  <div class="arch-block">
+    <h4>Services</h4>
+    <span class="tag">Resend (email)</span>
+    <span class="tag key">Puppeteer (PDF)</span>
+    <span class="tag">Vercel OG Image</span>
+    <span class="tag">Supabase Realtime</span>
+  </div>
+</div>
+
+<div class="section-label">Page Map — Customer</div>
+<div style="display:flex;flex-direction:column;gap:5px;">
+  <div class="flow-row"><div class="flow-box gold">/</div><div class="flow-desc">Hero · Featured products · How it works · Countdown sale banner</div></div>
+  <div class="flow-row"><div class="flow-box gold">/shop</div><div class="flow-desc">Filter: Box custom | Card custom | Accessories 1/64 · Pre-order badge · Sale countdown per card</div></div>
+  <div class="flow-row"><div class="flow-box gold">/design</div><div class="flow-desc">Box designer: Form panel (trái) + 3D preview (phải) · Step wizard 4 bước</div></div>
+  <div class="flow-row"><div class="flow-box gold">/checkout</div><div class="flow-desc">Cart → Upsell (5+ box free ship) → Address (phone lookup) → Payment → Confirm</div></div>
+  <div class="flow-row"><div class="flow-box gold">/checkout/success</div><div class="flow-desc">🎬 Box folding animation → Order summary → Shipping ETA 5 ngày làm việc</div></div>
+  <div class="flow-row"><div class="flow-box gold">/track</div><div class="flow-desc">Nhập SĐT → Xem tất cả đơn hàng + mã vận đơn</div></div>
+</div>
+
+<div class="section-label">Page Map — Admin (/admin/*)</div>
+<div class="flow-row" style="flex-wrap:wrap;gap:6px;">
+  <div class="flow-box">Dashboard</div>
+  <div class="flow-box">Orders</div>
+  <div class="flow-box">Products</div>
+  <div class="flow-box">Promotions</div>
+  <div class="flow-box">Reports</div>
+  <div class="flow-box">Box Templates</div>
+</div>
+
+<div class="section-label">3 Phần Kỹ Thuật Quan Trọng Nhất</div>
+<div style="display:flex;flex-direction:column;gap:8px;">
+
+  <div class="arch-block gold">
+    <h4>🎨 Box Designer Tool</h4>
+    <div class="two-col">
+      <div>
+        <span class="col-label">Form Panel (trái)</span>
+        <div class="col-text">
+          Upload ảnh xe → Supabase Storage<br/>
+          Tên xe + thông số → text inputs<br/>
+          Logo variant: MiniGT / Poprace<br/>
+          Color picker per component<br/>
+          Size: MiniGT box / Poprace box<br/>
+          <strong>"Flat view" toggle</strong> để kiểm tra layout in
+        </div>
+      </div>
+      <div>
+        <span class="col-label">3D Preview (phải)</span>
+        <div class="col-text">
+          React Three Fiber<br/>
+          BoxGeometry + UV texture map<br/>
+          Realtime update khi nhập liệu<br/>
+          Auto-rotate + drag to spin<br/>
+          Mobile: tab riêng Form | Preview
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arch-block">
+    <h4>📄 PDF Generation — Print-ready</h4>
+    <div style="font-size:12px;color:#555;">
+      Supabase Edge Function → Puppeteer → render flat box HTML template → export PDF 300dpi<br/>
+      <span class="tag" style="margin-top:6px">Bleed marks</span>
+      <span class="tag">Cut lines</span>
+      <span class="tag">CMYK-safe colors</span>
+      <span class="tag">A4 / custom paper size</span>
+    </div>
+  </div>
+
+  <div class="arch-block">
+    <h4>🎬 Post-payment Box Folding Animation</h4>
+    <div style="font-size:12px;color:#555;">
+      Framer Motion + React Three Fiber: flat panels → fold → assemble → close → checkmark<br/>
+      Duration ~3s · Spring physics · Tự chuyển sang order summary sau khi xong
+    </div>
+  </div>
+</div>
+
+<div class="warn">
+  ⚡ <strong>Brand Protection:</strong> Tên hãng (Lamborghini, Ferrari...) lưu encoded trong DB → render ra &lt;canvas&gt; / SVG trên frontend → không phải DOM text node → crawler không đọc được. Search cũng render kết quả qua canvas.
+</div>
+
+<div class="note">
+  ✅ <strong>Supabase:</strong> backup daily tự động · Phone OTP cho sổ địa chỉ (không cần email/password) · Realtime subscription cho admin thấy order mới ngay lập tức
+</div>
+
+</body>
+</html>

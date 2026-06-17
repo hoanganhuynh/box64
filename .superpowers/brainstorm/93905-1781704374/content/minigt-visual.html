@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #09090B;
+    --surface:   #111114;
+    --elevated:  #1A1A1F;
+    --border:    rgba(255,255,255,0.07);
+    --border-gold: rgba(201,168,76,0.3);
+    --text:      #EFEFEF;
+    --muted:     #777785;
+    --gold:      #C9A84C;
+    --gold-glow: rgba(201,168,76,0.15);
+    --gold-cta:  #A16207;
+    --red:       #E53E3E;
+    --radius:    8px;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; }
+
+  /* ─── SHARED ─── */
+  .label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .label::before { content: ''; width: 20px; height: 1px; background: var(--gold); display: block; }
+  .section { padding: 32px 28px; border-bottom: 1px solid var(--border); }
+  .gold-line { width: 40px; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin: 10px 0; }
+
+  /* ─── DESIGN TOKENS ─── */
+  .token-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .token { border-radius: 6px; height: 44px; position: relative; display: flex; align-items: flex-end; padding: 4px 6px; }
+  .token span { font-size: 9px; font-weight: 700; letter-spacing: 0.05em; }
+
+  /* ─── TYPOGRAPHY ─── */
+  .type-showcase { display: flex; flex-direction: column; gap: 6px; }
+  .t-display { font-family: var(--font-display); font-size: 52px; font-weight: 900; line-height: 0.95; letter-spacing: -0.01em; color: var(--text); text-transform: uppercase; }
+  .t-display .gold { color: var(--gold); }
+  .t-h1 { font-family: var(--font-display); font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: var(--text); }
+  .t-h2 { font-family: var(--font-display); font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text); }
+  .t-body { font-family: var(--font-body); font-size: 13px; font-weight: 400; color: var(--muted); line-height: 1.7; }
+  .t-label { font-family: var(--font-body); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+  .t-price { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); }
+
+  /* ─── COMPONENTS ─── */
+  .comp-section { display: flex; flex-direction: column; gap: 20px; }
+  .comp-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .comp-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  .btn { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 22px; border-radius: 4px; cursor: pointer; border: none; transition: all 200ms ease-out; }
+  .btn-gold { background: var(--gold); color: #0A0A0B; }
+  .btn-outline-gold { background: transparent; color: var(--gold); border: 1px solid var(--border-gold); }
+  .btn-white { background: var(--text); color: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+
+  .badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 3px; padding: 3px 9px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .badge-sale { background: rgba(229,62,62,0.15); color: var(--red); border: 1px solid rgba(229,62,62,0.3); }
+  .badge-pre  { background: var(--gold-glow); color: var(--gold); border: 1px solid var(--border-gold); }
+  .badge-custom { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .badge-new  { background: rgba(255,255,255,0.08); color: var(--muted); border: 1px solid var(--border); }
+
+  .countdown { display: inline-flex; align-items: center; gap: 4px; }
+  .cd-block { background: var(--elevated); border: 1px solid var(--border-gold); border-radius: 4px; padding: 5px 9px; font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--gold); min-width: 38px; text-align: center; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+  .cd-sep { color: var(--gold); font-size: 16px; font-weight: 300; opacity: 0.5; }
+  .cd-unit { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-top: 2px; }
+  .cd-wrap { display: flex; flex-direction: column; align-items: center; }
+
+  /* ─── PAGE PREVIEWS ─── */
+  .pages { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .page-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .page-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 7px 12px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+  /* HERO */
+  .hero { background: var(--bg); padding: 0; position: relative; overflow: hidden; }
+  .hero-bg-glow { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 300px; height: 200px; background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); position: relative; z-index: 2; }
+  .logo { font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: 0.05em; }
+  .logo span { color: var(--gold); }
+  .nav-items { display: flex; gap: 16px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .sale-ticker { background: linear-gradient(90deg, var(--gold-glow), transparent); border-bottom: 1px solid var(--border-gold); padding: 6px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .ticker-text { font-size: 10px; color: var(--gold); letter-spacing: 0.05em; font-weight: 500; }
+  .hero-body { padding: 22px 18px; position: relative; z-index: 2; }
+  .hero-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .hero-title { font-family: var(--font-display); font-size: 38px; font-weight: 900; text-transform: uppercase; line-height: 0.95; color: var(--text); }
+  .hero-title .gold { color: var(--gold); display: block; }
+  .diagonal-stripe { position: absolute; right: -10px; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, transparent, var(--gold), transparent); opacity: 0.4; }
+  .hero-sub { font-size: 11px; color: var(--muted); margin-top: 8px; letter-spacing: 0.05em; }
+  .hero-ctas { display: flex; gap: 8px; margin-top: 14px; }
+  .hero-btn-primary { background: var(--gold); color: var(--bg); font-family: var(--font-body); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; border-radius: 3px; border: none; cursor: pointer; }
+  .hero-btn-ghost { background: transparent; color: var(--text); font-family: var(--font-body); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; border-radius: 3px; border: 1px solid var(--border); cursor: pointer; }
+  .hero-3d-hint { margin-top: 16px; background: var(--elevated); border: 1px solid var(--border); border-radius: 6px; padding: 16px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .box-mock { width: 64px; height: 44px; background: linear-gradient(135deg, #111 0%, #1c1c1c 100%); border: 1px solid var(--border-gold); border-radius: 2px; position: relative; box-shadow: 4px 4px 0 rgba(201,168,76,0.08); }
+  .box-mock::after { content: ''; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; background: var(--surface); border: 1px solid rgba(201,168,76,0.1); border-radius: 2px; z-index: -1; }
+  .box-mock-label { font-size: 8px; color: var(--muted); text-align: center; }
+  .rotate-text { font-size: 8px; color: var(--muted); }
+
+  /* SHOP GRID */
+  .shop-bg { background: var(--bg); padding: 14px; }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .filter-pill { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid var(--border); color: var(--muted); }
+  .filter-pill.active { background: var(--gold-glow); border-color: var(--border-gold); color: var(--gold); }
+  .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .product-card:hover { border-color: var(--border-gold); }
+  .card-img-area { background: var(--elevated); height: 76px; position: relative; display: flex; align-items: center; justify-content: center; }
+  .card-box-model { width: 52px; height: 36px; background: linear-gradient(135deg, #111 0%, #1e1e1e 100%); border: 1px solid rgba(201,168,76,0.25); border-radius: 2px; }
+  .card-badges { position: absolute; top: 5px; left: 5px; display: flex; gap: 3px; }
+  .card-timer { position: absolute; bottom: 5px; right: 5px; display: flex; gap: 2px; align-items: center; }
+  .mini-cd { background: rgba(0,0,0,0.7); border: 1px solid var(--border-gold); border-radius: 2px; padding: 1px 4px; font-family: var(--font-display); font-size: 9px; font-weight: 700; color: var(--gold); }
+  .mini-sep { color: var(--gold); font-size: 8px; opacity: 0.5; }
+  .card-info { padding: 8px; }
+  .card-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text); line-height: 1.1; }
+  .card-scale { font-size: 9px; color: var(--muted); letter-spacing: 0.05em; margin-top: 1px; }
+  .card-price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+  .card-price { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text); }
+  .card-price-old { font-size: 10px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
+  .card-add { background: var(--gold); color: var(--bg); border: none; border-radius: 3px; padding: 4px 8px; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; cursor: pointer; font-family: var(--font-body); }
+
+  /* DESIGNER */
+  .designer-wrap { display: flex; min-height: 220px; }
+  .form-panel { flex: 0 0 44%; background: var(--surface); border-right: 1px solid var(--border); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .step-bar { display: flex; gap: 3px; margin-bottom: 4px; }
+  .step-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--elevated); }
+  .step-dot.done { background: var(--gold); }
+  .step-dot.active { background: var(--gold); opacity: 0.5; }
+  .f-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 3px; }
+  .f-input { background: var(--elevated); border: 1px solid var(--border); border-radius: 4px; padding: 5px 8px; width: 100%; color: var(--text); font-family: var(--font-body); font-size: 11px; }
+  .f-input.active-field { border-color: var(--border-gold); }
+  .two-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .logo-selector { display: flex; gap: 4px; }
+  .logo-opt { flex: 1; background: var(--elevated); border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; font-size: 9px; font-weight: 600; color: var(--muted); text-align: center; letter-spacing: 0.05em; cursor: pointer; }
+  .logo-opt.selected { border-color: var(--border-gold); color: var(--gold); background: var(--gold-glow); }
+  .color-pickers { display: flex; gap: 6px; align-items: center; }
+  .color-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; }
+  .color-dot.selected { border-color: var(--gold); }
+  .preview-panel { flex: 1; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; position: relative; }
+  .box-3d-preview { width: 90px; height: 62px; background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border: 1px solid rgba(201,168,76,0.4); border-radius: 2px; position: relative; box-shadow: 6px 6px 0 rgba(0,0,0,0.5), 0 0 20px rgba(201,168,76,0.06); }
+  .box-3d-preview::before { content: ''; position: absolute; top: -1px; right: -8px; width: 8px; height: 100%; background: linear-gradient(180deg, #1f1f1f, #141414); border: 1px solid rgba(201,168,76,0.15); border-left: none; transform: skewY(0deg); }
+  .box-3d-preview::after { content: ''; position: absolute; left: 0; bottom: -8px; width: 100%; height: 8px; background: linear-gradient(90deg, #111, #0a0a0a); border: 1px solid rgba(201,168,76,0.1); border-top: none; }
+  .box-gold-stripe { position: absolute; top: 6px; bottom: 6px; right: 8px; width: 1px; background: linear-gradient(180deg, transparent, var(--gold), transparent); opacity: 0.6; }
+  .preview-hint { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .flat-toggle { position: absolute; bottom: 10px; right: 10px; background: var(--elevated); border: 1px solid var(--border); border-radius: 3px; padding: 3px 7px; font-size: 9px; color: var(--muted); cursor: pointer; }
+
+  /* CART DRAWER */
+  .drawer-scene { display: flex; min-height: 210px; position: relative; }
+  .drawer-dim { flex: 1; background: rgba(0,0,0,0.6); }
+  .cart-drawer { width: 62%; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+  .drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .drawer-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; text-transform: uppercase; color: var(--text); letter-spacing: 0.03em; }
+  .drawer-count { background: var(--gold); color: var(--bg); border-radius: 10px; padding: 1px 7px; font-size: 10px; font-weight: 700; }
+  .drawer-items { flex: 1; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .drawer-item { display: flex; gap: 8px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .item-img { width: 40px; height: 28px; background: var(--elevated); border: 1px solid var(--border-gold); border-radius: 2px; flex-shrink: 0; }
+  .item-name { font-family: var(--font-display); font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text); }
+  .item-price { font-size: 11px; color: var(--muted); }
+  .upsell { margin: 0 14px 10px; background: rgba(201,168,76,0.05); border: 1px solid var(--border-gold); border-radius: 5px; padding: 8px 10px; }
+  .upsell-msg { font-size: 10px; color: var(--gold); margin-bottom: 5px; font-weight: 500; }
+  .upsell-bar-bg { background: var(--elevated); border-radius: 10px; height: 3px; }
+  .upsell-bar-fill { background: linear-gradient(90deg, var(--gold), #e6c060); border-radius: 10px; height: 3px; width: 60%; }
+  .drawer-footer { padding: 10px 14px; border-top: 1px solid var(--border); }
+  .subtotal-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .subtotal-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .subtotal-val { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); }
+  .checkout-cta { background: var(--gold); color: var(--bg); border: none; width: 100%; padding: 10px; font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ═══ SECTION 1: DESIGN TOKENS ═══ -->
+<div class="section">
+  <div class="label">Design Tokens — Dark Automotive</div>
+
+  <div style="display:flex;gap:20px;align-items:flex-start">
+    <!-- Colors -->
+    <div style="flex:1">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Color System</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#09090B;border-radius:5px;border:1px solid rgba(255,255,255,0.1)"></div>
+          <span style="font-size:8px;color:var(--muted)">BG</span>
+          <span style="font-size:8px;color:var(--muted)">#09090B</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#111114;border-radius:5px;border:1px solid rgba(255,255,255,0.1)"></div>
+          <span style="font-size:8px;color:var(--muted)">Surface</span>
+          <span style="font-size:8px;color:var(--muted)">#111114</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#1A1A1F;border-radius:5px;border:1px solid rgba(255,255,255,0.1)"></div>
+          <span style="font-size:8px;color:var(--muted)">Elevated</span>
+          <span style="font-size:8px;color:var(--muted)">#1A1A1F</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#C9A84C;border-radius:5px"></div>
+          <span style="font-size:8px;color:var(--muted)">Gold deco</span>
+          <span style="font-size:8px;color:var(--muted)">#C9A84C</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#A16207;border-radius:5px"></div>
+          <span style="font-size:8px;color:var(--muted)">Gold CTA</span>
+          <span style="font-size:8px;color:var(--muted)">#A16207</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#EFEFEF;border-radius:5px"></div>
+          <span style="font-size:8px;color:var(--muted)">Text</span>
+          <span style="font-size:8px;color:var(--muted)">#EFEFEF</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#777785;border-radius:5px"></div>
+          <span style="font-size:8px;color:var(--muted)">Muted</span>
+          <span style="font-size:8px;color:var(--muted)">#777785</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <div style="width:40px;height:40px;background:#E53E3E;border-radius:5px"></div>
+          <span style="font-size:8px;color:var(--muted)">Danger</span>
+          <span style="font-size:8px;color:var(--muted)">#E53E3E</span>
+        </div>
+      </div>
+    </div>
+    <!-- Typography -->
+    <div style="flex:1.5">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Typography</div>
+      <div class="type-showcase">
+        <div class="t-display"><span class="gold">MINI</span>GT BOX</div>
+        <div class="t-h1">Custom 1:64 Boxes</div>
+        <div class="t-h2">Lamborghini Huracán GT EVO</div>
+        <div class="t-body">Barlow Condensed 900 cho display. DM Sans 400 cho body — clean, readable, không generic.</div>
+        <div class="t-label">SCALE 1:64 · JOHN PLAYER SPECIAL · LB-SILHOUETTE WORKS</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 2: COMPONENTS ═══ -->
+<div class="section">
+  <div class="label">Components</div>
+  <div class="comp-section">
+    <div>
+      <div class="comp-label">Buttons</div>
+      <div class="comp-row">
+        <button class="btn btn-gold">Add to Cart</button>
+        <button class="btn btn-white">Checkout</button>
+        <button class="btn btn-outline-gold">Download PDF</button>
+        <button class="btn btn-ghost">View All</button>
+      </div>
+    </div>
+    <div>
+      <div class="comp-label">Badges</div>
+      <div class="comp-row">
+        <span class="badge badge-sale">SALE −20%</span>
+        <span class="badge badge-pre">PRE-ORDER</span>
+        <span class="badge badge-custom">CUSTOM</span>
+        <span class="badge badge-new">NEW</span>
+      </div>
+    </div>
+    <div>
+      <div class="comp-label">Countdown Timer</div>
+      <div class="comp-row" style="align-items:flex-start">
+        <div class="countdown">
+          <div class="cd-wrap"><div class="cd-block">02</div><div class="cd-unit">ngày</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-wrap"><div class="cd-block">14</div><div class="cd-unit">giờ</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-wrap"><div class="cd-block">37</div><div class="cd-unit">phút</div></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-wrap"><div class="cd-block">09</div><div class="cd-unit">giây</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: PAGE PREVIEWS ═══ -->
+<div class="section">
+  <div class="label">Page Previews</div>
+  <div class="pages">
+
+    <!-- HERO -->
+    <div class="page-wrap">
+      <div class="page-tag"><span>/ — Hero</span><span style="color:var(--gold)">Dark · Full-bleed</span></div>
+      <div class="hero">
+        <div class="hero-bg-glow"></div>
+        <div class="hero-nav">
+          <div class="logo">BOX<span>64</span></div>
+          <div class="nav-items"><span>Shop</span><span>Design</span><span>Track</span></div>
+        </div>
+        <div class="sale-ticker">
+          <span class="ticker-text">⚡ SUMMER SALE — 20% off Box Custom · Còn</span>
+          <div class="countdown" style="gap:3px">
+            <div class="mini-cd">14</div><span class="mini-sep">:</span>
+            <div class="mini-cd">37</div><span class="mini-sep">:</span>
+            <div class="mini-cd">09</div>
+          </div>
+        </div>
+        <div class="hero-body" style="position:relative">
+          <div class="diagonal-stripe"></div>
+          <div class="hero-eyebrow">1:64 Scale · Collector Boxes</div>
+          <div class="hero-title">YOUR BOX<span class="gold">YOUR STORY</span></div>
+          <div class="hero-sub">Custom in · Ship toàn SEA · MiniGT / Poprace size</div>
+          <div class="hero-ctas">
+            <button class="hero-btn-primary">Start Designing</button>
+            <button class="hero-btn-ghost">Shop Catalog</button>
+          </div>
+        </div>
+        <div style="padding:0 18px 18px">
+          <div class="hero-3d-hint">
+            <div>
+              <div class="box-mock"><div style="position:absolute;top:4px;bottom:4px;right:6px;width:1px;background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:0.5"></div></div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:var(--font-display);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted)">3D Preview</div>
+              <div style="font-size:9px;color:var(--muted);margin-top:2px">Drag to rotate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="page-wrap">
+      <div class="page-tag"><span>/shop — Product Grid</span><span style="color:var(--gold)">Dark · 2-col</span></div>
+      <div class="shop-bg">
+        <div class="filter-row">
+          <span class="filter-pill active">Box Custom</span>
+          <span class="filter-pill">Card Custom</span>
+          <span class="filter-pill">Accessories</span>
+        </div>
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="card-img-area">
+              <div class="card-box-model"></div>
+              <div class="card-badges">
+                <span class="badge badge-sale" style="font-size:8px;padding:1px 5px">−20%</span>
+              </div>
+              <div class="card-timer">
+                <div class="mini-cd">14</div><span class="mini-sep">:</span>
+                <div class="mini-cd">37</div><span class="mini-sep">:</span>
+                <div class="mini-cd">09</div>
+              </div>
+            </div>
+            <div class="card-info">
+              <div class="card-name">Huracán GT</div>
+              <div class="card-scale">MiniGT · Custom</div>
+              <div class="card-price-row">
+                <div><span class="card-price">120K</span><span class="card-price-old">150K</span></div>
+                <button class="card-add">+ Cart</button>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="card-img-area">
+              <div class="card-box-model"></div>
+              <div class="card-badges">
+                <span class="badge badge-pre" style="font-size:8px;padding:1px 5px">PRE-ORDER</span>
+              </div>
+            </div>
+            <div class="card-info">
+              <div class="card-name">Ferrari 488</div>
+              <div class="card-scale">Poprace · Custom</div>
+              <div class="card-price-row">
+                <div><span class="card-price">90K</span></div>
+                <button class="card-add">+ Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGNER -->
+    <div class="page-wrap">
+      <div class="page-tag"><span>/design — Box Designer</span><span style="color:var(--gold)">Split panel</span></div>
+      <div class="designer-wrap">
+        <div class="form-panel">
+          <div class="step-bar">
+            <div class="step-dot done"></div>
+            <div class="step-dot done"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+          </div>
+          <div style="font-size:9px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;font-weight:600">Step 3 — Customize</div>
+          <div>
+            <span class="f-label">Tên xe</span>
+            <input class="f-input active-field" value="Huracán GT EVO" readonly>
+          </div>
+          <div class="two-inputs">
+            <div>
+              <span class="f-label">Power</span>
+              <input class="f-input" value="1,500+ hp" readonly>
+            </div>
+            <div>
+              <span class="f-label">Top Speed</span>
+              <input class="f-input" value="350+ km/h" readonly>
+            </div>
+          </div>
+          <div>
+            <span class="f-label">Logo Variant</span>
+            <div class="logo-selector">
+              <div class="logo-opt selected">MiniGT</div>
+              <div class="logo-opt">Poprace</div>
+              <div class="logo-opt">Custom</div>
+            </div>
+          </div>
+          <div>
+            <span class="f-label">Màu nền</span>
+            <div class="color-pickers">
+              <div class="color-dot selected" style="background:#0a0a0a;border-color:var(--gold)"></div>
+              <div class="color-dot" style="background:#1a1a1a"></div>
+              <div class="color-dot" style="background:#1a1428"></div>
+              <div class="color-dot" style="background:#1a0808"></div>
+              <div style="width:18px;height:18px;border-radius:50%;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center">
+                <span style="font-size:8px;color:var(--muted)">+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-panel">
+          <div class="box-3d-preview">
+            <div class="box-gold-stripe"></div>
+          </div>
+          <div class="preview-hint">↕ Drag to rotate</div>
+          <div class="flat-toggle">Flat View</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div class="page-wrap">
+      <div class="page-tag"><span>Cart Drawer</span><span style="color:var(--gold)">Slide-in · Right</span></div>
+      <div class="drawer-scene">
+        <div class="drawer-dim"></div>
+        <div class="cart-drawer">
+          <div class="drawer-header">
+            <div class="drawer-title">Cart</div>
+            <span class="drawer-count">3</span>
+          </div>
+          <div class="drawer-items">
+            <div class="drawer-item">
+              <div class="item-img"></div>
+              <div>
+                <div class="item-name">Huracán GT · Custom</div>
+                <div class="item-price">120.000₫ × 2</div>
+              </div>
+            </div>
+            <div class="drawer-item">
+              <div class="item-img"></div>
+              <div>
+                <div class="item-name">Ferrari 488 · Catalog</div>
+                <div class="item-price">90.000₫ × 1</div>
+              </div>
+            </div>
+          </div>
+          <div class="upsell">
+            <div class="upsell-msg">🎁 Thêm <strong>2 box</strong> nữa → FREE SHIP toàn quốc</div>
+            <div class="upsell-bar-bg"><div class="upsell-bar-fill"></div></div>
+          </div>
+          <div class="drawer-footer">
+            <div class="subtotal-row">
+              <span class="subtotal-label">Subtotal</span>
+              <span class="subtotal-val">330.000₫</span>
+            </div>
+            <button class="checkout-cta">Checkout →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

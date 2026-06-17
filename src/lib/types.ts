@@ -62,6 +62,15 @@ export interface Order {
   created_at: string
 }
 
+export interface GreenSymbolItem {
+  id: string
+  src: string       // e.g. '/icons/Engine.svg'
+  x: number         // % within face (0-100)
+  y: number
+  rotation: number  // degrees
+  scale: number     // 0.5-2.0
+}
+
 export interface DesignState {
   car_image_url: string | null
   car_name: string
@@ -75,6 +84,31 @@ export interface DesignState {
   logo_tint: string
   box_size: BoxSize
   quantity: number
+
+  // Car image position on Orange face
+  car_image_offset_x: number   // 0-100
+  car_image_offset_y: number
+  car_image_scale: number      // 0.5-2.0
+
+  // Pink lid symbols
+  front_lid_symbol: string | null
+  back_lid_symbol: string | null
+  front_lid_rotation: number   // 0, 90, 180, 270
+  back_lid_rotation: number
+  front_lid_flipped: boolean
+  back_lid_flipped: boolean
+
+  // Green face free symbols
+  green_symbols: GreenSymbolItem[]
+
+  // Blue-T specs
+  spec_engine: string
+  spec_power: string
+  spec_torque: string
+  spec_acceleration: string
+  spec_top_speed: string
+  spec_bodykit: string
+  spec_social: string
 }
 
 export interface Template {
