@@ -79,18 +79,18 @@ export default function HomePage() {
   return (
     <>
       {/* ─── 1. ANNOUNCEMENT BAR ─── gold ──────────────────────── */}
-      <div className="bg-gold text-[#07070C] text-[11px] font-semibold py-2 px-4">
+      <div className="bg-gold text-[#07070C] text-xs font-semibold py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
           <span className="flex items-center gap-1.5">
-            <TruckFast size={12} color="currentColor" /> Free shipping on orders 500k+
+            <TruckFast size={13} color="currentColor" /> Free shipping on orders 500k+
           </span>
           <span className="w-px h-3 bg-black/20 hidden sm:block" />
           <span className="flex items-center gap-1.5">
-            <Flash size={12} color="currentColor" variant="Bold" /> Flash Sale live — up to 15% off
+            <Flash size={13} color="currentColor" variant="Bold" /> Flash Sale live — up to 15% off
           </span>
           <span className="w-px h-3 bg-black/20 hidden sm:block" />
           <span className="hidden sm:flex items-center gap-1.5">
-            <Star1 size={11} color="currentColor" variant="Bold" /> 4.9★ · 500+ boxes shipped
+            <Star1 size={12} color="currentColor" variant="Bold" /> 4.9★ · 500+ boxes shipped
           </span>
         </div>
       </div>
@@ -114,20 +114,20 @@ export default function HomePage() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <div className="max-w-xl">
-            <p className="text-gold text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
+            <p className="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4">
               1:64 Scale · MiniGT · Handcrafted in Vietnam
             </p>
             <h1
               id="hero-heading"
-              className="font-jakarta font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.07] mb-5"
+              className="font-playfair font-bold italic text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.1] mb-5"
               style={{ textShadow: '0 2px 24px rgba(0,0,0,0.7)' }}
             >
               Custom Box<br />
               for your{' '}
-              <span className="text-gold">Diecast</span>
+              <span className="text-gold not-italic">Diecast</span>
             </h1>
             <p
-              className="text-white/75 text-base md:text-lg mb-8 leading-relaxed"
+              className="text-white/80 text-base md:text-lg mb-8 leading-relaxed font-light"
               style={{ textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}
             >
               Designed in Illustrator. Printed on 350gsm. Laser-cut. Hand folded. Nationwide delivery.
@@ -154,7 +154,7 @@ export default function HomePage() {
               ].map(({ value, label }) => (
                 <div key={label}>
                   <span className="font-jakarta font-black text-white text-xl leading-none block">{value}</span>
-                  <span className="text-white/35 text-[9px] font-medium uppercase tracking-wider">{label}</span>
+                  <span className="text-white/40 text-[11px] font-medium uppercase tracking-wider">{label}</span>
                 </div>
               ))}
             </div>
@@ -170,8 +170,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-1">Community Favourites</p>
-              <h2 id="top-boxes-heading" className="font-jakarta font-extrabold text-ink text-2xl">
+              <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-1">Community Favourites</p>
+              <h2 id="top-boxes-heading" className="font-playfair font-bold text-ink text-2xl sm:text-3xl">
                 Top Boxes
               </h2>
             </div>
@@ -190,8 +190,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-1">Just Dropped</p>
-              <h2 id="new-arrivals-heading" className="font-jakarta font-extrabold text-primary text-2xl">
+              <p className="text-gold text-xs font-bold tracking-widest uppercase mb-1">Just Dropped</p>
+              <h2 id="new-arrivals-heading" className="font-playfair font-bold text-primary text-2xl sm:text-3xl">
                 New Arrivals
               </h2>
             </div>
@@ -219,7 +219,7 @@ export default function HomePage() {
               <p className="text-ink-muted text-sm max-w-md mb-5">{preOrderItem.description}</p>
               <div className="flex items-center gap-4 justify-center sm:justify-start">
                 <div>
-                  <p className="text-[10px] text-ink-faint uppercase tracking-wider mb-0.5">Launch price</p>
+                  <p className="text-xs text-ink-faint uppercase tracking-wider mb-0.5">Launch price</p>
                   <p className="font-black text-gold-mid text-xl">{formatVND(getDiscountedPrice(preOrderItem))}</p>
                 </div>
                 <Link
@@ -241,8 +241,8 @@ export default function HomePage() {
       <section aria-labelledby="process-heading" className="bg-warm-surface border-y border-border-warm py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-2">Handcrafted with Care</p>
-            <h2 id="process-heading" className="font-jakarta font-extrabold text-ink text-2xl sm:text-3xl mb-3">
+            <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-2">Handcrafted with Care</p>
+            <h2 id="process-heading" className="font-playfair font-bold text-ink text-2xl sm:text-3xl mb-3">
               Our Box Making Process
             </h2>
             <p className="text-ink-muted text-sm max-w-lg mx-auto leading-relaxed">
@@ -323,7 +323,7 @@ export default function HomePage() {
 
           {/* CTA */}
           <div className="text-center">
-            <h2 id="cta-heading" className="font-jakarta font-extrabold text-white text-2xl sm:text-3xl mb-3">
+            <h2 id="cta-heading" className="font-playfair font-bold italic text-white text-2xl sm:text-3xl mb-3">
               Want a box made just for you?
             </h2>
             <p className="text-white/70 text-sm mb-7 max-w-md mx-auto">

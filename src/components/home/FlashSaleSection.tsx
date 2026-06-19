@@ -49,7 +49,7 @@ export default function FlashSaleSection() {
               <Link
                 key={p.id}
                 href={`/shop/${p.slug}`}
-                className="group flex flex-col bg-white rounded overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
+                className="group flex flex-col bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-200 ease-out"
               >
                 {/* Large image */}
                 <div className="relative aspect-square overflow-hidden bg-[#F5F0EA]">
@@ -62,7 +62,7 @@ export default function FlashSaleSection() {
                   />
                   {/* Big bold badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="bg-white text-[#EA580C] font-black text-sm px-3 py-1.5 rounded shadow-md leading-none">
+                    <span className="bg-white text-[#EA580C] font-black text-sm px-3 py-1.5 rounded-full shadow-md leading-none">
                       -{p.promotion!.discount_pct}%
                     </span>
                   </div>

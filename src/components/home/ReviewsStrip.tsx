@@ -68,8 +68,8 @@ export default function ReviewsStrip() {
     <section aria-labelledby="reviews-heading" className="bg-bg py-14 border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
-          <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">Collector Community</p>
-          <h2 id="reviews-heading" className="font-jakarta font-extrabold text-primary text-2xl">
+          <p className="text-gold text-xs font-bold tracking-widest uppercase mb-2">Collector Community</p>
+          <h2 id="reviews-heading" className="font-playfair font-bold text-primary text-2xl sm:text-3xl">
             What Collectors Say
           </h2>
         </div>
@@ -82,7 +82,7 @@ export default function ReviewsStrip() {
           {REVIEWS.map((r, i) => (
             <article
               key={i}
-              className="flex-none w-[280px] sm:w-[300px] snap-start bg-surface border border-border rounded-sm p-5 flex flex-col gap-3"
+              className="flex-none w-[280px] sm:w-[300px] snap-start bg-surface border border-border rounded-xl p-5 flex flex-col gap-3"
             >
               {/* Stars */}
               <div className="flex gap-0.5">
@@ -98,7 +98,7 @@ export default function ReviewsStrip() {
 
               {/* Reviewer */}
               <footer className="flex items-center gap-3 pt-3 border-t border-border">
-                <div className="w-8 h-8 rounded-full bg-header border border-border flex items-center justify-center text-gold font-bold text-xs shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#1A1A2E] border border-[#2A2A42] flex items-center justify-center text-gold font-bold text-xs shrink-0">
                   {r.name.charAt(0)}
                 </div>
                 <div>

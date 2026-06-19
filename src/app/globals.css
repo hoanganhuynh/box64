@@ -26,10 +26,11 @@
   --ink-faint:     #9090A8;
   --border-warm:   #EBE3D8;
 
-  /* ── Shape ── */
+  /* ── Shape scale ── */
   --radius:        10px;
-  --radius-sm:     7px;
-  --radius-lg:     16px;
+  --radius-sm:     6px;
+  --radius-lg:     14px;
+  --radius-xl:     20px;
 }
 
 body {
@@ -37,8 +38,39 @@ body {
   color: var(--text-primary);
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Focus states (WCAG 2.4.7) ─────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Tailwind's `outline-none` on buttons/links removes focus ring — re-add
+   via focus-visible so mouse users don't see the ring */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Cursor ─────────────────────────────────────────────────────────── */
+a, button, [role="button"], label[for], summary {
+  cursor: pointer;
+}
+
+/* ── Reduced motion (WCAG 2.3.3) ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }

@@ -35,9 +35,11 @@ const config: Config = {
         DEFAULT: 'var(--radius)',
         sm:      'var(--radius-sm)',
         lg:      'var(--radius-lg)',
+        xl:      'var(--radius-xl)',
       },
       fontFamily: {
-        jakarta: ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
+        jakarta:  ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
+        playfair: ['var(--font-playfair)', 'Georgia', 'serif'],
       },
     },
   },

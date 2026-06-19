@@ -15,7 +15,7 @@ export default function ProductCard({ product }: Props) {
   return (
     <Link
       href={`/shop/${product.slug}`}
-      className="group flex flex-col bg-white rounded-sm border border-[#EBE3D8] hover:border-gold/60 hover:shadow-lg transition-all duration-200 overflow-hidden"
+      className="group flex flex-col bg-white rounded-xl border border-[#EBE3D8] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 ease-out overflow-hidden"
     >
       {/* ── Image ── */}
       <div className="relative aspect-square overflow-hidden bg-[#F5F0EA]">
@@ -23,31 +23,31 @@ export default function ProductCard({ product }: Props) {
           src={product.images[0]}
           alt={product.name}
           fill
-          className={`object-cover transition-transform duration-300 group-hover:scale-105 ${isOutOfStock ? 'opacity-50' : ''}`}
+          className={`object-cover transition-transform duration-300 ease-out group-hover:scale-105 ${isOutOfStock ? 'opacity-50' : ''}`}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
         {isActive && promo!.discount_pct > 0 && (
-          <span className="absolute top-2.5 left-2.5 bg-gold text-[#07070C] text-[10px] font-bold px-2 py-0.5 rounded-sm tracking-wider uppercase leading-none">
+          <span className="absolute top-3 left-3 bg-gold text-[#07070C] text-[11px] font-bold px-2.5 py-1 rounded-full tracking-wide uppercase leading-none">
             -{promo!.discount_pct}%
           </span>
         )}
         {isPreOrder && !isActive && (
-          <span className="absolute top-2.5 left-2.5 bg-[#1D4ED8] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm tracking-wider uppercase leading-none">
+          <span className="absolute top-3 left-3 bg-[#1D4ED8] text-white text-[11px] font-bold px-2.5 py-1 rounded-full tracking-wide uppercase leading-none">
             Pre-order
           </span>
         )}
-        <span className="absolute top-2.5 right-2.5 bg-black/55 backdrop-blur-sm text-white/90 text-[9px] font-bold px-2 py-0.5 rounded-sm tracking-wider uppercase">
+        <span className="absolute top-3 right-3 bg-black/55 backdrop-blur-sm text-white/90 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase">
           Custom
         </span>
         {isOutOfStock && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-sm tracking-wider uppercase">
+            <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full tracking-wider uppercase">
               Out of stock
             </span>
           </div>
         )}
         {isActive && (promo!.type === 'sale' || promo!.type === 'flash_sale') && (
-          <div className="absolute bottom-2 left-2">
+          <div className="absolute bottom-2.5 left-2.5">
             <CountdownBadge
               label={promo!.type === 'flash_sale' ? 'ENDS IN' : 'SALE ENDS'}
               endDate={promo!.ends_at}
@@ -56,7 +56,7 @@ export default function ProductCard({ product }: Props) {
           </div>
         )}
         {isPreOrder && isActive && (
-          <div className="absolute bottom-2 left-2">
+          <div className="absolute bottom-2.5 left-2.5">
             <CountdownBadge label="SHIPS IN" endDate={promo!.ends_at} variant="pre_order" />
           </div>
         )}
@@ -64,10 +64,10 @@ export default function ProductCard({ product }: Props) {
 
       {/* ── Info ── */}
       <div className="p-4 flex flex-col gap-1.5 flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
+        <p className="text-xs font-semibold uppercase tracking-wider text-ink-faint">
           Custom Box
         </p>
-        <h3 className="font-semibold text-ink text-sm leading-snug line-clamp-2 group-hover:text-gold-mid transition-colors flex-1">
+        <h3 className="font-semibold text-ink text-sm leading-snug line-clamp-2 group-hover:text-gold-mid transition-colors duration-200 flex-1">
           {product.name}
         </h3>
         <div className="mt-2 flex items-center justify-between gap-2">
@@ -76,7 +76,7 @@ export default function ProductCard({ product }: Props) {
             discountPct={isActive && promo!.discount_pct > 0 ? promo!.discount_pct : undefined}
           />
           {product.stock > 0 && product.stock <= 5 && (
-            <span className="text-[10px] text-error font-medium shrink-0">Only {product.stock} left</span>
+            <span className="text-xs text-error font-medium shrink-0">Only {product.stock} left</span>
           )}
         </div>
       </div>
