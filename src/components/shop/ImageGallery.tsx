@@ -3,19 +3,11 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import Image from 'next/image'
-import { TickCircle, Box, TruckFast } from 'iconsax-react'
-
 interface Props {
   images: string[]
   name: string
   badge?: ReactNode
 }
-
-const TRUST = [
-  { icon: TickCircle, label: 'Print-ready quality' },
-  { icon: Box, label: 'Secure packaging' },
-  { icon: TruckFast, label: 'Nationwide delivery' },
-] as const
 
 export default function ImageGallery({ images, name, badge }: Props) {
   const [active, setActive] = useState(0)
@@ -59,18 +51,6 @@ export default function ImageGallery({ images, name, badge }: Props) {
         })}
       </div>
 
-      {/* Trust badges */}
-      <div className="grid grid-cols-3 gap-2">
-        {TRUST.map(({ icon: Icon, label }) => (
-          <div
-            key={label}
-            className="flex flex-col items-center gap-1.5 bg-[#0F0F18] border border-border rounded-sm py-3 px-2 text-center"
-          >
-            <Icon size={15} color="var(--gold)" variant="Bold" />
-            <p className="text-xs text-muted leading-tight">{label}</p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }

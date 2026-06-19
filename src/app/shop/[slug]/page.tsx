@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star1, Ruler, Layer, Brush2, Clock } from 'iconsax-react'
+import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast } from 'iconsax-react'
 import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
 
 export function generateStaticParams() {
@@ -228,6 +228,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Add to cart */}
             <AddToCartButton product={product} />
+
+            {/* Trust signals — inline, no bg */}
+            <div className="flex items-center flex-wrap gap-x-0 gap-y-1">
+              {([
+                { Icon: TickCircle, label: 'Print-ready quality' },
+                { Icon: Box,         label: 'Secure packaging'    },
+                { Icon: TruckFast,   label: 'Nationwide delivery' },
+              ] as const).map(({ Icon, label }, i) => (
+                <span key={label} className="flex items-center">
+                  {i > 0 && <span className="mx-2.5 text-white/20 text-[10px] select-none">•</span>}
+                  <Icon size={12} color="rgba(245,158,11,0.7)" variant="Bold" />
+                  <span className="ml-1.5 text-[11px] text-muted">{label}</span>
+                </span>
+              ))}
+            </div>
 
             {/* Sticky bar - sentinel div is rendered here, bar is fixed */}
             <StickyCartBar product={product} salePrice={salePrice} />
