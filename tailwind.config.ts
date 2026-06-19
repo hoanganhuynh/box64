@@ -38,8 +38,8 @@ const config: Config = {
         xl:      'var(--radius-xl)',
       },
       fontFamily: {
-        jakarta:  ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
-        playfair: ['var(--font-playfair)', 'Georgia', 'serif'],
+        jakarta: ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
     },
   },

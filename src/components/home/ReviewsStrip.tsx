@@ -69,7 +69,7 @@ export default function ReviewsStrip() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <p className="text-gold text-xs font-bold tracking-widest uppercase mb-2">Collector Community</p>
-          <h2 id="reviews-heading" className="font-playfair font-bold text-primary text-2xl sm:text-3xl">
+          <h2 id="reviews-heading" className="font-display font-extrabold text-primary text-3xl sm:text-4xl">
             What Collectors Say
           </h2>
         </div>

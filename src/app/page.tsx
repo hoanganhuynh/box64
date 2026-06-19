@@ -119,12 +119,12 @@ export default function HomePage() {
             </p>
             <h1
               id="hero-heading"
-              className="font-playfair font-bold italic text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.1] mb-5"
-              style={{ textShadow: '0 2px 24px rgba(0,0,0,0.7)' }}
+              className="font-display font-extrabold uppercase text-white text-6xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight mb-5"
+              style={{ textShadow: '0 2px 32px rgba(0,0,0,0.8)' }}
             >
               Custom Box<br />
               for your{' '}
-              <span className="text-gold not-italic">Diecast</span>
+              <span className="text-gold">Diecast</span>
             </h1>
             <p
               className="text-white/80 text-base md:text-lg mb-8 leading-relaxed font-light"
@@ -171,7 +171,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between mb-7">
             <div>
               <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-1">Community Favourites</p>
-              <h2 id="top-boxes-heading" className="font-playfair font-bold text-ink text-2xl sm:text-3xl">
+              <h2 id="top-boxes-heading" className="font-display font-extrabold text-ink text-3xl sm:text-4xl">
                 Top Boxes
               </h2>
             </div>
@@ -191,7 +191,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between mb-7">
             <div>
               <p className="text-gold text-xs font-bold tracking-widest uppercase mb-1">Just Dropped</p>
-              <h2 id="new-arrivals-heading" className="font-playfair font-bold text-primary text-2xl sm:text-3xl">
+              <h2 id="new-arrivals-heading" className="font-display font-extrabold text-primary text-3xl sm:text-4xl">
                 New Arrivals
               </h2>
             </div>
@@ -242,7 +242,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-2">Handcrafted with Care</p>
-            <h2 id="process-heading" className="font-playfair font-bold text-ink text-2xl sm:text-3xl mb-3">
+            <h2 id="process-heading" className="font-display font-extrabold text-ink text-3xl sm:text-4xl mb-3">
               Our Box Making Process
             </h2>
             <p className="text-ink-muted text-sm max-w-lg mx-auto leading-relaxed">
@@ -323,7 +323,7 @@ export default function HomePage() {
 
           {/* CTA */}
           <div className="text-center">
-            <h2 id="cta-heading" className="font-playfair font-bold italic text-white text-2xl sm:text-3xl mb-3">
+            <h2 id="cta-heading" className="font-display font-extrabold text-white text-3xl sm:text-4xl mb-3">
               Want a box made just for you?
             </h2>
             <p className="text-white/70 text-sm mb-7 max-w-md mx-auto">
