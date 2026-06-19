@@ -2,13 +2,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Flash, ArrowRight2 } from 'iconsax-react'
 import { getFlashSaleProducts, getDiscountedPrice } from '@/lib/data/products'
-import { formatVND } from '@/lib/utils/format'
+import { formatVND, formatReleaseDate } from '@/lib/utils/format'
 import FlashCountdown from './FlashCountdown'
-
-function formatReleaseDate(d: string) {
-  const [y, m] = d.split('-')
-  return `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m - 1]} ${y}`
-}
 
 export default function FlashSaleSection() {
   const products = getFlashSaleProducts()
