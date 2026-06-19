@@ -127,11 +127,11 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
         {/* MiniGT logo + material + sold */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <Image
-            src="/MINI_GT_logo.svg.png"
+            src="/mini-gt-seeklogo.svg"
             alt="MiniGT"
             width={38}
             height={18}
-            className="object-contain shrink-0"
+            className={`object-contain shrink-0 ${dark ? 'invert' : ''}`}
           />
           {product.material && (
             <span className={`text-[10px] border rounded px-1.5 py-0.5 leading-none ${

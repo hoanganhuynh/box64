@@ -144,7 +144,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
           {/* Meta badges */}
           <div className="flex items-center gap-2 flex-wrap mt-3">
-            <Image src="/MINI_GT_logo.svg.png" alt="MiniGT" width={38} height={18} className="object-contain shrink-0" />
+            <Image src="/mini-gt-seeklogo.svg" alt="MiniGT" width={38} height={18} className="object-contain shrink-0 invert" />
             {product.material && (
               <span className="text-[10px] text-[#a08070] border border-[#3a2e28] rounded px-1.5 py-0.5 leading-none">
                 {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
