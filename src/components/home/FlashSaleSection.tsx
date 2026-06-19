@@ -82,34 +82,31 @@ export default function FlashSaleSection() {
 
                 {/* Info */}
                 <div className="flex flex-col p-4 gap-2.5 flex-1">
-                  <p className="text-ink font-semibold text-sm leading-snug line-clamp-2 flex-1 group-hover:text-[#EA580C] transition-colors">
-                    {p.name}
-                  </p>
-
                   {/* Meta row */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* MiniGT logo badge */}
                     <span className="inline-flex items-center h-[18px] px-1.5 rounded bg-[#0f0f0f] text-white font-extrabold leading-none" style={{ fontSize: '9px', letterSpacing: '0.01em' }}>
                       Mi<span style={{ color: '#e8002d' }}>N</span>i<span style={{ color: '#e8002d' }}>GT</span>
                     </span>
-                    {/* Material */}
                     <span className="text-[10px] font-medium text-[#A08070] border border-[#EBE0D5] rounded px-1.5 py-0.5 leading-none">
                       {p.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
                     </span>
-                    {/* Release date */}
                     {p.release_date && (
                       <span className="text-[10px] text-[#A08070] leading-none">
-                        {formatReleaseDate(p.release_date)}
+                        Release at {formatReleaseDate(p.release_date)}
                       </span>
                     )}
                   </div>
+
+                  <p className="text-ink font-semibold text-sm leading-snug line-clamp-2 flex-1 group-hover:text-[#EA580C] transition-colors">
+                    {p.name}
+                  </p>
 
                   <div className="flex items-baseline gap-2 pt-2 border-t border-[#F0E8E0]">
                     <span className="font-black text-[#EA580C] text-lg leading-none">{formatVND(salePrice)}</span>
                     <span className="line-through text-[#B0A090] text-sm">{formatVND(p.price)}</span>
                   </div>
                   <span className="inline-flex items-center gap-1 text-[#EA580C] text-xs font-semibold">
-                    Shop now <ArrowRight2 size={11} color="currentColor" />
+                    Add to Cart <ArrowRight2 size={11} color="currentColor" />
                   </span>
                 </div>
               </Link>
