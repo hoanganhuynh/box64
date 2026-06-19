@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingCart, Check } from 'lucide-react'
+import { Flash } from 'iconsax-react'
 import type { Product } from '@/lib/types'
 import CountdownBadge from './CountdownBadge'
 import PriceDisplay from './PriceDisplay'
@@ -14,20 +15,31 @@ interface Props {
   variant?: 'dark' | 'light'
 }
 
+const FLASH_TOTAL = 20
+
 function getSoldCount(slug: string): number {
   const sum = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
   return (sum % 80) + 20
 }
 
+function getFlashSoldCount(slug: string): number {
+  const sum = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  return (sum % 15) + 3  // 3–17 sold out of 20
+}
+
 export default function ProductCard({ product, variant = 'dark' }: Props) {
   const promo = product.promotion
   const isActive = promo && new Date(promo.ends_at) > new Date()
+  const isFlashSale = isActive && promo!.type === 'flash_sale'
   const isOutOfStock = product.stock === 0 && product.status !== 'pre_order'
   const isPreOrder = product.status === 'pre_order'
   const dark = variant === 'dark'
   const addItem = useCartStore(s => s.addItem)
   const [added, setAdded] = useState(false)
+
   const sold = getSoldCount(product.slug)
+  const flashSold = isFlashSale ? getFlashSoldCount(product.slug) : 0
+  const flashPct = Math.round((flashSold / FLASH_TOTAL) * 100)
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -128,9 +140,11 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
               {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
             </span>
           )}
-          <span className={`text-[10px] font-semibold ml-auto ${dark ? 'text-white/30' : 'text-[#B0A090]'}`}>
-            {sold} sold
-          </span>
+          {!isFlashSale && (
+            <span className={`text-[10px] font-semibold ml-auto ${dark ? 'text-white/30' : 'text-[#B0A090]'}`}>
+              {sold} sold
+            </span>
+          )}
         </div>
 
         {/* Name + price — clickable */}
@@ -153,6 +167,42 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
             )}
           </div>
         </Link>
+
+        {/* Flash sale progress bar — "đang cháy hàng" */}
+        {isFlashSale && (
+          <div
+            className="relative h-[26px] rounded-full overflow-hidden"
+            style={{ background: '#7B0010' }}
+            role="meter"
+            aria-valuenow={flashSold}
+            aria-valuemax={FLASH_TOTAL}
+            aria-label={`Đã bán ${flashSold}/${FLASH_TOTAL} suất`}
+          >
+            {/* Red fill — sold portion */}
+            <div
+              className="absolute inset-y-0 left-0 transition-none"
+              style={{
+                width: `${flashPct}%`,
+                background: 'linear-gradient(90deg, #D90020 0%, #FF1A35 100%)',
+              }}
+            />
+            {/* Subtle shimmer on the fill */}
+            <div
+              className="absolute inset-y-0 left-0 pointer-events-none"
+              style={{
+                width: `${flashPct}%`,
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%)',
+              }}
+            />
+            {/* Icon + text */}
+            <div className="relative h-full flex items-center gap-1 px-2.5">
+              <Flash size={11} color="#FFD600" variant="Bold" />
+              <span className="text-white text-[10px] font-bold tracking-wide leading-none drop-shadow-sm">
+                Đã bán {flashSold}/{FLASH_TOTAL} suất
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Add to Cart */}
         <button
