@@ -10,3 +10,8 @@ export function formatCountdown(deltaMs: number) {
   const days    = Math.floor(total / 1000 / 60 / 60 / 24)
   return { days, hours, minutes, seconds }
 }
+
+export function formatReleaseDate(d: string): string {
+  const [y, m] = d.split('-')
+  return `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m - 1]} ${y}`
+}
