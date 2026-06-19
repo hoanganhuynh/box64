@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { ShoppingCart, Check } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import CountdownBadge from './CountdownBadge'
 import PriceDisplay from './PriceDisplay'
@@ -147,7 +148,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
         <button
           onClick={handleAdd}
           disabled={isOutOfStock}
-          className={`w-full h-9 rounded-sm text-xs font-bold tracking-wide uppercase transition-all active:scale-[0.98] ${
+          className={`w-full h-10 rounded-sm text-xs font-bold tracking-wide uppercase transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${
             isOutOfStock
               ? dark
                 ? 'bg-surface border border-border text-faint cursor-not-allowed'
@@ -159,7 +160,11 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
                   : 'bg-[#07070C] text-white hover:bg-[#1a1a1a]'
           }`}
         >
-          {added ? '✓ Added!' : isOutOfStock ? 'Out of stock' : isPreOrder ? 'Pre-order' : 'Add to Cart'}
+          {added ? (
+          <><Check size={14} strokeWidth={2.5} /> Added!</>
+        ) : isOutOfStock ? 'Out of stock' : (
+          <><ShoppingCart size={14} strokeWidth={2} /> {isPreOrder ? 'Pre-order' : 'Add to Cart'}</>
+        )}
         </button>
       </div>
     </div>
