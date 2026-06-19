@@ -14,6 +14,11 @@ interface Props {
   variant?: 'dark' | 'light'
 }
 
+function getSoldCount(slug: string): number {
+  const sum = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+  return (sum % 80) + 20
+}
+
 export default function ProductCard({ product, variant = 'dark' }: Props) {
   const promo = product.promotion
   const isActive = promo && new Date(promo.ends_at) > new Date()
@@ -22,6 +27,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
   const dark = variant === 'dark'
   const addItem = useCartStore(s => s.addItem)
   const [added, setAdded] = useState(false)
+  const sold = getSoldCount(product.slug)
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -46,7 +52,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
           alt={product.name}
           fill
           className={`object-cover transition-transform duration-300 ease-out group-hover:scale-105 ${isOutOfStock ? 'opacity-50' : ''}`}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
         {/* Top-left: discount / pre-order */}
@@ -106,14 +112,15 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
       {/* ── Info ── */}
       <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-2.5 flex-1">
 
-        {/* MiniGT badge + material */}
+        {/* MiniGT logo + material + sold */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span
-            className="inline-flex items-center h-[18px] px-1.5 rounded bg-[#0f0f0f] text-white font-extrabold leading-none border border-[#333]"
-            style={{ fontSize: '9px', letterSpacing: '0.01em' }}
-          >
-            Mi<span style={{ color: '#e8002d' }}>N</span>i<span style={{ color: '#e8002d' }}>GT</span>
-          </span>
+          <Image
+            src="/MINI_GT_logo.svg.png"
+            alt="MiniGT"
+            width={38}
+            height={18}
+            className="object-contain shrink-0"
+          />
           {product.material && (
             <span className={`text-[10px] border rounded px-1.5 py-0.5 leading-none ${
               dark ? 'text-[#a08070] border-[#3a2e28]' : 'text-[#A08070] border-[#EBE0D5]'
@@ -121,6 +128,9 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
               {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
             </span>
           )}
+          <span className={`text-[10px] font-semibold ml-auto ${dark ? 'text-white/30' : 'text-[#B0A090]'}`}>
+            {sold} sold
+          </span>
         </div>
 
         {/* Name + price — clickable */}
@@ -161,10 +171,10 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
           }`}
         >
           {added ? (
-          <><Check size={14} strokeWidth={2.5} /> Added!</>
-        ) : isOutOfStock ? 'Out of stock' : (
-          <><ShoppingCart size={14} strokeWidth={2} /> {isPreOrder ? 'Pre-order' : 'Add to Cart'}</>
-        )}
+            <><Check size={14} strokeWidth={2.5} /> Added!</>
+          ) : isOutOfStock ? 'Out of stock' : (
+            <><ShoppingCart size={14} strokeWidth={2} /> {isPreOrder ? 'Pre-order' : 'Add to Cart'}</>
+          )}
         </button>
       </div>
     </div>

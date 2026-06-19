@@ -35,14 +35,12 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-header border-b border-border">
-      {/* ── Single row ──────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4" style={{ height: '56px' }}>
+      {/* ── Main row: 3-col grid [nav | logo | actions] ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-3 items-center" style={{ height: '56px' }}>
 
-        {/* Logo + Desktop nav */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center shrink-0" aria-label="figbox.store — home">
-            <Image src="/logo.svg" alt="figbox.store" width={37} height={40} priority />
-          </Link>
+        {/* Left: desktop nav / mobile hamburger */}
+        <div className="flex items-center">
+          {/* Desktop nav */}
           <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
             <Link href="/shop" className="text-sm font-medium text-white/60 hover:text-white transition-colors">
               Shop
@@ -51,10 +49,27 @@ export default function Header() {
               Track Order
             </Link>
           </nav>
+
+          {/* Mobile: hamburger */}
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/60"
+          >
+            {menuOpen ? <CloseSquare size={19} color="currentColor" /> : <HambergerMenu size={19} color="currentColor" />}
+          </button>
+        </div>
+
+        {/* Center: logo */}
+        <div className="flex justify-center">
+          <Link href="/" aria-label="figbox.store — home">
+            <Image src="/logo.svg" alt="figbox.store" width={37} height={40} priority />
+          </Link>
         </div>
 
         {/* Right: phone + login + cart */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center justify-end gap-1">
           <a
             href={PHONE_HREF}
             aria-label="Call us"
@@ -76,19 +91,10 @@ export default function Header() {
           </a>
 
           <CartBadge />
-
-          <button
-            onClick={() => setMenuOpen(v => !v)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/60"
-          >
-            {menuOpen ? <CloseSquare size={19} color="currentColor" /> : <HambergerMenu size={19} color="currentColor" />}
-          </button>
         </div>
       </div>
 
-      {/* ── Mobile menu ──────────────────────────────────────────── */}
+      {/* ── Mobile menu ── */}
       {menuOpen && (
         <nav aria-label="Mobile navigation" className="md:hidden border-t border-border bg-header">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-1">

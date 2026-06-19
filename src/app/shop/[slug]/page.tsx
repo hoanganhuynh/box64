@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Star1 } from 'iconsax-react'
 import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
 
@@ -143,12 +144,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
           {/* Meta badges */}
           <div className="flex items-center gap-2 flex-wrap mt-3">
-            <span
-              className="inline-flex items-center h-[18px] px-1.5 rounded bg-[#0f0f0f] text-white font-extrabold leading-none border border-[#333]"
-              style={{ fontSize: '9px', letterSpacing: '0.01em' }}
-            >
-              Mi<span style={{ color: '#e8002d' }}>N</span>i<span style={{ color: '#e8002d' }}>GT</span>
-            </span>
+            <Image src="/MINI_GT_logo.svg.png" alt="MiniGT" width={38} height={18} className="object-contain shrink-0" />
             {product.material && (
               <span className="text-[10px] text-[#a08070] border border-[#3a2e28] rounded px-1.5 py-0.5 leading-none">
                 {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
