@@ -36,20 +36,24 @@ export default function ImageGallery({ images, name, badge }: Props) {
         {badge && <div className="absolute bottom-3 left-3">{badge}</div>}
       </div>
 
-      {/* Thumbnails */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Thumbnails — centered strip, fixed 80px */}
+      <div className="flex items-center justify-center gap-2">
         {thumbs.map((src, i) => {
           const imgIdx = i % images.length
+          const isActive = imgIdx === active
           return (
             <button
               key={i}
               onClick={() => setActive(imgIdx)}
-              className={`relative aspect-square rounded-sm overflow-hidden bg-[#0C0C18] border transition-colors ${
-                imgIdx === active ? 'border-gold' : 'border-border hover:border-gold/40'
+              style={{ width: 80, height: 80 }}
+              className={`relative shrink-0 rounded-sm overflow-hidden bg-[#0C0C18] border transition-all duration-200 ${
+                isActive
+                  ? 'border-gold opacity-50'
+                  : 'border-border opacity-100 hover:border-gold/40'
               }`}
               aria-label={`View image ${imgIdx + 1}`}
             >
-              <Image src={src} alt="" fill className="object-cover" sizes="17vw" />
+              <Image src={src} alt="" fill className="object-cover" sizes="80px" />
             </button>
           )
         })}
