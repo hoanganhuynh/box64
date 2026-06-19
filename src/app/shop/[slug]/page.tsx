@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star1 } from 'iconsax-react'
+import { Star1, Ruler, Layer, Brush2, Clock } from 'iconsax-react'
 import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
 
 export function generateStaticParams() {
@@ -203,15 +203,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {/* Telemetry spec rows */}
             <div className="border-t border-border pt-4">
               {([
-                ['Size', '120 × 55 × 40 mm (MiniGT standard)'],
-                ['Material', '350gsm coated cardboard'],
-                ['Finish', 'Matte laminate + spot UV'],
-                ['Lead time', isPreOrder ? 'Ships mid-July 2026' : '3–5 business days'],
-              ] as const).map(([label, value]) => (
+                { label: 'Size',      value: '120 × 55 × 40 mm (MiniGT standard)',                   Icon: Ruler  },
+                { label: 'Material',  value: '350gsm coated cardboard',                              Icon: Layer  },
+                { label: 'Finish',    value: 'Matte laminate + spot UV',                             Icon: Brush2 },
+                { label: 'Lead time', value: isPreOrder ? 'Ships mid-July 2026' : '3–5 business days', Icon: Clock  },
+              ]).map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
-                  <div className="w-0.5 h-3.5 bg-gold rounded-sm shrink-0" aria-hidden="true" />
                   <span className="text-[11px] text-muted font-medium w-28 shrink-0">{label}</span>
-                  <span className="text-[11px] text-primary">{value}</span>
+                  <div className="flex items-center gap-1.5">
+                    <Icon size={13} color="rgba(245,158,11,0.75)" variant="Bold" />
+                    <span className="text-[11px] text-primary">{value}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -230,9 +232,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
             {/* Sticky bar - sentinel div is rendered here, bar is fixed */}
             <StickyCartBar product={product} salePrice={salePrice} />
 
-            <Link href="/shop" className="inline-flex items-center gap-1.5 text-muted hover:text-primary text-xs transition-colors w-fit">
-              ← Back to shop
-            </Link>
           </div>
         </div>
 
