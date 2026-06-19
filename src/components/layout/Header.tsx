@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart'
 import { useEffect, useState } from 'react'
 import { Bag2, Call, ProfileCircle, HambergerMenu, CloseSquare } from 'iconsax-react'
@@ -40,9 +41,7 @@ export default function Header() {
         {/* Logo + Desktop nav */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center shrink-0" aria-label="figbox.store — home">
-            <span className="font-jakarta font-black text-white text-xl tracking-tight">fig</span>
-            <span className="font-jakarta font-black text-gold text-xl tracking-tight">box</span>
-            <span className="font-jakarta font-light text-white/35 text-sm tracking-tight ml-0.5">.store</span>
+            <Image src="/logo.svg" alt="figbox.store" width={37} height={40} priority />
           </Link>
           <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
             <Link href="/shop" className="text-sm font-medium text-white/60 hover:text-white transition-colors">

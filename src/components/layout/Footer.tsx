@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight2, Call, ArrowUp2 } from 'iconsax-react'
 
 const SHOP_LINKS = [
@@ -25,10 +26,8 @@ export default function Footer() {
 
           {/* ── brand column ── */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-flex items-center gap-0 mb-4">
-              <span className="font-jakarta font-black text-white text-xl">fig</span>
-              <span className="font-jakarta font-black text-gold text-xl">box</span>
-              <span className="font-jakarta font-light text-white/30 text-base ml-0.5">.store</span>
+            <Link href="/" className="inline-flex items-center mb-4">
+              <Image src="/logo.svg" alt="figbox.store" width={44} height={48} />
             </Link>
 
             <p className="text-white/40 text-sm leading-relaxed mb-5 max-w-[220px]">
