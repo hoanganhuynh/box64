@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowUp2 } from 'iconsax-react'
+import { ArrowUp2, Call, Sms, Clock, Location } from 'iconsax-react'
 
 const SHOP_LINKS = [
   { label: 'All Products', href: '/shop' },
@@ -57,6 +57,35 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* ── Contact ── (moved before Shop) */}
+          <div>
+            <p className="font-display font-extrabold uppercase text-white/80 text-xs tracking-widest mb-4">
+              Contact
+            </p>
+            <ul className="space-y-3">
+              <li>
+                <a href="tel:+84901234567" className="flex items-center gap-2 text-white/40 hover:text-gold transition-colors group">
+                  <Call size={13} color="currentColor" variant="Bold" className="shrink-0 text-gold/50 group-hover:text-gold" />
+                  <span className="text-sm">0901 234 567</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:hello@figbox.store" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
+                  <Sms size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/25 group-hover:text-white/60" />
+                  <span className="text-sm">hello@figbox.store</span>
+                </a>
+              </li>
+              <li className="flex items-center gap-2 text-white/35">
+                <Clock size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/20" />
+                <span className="text-xs">Mon–Sat · 9:00–21:00</span>
+              </li>
+              <li className="flex items-start gap-2 text-white/35">
+                <Location size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/20 mt-0.5" />
+                <span className="text-xs leading-relaxed">P.26, Bình Thạnh<br />TP. Hồ Chí Minh</span>
+              </li>
+            </ul>
+          </div>
+
           {/* ── Shop ── */}
           <div>
             <p className="font-display font-extrabold uppercase text-white/80 text-xs tracking-widest mb-4">
@@ -86,28 +115,6 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
-            </ul>
-          </div>
-
-          {/* ── Contact ── */}
-          <div>
-            <p className="font-display font-extrabold uppercase text-white/80 text-xs tracking-widest mb-4">
-              Contact
-            </p>
-            <ul className="space-y-2.5">
-              <li>
-                <a href="tel:+84901234567" className="text-white/40 hover:text-gold text-sm transition-colors">
-                  0901 234 567
-                </a>
-              </li>
-              <li>
-                <a href="mailto:hello@figbox.store" className="text-white/40 hover:text-white text-sm transition-colors">
-                  hello@figbox.store
-                </a>
-              </li>
-              <li className="pt-1">
-                <span className="text-white/50 text-xs leading-relaxed block">Mon–Sat · 9:00–21:00</span>
-              </li>
             </ul>
           </div>
 
