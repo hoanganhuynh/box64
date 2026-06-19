@@ -340,7 +340,7 @@ export default function HomePage() {
                 className="font-display font-extrabold uppercase text-white leading-[0.9] text-4xl sm:text-5xl lg:text-7xl mb-6"
               >
                 Your car.<br />
-                Your rules.<br />
+                Your design.<br />
                 <span className="text-gold">Your box.</span>
               </h2>
               <p className="text-muted text-sm leading-relaxed max-w-md">
