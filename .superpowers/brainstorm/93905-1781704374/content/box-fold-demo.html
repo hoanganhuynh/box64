@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F4F6F9;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 24px; min-height: 100vh; gap: 32px;
+}
+
+h2 { font-size: 17px; font-weight: 800; color: #0F172A; text-align: center; }
+.sub { font-size: 12px; color: #94A3B8; text-align: center; margin-top: 4px; }
+
+/* ─── FACE COLOR LEGEND ─── */
+.legend {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  background: white; border-radius: 10px; padding: 12px 16px;
+  border: 1px solid #E2E8F0; font-size: 11px; font-weight: 600;
+}
+.leg { display: flex; align-items: center; gap: 5px; }
+.leg-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ─── STAGE ─── */
+.stage-wrap {
+  background: white; border-radius: 16px; border: 1px solid #E2E8F0;
+  padding: 32px 40px; display: flex; flex-direction: column; align-items: center; gap: 24px;
+  width: 100%; max-width: 640px;
+}
+.stage-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94A3B8; }
+
+/* ─── FLAT BOX (cross layout) ─── */
+/*
+  SVG proportions: main face 286.22 x 130.12, lid 130.12 x 130.12
+  Ratio ≈ 2.2 : 1 : 1
+  Scale: 130 units → 70px → main face = 154px wide
+  Let's use: face-w=154, face-h=70, lid-w=70, lid-h=70
+*/
+:root {
+  --fw: 154px;  /* face width (main) */
+  --fh: 70px;   /* face height */
+  --lw: 70px;   /* lid width */
+}
+
+.flat-container {
+  position: relative;
+  width: calc(var(--fw) + var(--lw) * 2);
+  height: calc(var(--fh) * 4);
+  transition: opacity 400ms;
+}
+
+.face {
+  position: absolute;
+  border: 1.5px solid rgba(0,0,0,0.15);
+}
+
+/* Black outline (tabs) - full shape */
+.face-outline {
+  /* The outer shape including tabs is drawn via SVG background */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Blue top = đáy (bottom face) */
+.face-bottom {
+  width: var(--fw); height: var(--fh);
+  background: #478ecc;
+  left: var(--lw); top: 0;
+}
+/* Green = trái (left side) */
+.face-left {
+  width: var(--fw); height: var(--fh);
+  background: #71bf4e;
+  left: var(--lw); top: var(--fh);
+}
+/* Orange = trên (TOP / main face) */
+.face-top {
+  width: var(--fw); height: var(--fh);
+  background: #f99c1c;
+  left: var(--lw); top: calc(var(--fh) * 2);
+}
+/* Blue bottom = phải (right side) */
+.face-right {
+  width: var(--fw); height: var(--fh);
+  background: #478ecc;
+  left: var(--lw); top: calc(var(--fh) * 3);
+}
+/* Pink left = nắp trước */
+.face-lid-front {
+  width: var(--lw); height: var(--fh);
+  background: #b4519e;
+  left: 0; top: calc(var(--fh) * 2);
+}
+/* Pink right = nắp sau */
+.face-lid-back {
+  width: var(--lw); height: var(--fh);
+  background: #b4519e;
+  left: calc(var(--lw) + var(--fw)); top: calc(var(--fh) * 2);
+}
+
+/* Face labels */
+.face-lbl {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.85);
+  letter-spacing: 0.05em; text-align: center; line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ─── FOLD ANIMATION ─── */
+/*
+  Strategy: CSS 3D perspective-based fold animation
+  Each face folds around its shared edge with the main (orange/top) face.
+  We use a pivot wrapper for each face.
+
+  Orange (main) stays fixed as reference.
+  Green folds 90° upward (around top edge of orange).
+  Blue-bottom folds 90° downward (around bottom edge of orange).
+  Blue-top continues to fold 180° (wraps to back = bottom of box).
+  Lids fold 90° inward.
+*/
+
+.fold-scene {
+  perspective: 700px;
+  width: calc(var(--fw) + var(--lw) * 2 + 30px);
+  height: calc(var(--fh) * 4 + 30px);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.fold-root {
+  position: relative;
+  transform-style: preserve-3d;
+  width: var(--fw);
+  height: var(--fh);
+  /* Orange/main face is the anchor */
+}
+
+/* Orange = anchor face (stays flat) */
+.f-main {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  background: #f99c1c;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+.f-main .face-lbl { font-size: 8px; }
+
+/* ─ Pivot wrappers ─ */
+/* Each pivot is at the EDGE where the fold happens */
+
+/* GREEN (left wall) — folds UP from top edge of orange */
+.pivot-left {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  top: calc(-1 * var(--fh)); left: 0;
+  transform-style: preserve-3d;
+  transform-origin: bottom center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.f-left {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  background: #71bf4e;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  backface-visibility: hidden;
+  bottom: 0; left: 0;
+}
+
+/* BLUE-BOTTOM (right wall) — folds DOWN from bottom edge of orange */
+.pivot-right {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  top: var(--fh); left: 0;
+  transform-style: preserve-3d;
+  transform-origin: top center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+}
+.f-right {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  background: #478ecc;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  backface-visibility: hidden;
+  top: 0; left: 0;
+}
+
+/* BLUE-TOP (bottom/đáy) — sits on top of green, needs to fold 180° to become bottom */
+.pivot-bottom {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  top: 0; left: 0;
+  transform-style: preserve-3d;
+  transform-origin: bottom center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pivot-bottom-inner {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  top: calc(-1 * var(--fh)); left: 0;
+  transform-style: preserve-3d;
+  transform-origin: bottom center;
+  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1) 100ms;
+}
+.f-bottom {
+  position: absolute;
+  width: var(--fw); height: var(--fh);
+  background: #478ecc;
+  border: 1.5px solid rgba(0,0,0,0.2);
+  backface-visibility: hidden;
+  bottom: 0; left: 0;
+}
+
+/* LIDS (pink) — fold inward 90° */
+.pivot-lid-l {
+  position: absolute;
+  width: var(--lw); height: var(--fh);
+  top: 0; left: calc(-1 * var(--lw));
+  transform-style: preserve-3d;
+  transform-origin: right center;
+  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1) 500ms;
+}
+.f-lid-l {
+  position: absolute;
+  width: var(--lw); height: var(--fh);
+  background: #b4519e;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  backface-visibility: hidden;
+  inset: 0;
+}
+
+.pivot-lid-r {
+  position: absolute;
+  width: var(--lw); height: var(--fh);
+  top: 0; left: var(--fw);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1) 500ms;
+}
+.f-lid-r {
+  position: absolute;
+  width: var(--lw); height: var(--fh);
+  background: #b4519e;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  backface-visibility: hidden;
+  inset: 0;
+}
+
+/* ─── FOLDED STATE ─── */
+.fold-root.folded .pivot-left  { transform: rotateX(-90deg); }
+.fold-root.folded .pivot-right { transform: rotateX(90deg); }
+.fold-root.folded .pivot-bottom { transform: rotateX(-90deg); }
+.fold-root.folded .pivot-bottom-inner { transform: rotateX(-90deg); }
+.fold-root.folded .pivot-lid-l { transform: rotateY(90deg); }
+.fold-root.folded .pivot-lid-r { transform: rotateY(-90deg); }
+
+/* ─── ASSEMBLED FAKE 3D VIEW (static CSS) ─── */
+.assembled {
+  position: relative;
+  filter: drop-shadow(6px 10px 20px rgba(0,0,0,0.2));
+}
+
+/* Box dimensions for assembled view */
+:root {
+  --bw: 200px;  /* box face width */
+  --bh: 90px;   /* box face height */
+  --bd: 40px;   /* box depth (side face) */
+  --skew: 30deg;
+}
+
+.asm-main {
+  width: var(--bw); height: var(--bh);
+  background: linear-gradient(135deg, #f99c1c 0%, #e8880a 100%);
+  border: 1.5px solid rgba(0,0,0,0.2);
+  position: relative;
+  /* Car image area placeholder */
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.asm-main::before {
+  content: '';
+  position: absolute; top: 8px; bottom: 8px; right: 24px; width: 1.5px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.2), transparent);
+}
+
+/* TOP FACE */
+.asm-top {
+  width: var(--bw);
+  height: var(--bd);
+  background: linear-gradient(90deg, #71bf4e 0%, #5ea63b 100%);
+  border: 1.5px solid rgba(0,0,0,0.2);
+  transform-origin: bottom left;
+  transform: skewX(-30deg) scaleY(0.6);
+  position: absolute;
+  bottom: var(--bh);
+  left: 0;
+}
+
+/* RIGHT SIDE FACE */
+.asm-side {
+  width: var(--bd);
+  height: var(--bh);
+  background: linear-gradient(180deg, #478ecc 0%, #3578b8 100%);
+  border: 1.5px solid rgba(0,0,0,0.2);
+  transform-origin: top left;
+  transform: skewY(-30deg) scaleX(0.6);
+  position: absolute;
+  top: 0;
+  left: var(--bw);
+}
+
+/* TOP-RIGHT CORNER CONNECTOR */
+.asm-corner {
+  width: var(--bd);
+  height: var(--bd);
+  background: #3a9a35;
+  transform-origin: bottom left;
+  transform: skewX(-30deg) skewY(-30deg) scaleX(0.6) scaleY(0.6);
+  position: absolute;
+  bottom: var(--bh);
+  left: var(--bw);
+}
+
+.asm-wrap {
+  position: relative;
+  width: calc(var(--bw) + 30px);
+  height: calc(var(--bh) + 40px);
+  margin-top: 48px;
+}
+
+/* Car image placeholder on main face */
+.car-placeholder {
+  width: 120px; height: 60px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: rgba(255,255,255,0.6); font-weight: 600;
+}
+.box-label-main {
+  position: absolute; bottom: 8px; right: 10px;
+  font-size: 9px; font-weight: 800; color: rgba(0,0,0,0.4);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+/* ─── CONTROLS ─── */
+.controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn {
+  background: #0F1729; color: white; border: none; border-radius: 9px;
+  padding: 10px 20px; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: -0.01em;
+}
+.btn.gold { background: #CA8A04; }
+.btn.outline { background: white; color: #0F172A; border: 1px solid #E2E8F0; }
+
+/* ─── NOTE ─── */
+.note {
+  background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px;
+  padding: 12px 16px; font-size: 12px; color: #92400E; max-width: 560px;
+  text-align: center; line-height: 1.7;
+}
+</style>
+</head>
+<body>
+
+<div>
+  <h2>Box Fold Animation — Prototype</h2>
+  <p class="sub">CSS 3D transforms · No WebGL · SVG template proportions (286×130 → 2.2:1 ratio)</p>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#f99c1c"></div>Orange = Mặt trên (TOP/MAIN)</div>
+  <div class="leg"><div class="leg-dot" style="background:#71bf4e"></div>Xanh lá = Mặt trái</div>
+  <div class="leg"><div class="leg-dot" style="background:#478ecc"></div>Xanh dương = Mặt phải / Đáy</div>
+  <div class="leg"><div class="leg-dot" style="background:#b4519e"></div>Hồng = Nắp trước/sau</div>
+  <div class="leg"><div class="leg-dot" style="background:#231f20"></div>Đen = Tab gấp vào</div>
+</div>
+
+<!-- FLAT VIEW -->
+<div class="stage-wrap">
+  <div class="stage-title">Flat Layout — từ SVG template</div>
+  <div class="flat-container">
+    <div class="face face-bottom"><div class="face-lbl">ĐÁY<br/>(bottom)</div></div>
+    <div class="face face-left"><div class="face-lbl">MẶT<br/>TRÁI</div></div>
+    <div class="face face-top"><div class="face-lbl">MẶT TRÊN<br/>(main design)</div></div>
+    <div class="face face-right"><div class="face-lbl">MẶT<br/>PHẢI</div></div>
+    <div class="face face-lid-front"><div class="face-lbl">NẮP</div></div>
+    <div class="face face-lid-back"><div class="face-lbl">NẮP</div></div>
+  </div>
+</div>
+
+<!-- FOLD ANIMATION -->
+<div class="stage-wrap">
+  <div class="stage-title">Fold Animation — CSS 3D (click Fold!)</div>
+
+  <div class="fold-scene">
+    <div class="fold-root" id="foldBox">
+      <!-- Main orange face (anchor) -->
+      <div class="f-main">
+        <div class="face-lbl" style="font-size:8px;color:rgba(0,0,0,0.5)">MAIN</div>
+      </div>
+
+      <!-- Green = left wall -->
+      <div class="pivot-left">
+        <div class="f-left"><div class="face-lbl">TRÁI</div></div>
+        <!-- Blue-top (đáy) is attached above green -->
+        <div class="pivot-bottom">
+          <div class="pivot-bottom-inner">
+            <div class="f-bottom"><div class="face-lbl">ĐÁY</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blue bottom = right wall -->
+      <div class="pivot-right">
+        <div class="f-right"><div class="face-lbl">PHẢI</div></div>
+      </div>
+
+      <!-- Lids -->
+      <div class="pivot-lid-l">
+        <div class="f-lid-l"><div class="face-lbl">NẮP</div></div>
+      </div>
+      <div class="pivot-lid-r">
+        <div class="f-lid-r"><div class="face-lbl">NẮP</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn gold" onclick="fold()">📦 Fold!</button>
+    <button class="btn outline" onclick="unfold()">↩ Unfold</button>
+  </div>
+</div>
+
+<!-- ASSEMBLED CSS FAKE 3D -->
+<div class="stage-wrap">
+  <div class="stage-title">Assembled — CSS Fake 3D Preview (static, no WebGL)</div>
+
+  <div style="position:relative;width:260px;height:180px;display:flex;align-items:center;justify-content:center;">
+    <!-- Shadow -->
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:200px;height:16px;background:radial-gradient(ellipse,rgba(0,0,0,0.2),transparent);border-radius:50%"></div>
+
+    <div class="asm-wrap">
+      <!-- Top face (green) -->
+      <div class="asm-top"></div>
+      <!-- Right face (blue) -->
+      <div class="asm-side"></div>
+      <!-- Corner connector -->
+      <div class="asm-corner"></div>
+      <!-- Main face (orange) -->
+      <div class="asm-main">
+        <div class="car-placeholder">🚗 car image</div>
+        <div class="box-label-main">Mini GT · 1:64</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    Trong sản phẩm thật: mặt cam sẽ có hình xe + text từ canvas · Màu các mặt thay đổi theo màu nền khách chọn · 3 mặt visible = front + top + side
+  </div>
+</div>
+
+<div class="note">
+  💡 <strong>Post-payment animation</strong>: chạy từ flat → fold → assembled (sequence trên) · Duration ~3s · Sau đó transition sang order summary · Dùng Framer Motion trong production (spring physics đẹp hơn CSS)
+</div>
+
+<script>
+function fold() {
+  document.getElementById('foldBox').classList.add('folded');
+}
+function unfold() {
+  document.getElementById('foldBox').classList.remove('folded');
+}
+</script>
+</body>
+</html>

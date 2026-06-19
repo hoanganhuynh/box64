@@ -3,22 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --bg:            #F4F6F9;
-  --surface:       #FFFFFF;
-  --header:        #0F1729;
-  --header-muted:  #1E2A45;
-  --gold:          #CA8A04;
-  --gold-mid:      #D97706;
-  --gold-light:    #FEF3C7;
-  --border:        #E2E8F0;
-  --text-primary:  #0F172A;
-  --text-muted:    #64748B;
-  --text-faint:    #94A3B8;
+  /* ── Dark palette ── */
+  --bg:            #09090F;
+  --surface:       #131320;
+  --header:        #07070C;
+  --header-muted:  #0F0F1C;
+  --gold:          #F59E0B;
+  --gold-mid:      #F97316;
+  --gold-light:    #FFF7ED;
+  --border:        #1E1E2C;
+  --text-primary:  #F0EDE8;
+  --text-muted:    #7878A0;
+  --text-faint:    #48486A;
   --error:         #EF4444;
   --success:       #22C55E;
-  --radius:        12px;
-  --radius-sm:     8px;
-  --radius-lg:     16px;
+
+  /* ── Light palette (for alternating sections) ── */
+  --bg-warm:       #FFFBF5;
+  --surface-warm:  #FFFFFF;
+  --ink:           #0F0F1A;
+  --ink-muted:     #5A5A78;
+  --ink-faint:     #9090A8;
+  --border-warm:   #EBE3D8;
+
+  /* ── Shape scale ── */
+  --radius:        10px;
+  --radius-sm:     6px;
+  --radius-lg:     14px;
+  --radius-xl:     20px;
 }
 
 body {
@@ -26,12 +38,61 @@ body {
   color: var(--text-primary);
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* ── Focus states (WCAG 2.4.7) ─────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
 
-.tint-gold  img { filter: sepia(0.3) saturate(1.5) hue-rotate(15deg); }
-.tint-blue  img { filter: sepia(0.2) saturate(1.2) hue-rotate(180deg); }
-.tint-slate img { filter: none; }
+/* Tailwind's `outline-none` on buttons/links removes focus ring — re-add
+   via focus-visible so mouse users don't see the ring */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Cursor ─────────────────────────────────────────────────────────── */
+a, button, [role="button"], label[for], summary {
+  cursor: pointer;
+}
+
+/* ── Reduced motion (WCAG 2.3.3) ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+/* ── Racing marquee ─────────────────────────────────────────────────── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+/* ── Process step reveal ────────────────────────────────────────────── */
+@keyframes step-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-reveal {
+  animation: step-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

@@ -66,6 +66,18 @@ describe('DesignState type', () => {
       logo_tint: '#FFFFFF',
       box_size: 'minigt',
       quantity: 1,
+      car_image_offset_x: 50,
+      car_image_offset_y: 50,
+      car_image_scale: 1,
+      front_lid_symbol: null,
+      back_lid_symbol: null,
+      front_lid_rotation: 0,
+      back_lid_rotation: 0,
+      front_lid_flipped: false,
+      back_lid_flipped: false,
+      green_symbols: [],
+      spec_engine: '', spec_power: '', spec_torque: '',
+      spec_acceleration: '', spec_top_speed: '', spec_bodykit: '', spec_social: '',
     }
     expectTypeOf(d.logo_variant).toMatchTypeOf<'minigt' | 'poprace' | 'custom'>()
     expectTypeOf(d.box_size).toMatchTypeOf<'minigt' | 'poprace'>()

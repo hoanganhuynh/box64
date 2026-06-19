@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F4F6F9;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 40px 24px; gap: 40px;
+}
+
+h2 { font-size: 17px; font-weight: 800; color: #0F172A; }
+.sub { font-size: 12px; color: #94A3B8; margin-top: 3px; }
+
+.stage {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 700px;
+}
+.stage-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94A3B8; }
+
+/* ─── BOX DIMENSIONS ───
+   MiniGT real box: ~120mm × 55mm × 40mm (L × W × H)
+   Ratio: 3 : 1.375 : 1
+   Screen scale: L=240px, W=110px, H=80px
+   Isometric angle matching photo: ~25° from front
+   Shear factor for top: 0.4
+   Shear factor for side: 0.3
+*/
+
+:root {
+  --L: 240px;   /* box length (main face width) */
+  --H:  82px;   /* box height (main face height) */
+  --W:  50px;   /* box depth/width (side face visible width) */
+  --top-h: 22px; /* top face visible height */
+}
+
+/* ─── CSS ISOMETRIC BOX ─── */
+.box-scene {
+  position: relative;
+  /* Total visual area accounting for top and side offset */
+  width: calc(var(--L) + var(--W) + 12px);
+  height: calc(var(--H) + var(--top-h) + 12px);
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,0.18)) drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+/* FRONT FACE — main design face */
+.box-front {
+  position: absolute;
+  width: var(--L);
+  height: var(--H);
+  bottom: 0;
+  left: 0;
+  background: #111212;
+  overflow: hidden;
+  /* Slight perspective tilt — left edge higher than right */
+  transform: perspective(800px) rotateY(-2deg) rotateX(1deg);
+}
+
+/* TOP FACE — parallelogram */
+.box-top {
+  position: absolute;
+  bottom: var(--H);
+  left: 0;
+  width: var(--L);
+  height: var(--top-h);
+  background: #1e2020;
+  transform-origin: bottom left;
+  /* Skew to create the parallelogram: top face goes up-right */
+  transform: skewX(-30deg) scaleY(1);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.box-top::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+}
+
+/* RIGHT SIDE FACE — parallelogram */
+.box-side {
+  position: absolute;
+  bottom: 0;
+  left: var(--L);
+  width: var(--W);
+  height: var(--H);
+  background: #191a1a;
+  transform-origin: top left;
+  /* Skew to create the side face going up-right */
+  transform: skewY(-30deg) scaleX(1);
+  border-left: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+.box-side::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+}
+
+/* TOP-RIGHT CORNER FILL */
+.box-corner {
+  position: absolute;
+  bottom: var(--H);
+  left: var(--L);
+  width: var(--W);
+  height: var(--top-h);
+  background: #161717;
+  transform-origin: bottom left;
+  transform: skewX(-30deg) skewY(-30deg);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ─── FRONT FACE DESIGN ─── */
+/* Diagonal gold stripe — signature MiniGT element */
+.stripe {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 48px;
+  width: 1.5px;
+  background: linear-gradient(180deg, transparent 0%, #C9A84C 30%, #C9A84C 70%, transparent 100%);
+  opacity: 0.7;
+}
+.stripe-thin {
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 52px;
+  width: 0.5px;
+  background: linear-gradient(180deg, transparent 0%, #C9A84C 30%, #C9A84C 70%, transparent 100%);
+  opacity: 0.3;
+}
+
+/* Brand logo top-right corner */
+.brand-logo {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 900;
+  color: #EFEFEF;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-align: right;
+}
+.brand-logo .gt { color: #C9A84C; font-size: 9px; display: block; }
+
+/* Car image area */
+.car-area {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  width: 130px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Fake car silhouette */
+.car-silhouette {
+  width: 120px; height: 48px;
+  position: relative;
+  opacity: 0.85;
+}
+.car-body {
+  position: absolute;
+  bottom: 8px; left: 4px; right: 4px; height: 24px;
+  background: #2a2a2a;
+  border-radius: 12px 10px 4px 4px;
+}
+.car-roof {
+  position: absolute;
+  bottom: 28px; left: 24px; right: 28px; height: 16px;
+  background: #222;
+  border-radius: 8px 6px 2px 2px;
+}
+.car-wheel-l, .car-wheel-r {
+  position: absolute;
+  bottom: 2px;
+  width: 14px; height: 14px;
+  background: #111;
+  border: 2px solid #444;
+  border-radius: 50%;
+}
+.car-wheel-l { left: 10px; }
+.car-wheel-r { right: 12px; }
+.car-spoiler {
+  position: absolute;
+  bottom: 32px; right: 8px; width: 2px; height: 10px;
+  background: #C9A84C; opacity: 0.6;
+}
+
+/* Car name bottom */
+.car-name {
+  position: absolute;
+  bottom: 7px; left: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Warning badge on far right */
+.warning-area {
+  position: absolute;
+  right: 6px; bottom: 6px;
+  width: 36px;
+  font-size: 5px;
+  color: rgba(255,255,255,0.15);
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Top face content */
+.top-content {
+  position: absolute;
+  bottom: 3px; left: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 7px; font-weight: 700;
+  color: rgba(201,168,76,0.5);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: skewX(30deg); /* counter the parent skew */
+}
+
+/* Side face content */
+.side-content {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) skewY(30deg);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; font-weight: 800;
+  color: rgba(255,255,255,0.15);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.1em;
+}
+
+/* ─── HOVER INTERACTION ─── */
+.box-hover-wrap {
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: grab;
+}
+.box-hover-wrap:hover {
+  transform: translateY(-6px) rotate(-1deg);
+}
+
+/* Ground shadow */
+.ground-shadow {
+  width: calc(var(--L) + var(--W) + 12px);
+  height: 14px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  margin-top: 6px;
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.box-hover-wrap:hover + .ground-shadow {
+  transform: scaleX(0.9);
+  opacity: 0.7;
+}
+
+/* ─── SIZE COMPARISON ─── */
+.size-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+.size-card {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  background: #F8FAFC; border-radius: 12px; padding: 20px; border: 1px solid #E2E8F0;
+}
+.size-name { font-size: 12px; font-weight: 700; color: #0F172A; }
+.size-dim { font-size: 10px; color: #94A3B8; }
+
+/* MiniGT size box */
+.box-minigt {
+  --L: 200px; --H: 70px; --W: 42px; --top-h: 18px;
+}
+/* Poprace size box — slightly different */
+.box-poprace {
+  --L: 180px; --H: 78px; --W: 46px; --top-h: 20px;
+}
+
+/* ─── NOTE ─── */
+.note {
+  background: #FFFBEB; border: 1px solid #FDE68A;
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 12px; color: #92400E; line-height: 1.7;
+  max-width: 600px; text-align: center;
+}
+.note strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <h2>Box Isometric Preview — CSS Only, No WebGL</h2>
+  <p class="sub">Góc nhìn isometric như ảnh MiniGT thật · Hover để thấy float animation</p>
+</div>
+
+<!-- MAIN DEMO -->
+<div class="stage">
+  <div class="stage-label">Preview — Box isometric (hover me)</div>
+
+  <div class="box-hover-wrap">
+    <div class="box-scene">
+      <!-- CORNER -->
+      <div class="box-corner"></div>
+      <!-- TOP FACE -->
+      <div class="box-top">
+        <div class="top-content">Scale 1:64 · MiniGT</div>
+      </div>
+      <!-- SIDE FACE -->
+      <div class="box-side">
+        <div class="side-content">LB WORKS</div>
+      </div>
+      <!-- FRONT FACE -->
+      <div class="box-front">
+        <!-- Stripes -->
+        <div class="stripe"></div>
+        <div class="stripe-thin"></div>
+        <!-- Brand -->
+        <div class="brand-logo">MINI<span class="gt">GT™</span></div>
+        <!-- Car silhouette -->
+        <div class="car-area">
+          <div class="car-silhouette">
+            <div class="car-roof"></div>
+            <div class="car-body"></div>
+            <div class="car-wheel-l"></div>
+            <div class="car-wheel-r"></div>
+            <div class="car-spoiler"></div>
+          </div>
+        </div>
+        <!-- Car name -->
+        <div class="car-name">Lamborghini Huracán GT EVO · JPS</div>
+        <!-- Warning -->
+        <div class="warning-area">⚠ WARNING CHOKING HAZARD</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ground-shadow"></div>
+
+  <div class="note">
+    Trong production: mặt cam (main) sẽ render từ <strong>Canvas API</strong> — ảnh xe thật + text + màu từ user · Mặt top và side render phẳng từ canvas riêng · Toàn bộ CSS, không cần Three.js
+  </div>
+</div>
+
+<!-- SIZE COMPARISON -->
+<div class="stage">
+  <div class="stage-label">Size Comparison — MiniGT vs Poprace</div>
+
+  <div class="size-row">
+
+    <!-- MiniGT -->
+    <div class="size-card">
+      <div class="size-name">MiniGT Box</div>
+      <div class="size-dim">~120 × 55 × 40mm</div>
+
+      <div class="box-hover-wrap">
+        <div class="box-scene box-minigt">
+          <div class="box-corner"></div>
+          <div class="box-top"><div class="top-content">Scale 1:64</div></div>
+          <div class="box-side"></div>
+          <div class="box-front">
+            <div class="stripe"></div>
+            <div class="brand-logo" style="font-size:9px">MINI<span class="gt" style="font-size:7px">GT™</span></div>
+            <div class="car-area" style="width:100px;height:44px;left:8px">
+              <div class="car-silhouette" style="width:90px;height:36px">
+                <div class="car-roof" style="left:16px;right:20px;height:12px;bottom:20px"></div>
+                <div class="car-body" style="height:18px;bottom:6px"></div>
+                <div class="car-wheel-l" style="width:10px;height:10px;left:6px;bottom:1px"></div>
+                <div class="car-wheel-r" style="width:10px;height:10px;right:8px;bottom:1px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poprace -->
+    <div class="size-card">
+      <div class="size-name">Poprace Box</div>
+      <div class="size-dim">~115 × 60 × 45mm</div>
+
+      <div class="box-hover-wrap">
+        <div class="box-scene box-poprace">
+          <div class="box-corner"></div>
+          <div class="box-top"><div class="top-content">Scale 1:64</div></div>
+          <div class="box-side"></div>
+          <div class="box-front" style="background:#0d1117">
+            <div class="stripe" style="right:44px;opacity:0.5;background:linear-gradient(180deg,transparent,#e53935,transparent)"></div>
+            <div class="brand-logo" style="font-size:8px;color:#e53935">POPRACE</div>
+            <div class="car-area" style="width:100px;height:50px;left:8px">
+              <div class="car-silhouette" style="width:90px;height:40px">
+                <div class="car-roof" style="left:16px;right:18px;height:14px;bottom:22px"></div>
+                <div class="car-body" style="height:20px;bottom:6px"></div>
+                <div class="car-wheel-l" style="width:12px;height:12px;left:6px;bottom:1px"></div>
+                <div class="car-wheel-r" style="width:12px;height:12px;right:8px;bottom:1px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TECH NOTE -->
+<div class="note" style="max-width:600px">
+  <strong>Implementation:</strong> 3 div (front + top + side) · CSS <code>skewX/Y</code> cho góc isometric · Front face dùng <code>&lt;canvas&gt;</code> realtime · Hover = CSS <code>translateY + rotate</code> · Toàn bộ ~50 dòng CSS · Không cần library nào
+</div>
+
+</body>
+</html>

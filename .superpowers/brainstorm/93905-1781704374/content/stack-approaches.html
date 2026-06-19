@@ -1,0 +1,75 @@
+<h2>Tech Stack — 3 Approaches</h2>
+<p class="subtitle">Bạn bán cho SEA market → Singapore region = latency tốt cho VN, TH, MY, ID. Pick 1 hướng.</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Vercel + Supabase <span style="color:#c9a84c;font-size:12px;margin-left:6px;">★ Recommended</span></h3>
+      <p><strong>Next.js 15</strong> → deploy Vercel (CDN toàn cầu) · <strong>Supabase</strong> Singapore (PostgreSQL + auth + file storage) · <strong>Stripe + PayPal</strong> · <strong>Resend</strong> email</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Deploy tự động khi push git</li>
+          <li>Singapore DB = ~20ms latency từ VN</li>
+          <li>Supabase lo backup tự động</li>
+          <li>Claude Code build nhanh nhất với stack này</li>
+          <li>Scale tự động khi có traffic spike</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Chi phí tăng theo traffic (nhưng free tier rộng)</li>
+          <li>Phụ thuộc vendor</li>
+        </ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#888;">💰 Est. cost: $0-25/tháng (ban đầu) → $50-100/tháng khi scale</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>VPS Singapore + Docker</h3>
+      <p><strong>Next.js</strong> self-hosted · <strong>PostgreSQL</strong> tự quản lý · <strong>MinIO</strong> cho file storage · <strong>Nginx</strong> reverse proxy · <strong>Coolify</strong> để deploy dễ hơn</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Chi phí cố định ~$20-40/tháng</li>
+          <li>Kiểm soát hoàn toàn</li>
+          <li>Dữ liệu không qua bên thứ 3</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Phải tự lo backup, SSL, updates</li>
+          <li>DevOps overhead cao</li>
+          <li>Downtime khi maintain</li>
+          <li>Build chậm hơn với Claude Code</li>
+        </ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#888;">💰 Est. cost: $20-40/tháng fixed (DigitalOcean/Vultr Singapore)</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Vercel + PlanetScale/Neon + Cloudinary</h3>
+      <p><strong>Next.js</strong> → Vercel · <strong>Neon</strong> (serverless PostgreSQL) · <strong>Cloudinary</strong> (image transform + storage) · Phù hợp nếu ảnh xe là core feature cần optimize</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Cloudinary tự resize/optimize ảnh xe upload</li>
+          <li>Neon = serverless, không trả tiền khi idle</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Nhiều vendor → phức tạp hơn A</li>
+          <li>Cloudinary có thể đắt khi traffic cao</li>
+          <li>Supabase đã làm được tất cả điều này rồi</li>
+        </ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#888;">💰 Est. cost: $0-50/tháng tùy usage</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:16px;margin-top:16px;">
+  <h3 style="margin:0 0 8px;color:#c9a84c;">Tại sao A là tốt nhất cho case của bạn?</h3>
+  <p style="margin:0;font-size:13px;color:#aaa;">Supabase đã bao gồm: PostgreSQL · Auth (phone OTP cho sổ địa chỉ) · File Storage (ảnh xe upload) · Realtime (order tracking) · Backup tự động. Đây là lý do bạn mention "backup mỗi tháng" — Supabase lo hết. Vercel lo CDN + deploy. Bạn chỉ cần code.</p>
+</div>

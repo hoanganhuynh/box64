@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F4F6F9; font-family: 'Plus Jakarta Sans', sans-serif; padding: 32px; color: #0F172A; }
+
+  h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+  .sub { font-size: 12px; color: #94A3B8; margin-bottom: 32px; }
+
+  /* ─── APPROACH COMPARE ─── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+  .approach { background: white; border-radius: 14px; border: 1px solid #E2E8F0; padding: 20px; }
+  .approach h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .approach p { font-size: 11px; color: #64748B; line-height: 1.7; }
+  .tag-good { display: inline-block; background: #D1FAE5; color: #065F46; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+  .tag-bad { display: inline-block; background: #FEE2E2; color: #991B1B; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+
+  /* ─── BOX DEMO ─── */
+  .demo-area { background: white; border-radius: 14px; border: 1px solid #E2E8F0; padding: 28px; margin-bottom: 24px; }
+  .demo-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94A3B8; margin-bottom: 20px; }
+  .demos-row { display: flex; gap: 48px; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+  .demo-item { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .demo-label { font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ─── CSS FAKE 3D BOX ─── */
+  /* Box lying flat: front face + top face + right side face */
+  /* Dimensions ratio from actual MiniGT box: ~120 x 38 x 50mm */
+  /* Scale: 3px per mm → 360 x 114 x 150px → too big, use 2px → 240 x 76 x 100 */
+  /* Let's use: front=220x80, top=220x40 skewed, side=50x80 skewed */
+
+  .box-wrap { position: relative; }
+
+  .box-3d {
+    position: relative;
+    width: 220px;
+    height: 155px; /* front(80) + top(40skewed) + some margin */
+    filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.18));
+  }
+
+  /* FRONT FACE - main visible face */
+  .face-front {
+    position: absolute;
+    bottom: 0; left: 22px;
+    width: 200px; height: 90px;
+    background: linear-gradient(145deg, #111 0%, #1a1a1a 100%);
+    border: 1px solid rgba(201,168,76,0.35);
+    overflow: hidden;
+  }
+  /* diagonal gold stripe like real box */
+  .face-front::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 30px; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent 0%, #C9A84C 40%, #C9A84C 60%, transparent 100%);
+    opacity: 0.6;
+  }
+  .face-front-content {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px;
+  }
+  .face-car-placeholder {
+    width: 100px; height: 64px;
+    background: linear-gradient(135deg, #1a1a1a, #222);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(201,168,76,0.4); font-weight: 600; letter-spacing: 0.05em;
+  }
+  .face-front-text { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+  .face-brand { font-size: 8px; font-weight: 800; color: #C9A84C; letter-spacing: 0.1em; text-transform: uppercase; }
+  .face-name { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.9); line-height: 1.2; }
+  .face-name-sub { font-size: 7px; color: rgba(255,255,255,0.4); }
+
+  /* TOP FACE - parallelogram */
+  .face-top {
+    position: absolute;
+    bottom: 90px; left: 22px;
+    width: 200px;
+    height: 40px;
+    background: linear-gradient(90deg, #1e1e1e 0%, #2a2a2a 100%);
+    transform-origin: bottom left;
+    transform: skewX(-45deg) scaleY(0.6);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    border-left: 1px solid rgba(201,168,76,0.15);
+    overflow: hidden;
+  }
+  .face-top::after {
+    content: 'Scale 1:64';
+    position: absolute;
+    bottom: 4px; left: 20px;
+    font-size: 9px; color: rgba(201,168,76,0.6); font-weight: 600; letter-spacing: 0.1em;
+    transform: skewX(0deg);
+  }
+
+  /* RIGHT SIDE FACE */
+  .face-right {
+    position: absolute;
+    bottom: 0; left: 222px;
+    width: 40px; height: 90px;
+    background: linear-gradient(180deg, #222 0%, #161616 100%);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-left: none;
+    transform-origin: top left;
+    transform: skewY(-45deg) scaleX(0.5);
+    overflow: hidden;
+  }
+  .face-right::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+  }
+
+  /* ─── ANGLE VARIANTS ─── */
+  /* Slight angle - more dramatic */
+  .box-3d.angle-2 .face-front { bottom: 0; left: 16px; }
+  .box-3d.angle-2 .face-top { transform: skewX(-35deg) scaleY(0.5); bottom: 90px; left: 16px; width: 200px; height: 50px; }
+  .box-3d.angle-2 .face-right { left: 216px; transform: skewY(-35deg) scaleX(0.6); width: 50px; }
+
+  /* ─── ANIMATED VERSION ─── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes rotate-hint {
+    0% { transform: rotateY(0deg); }
+    25% { transform: rotateY(8deg); }
+    75% { transform: rotateY(-8deg); }
+    100% { transform: rotateY(0deg); }
+  }
+  .box-float { animation: float 3s ease-in-out infinite; }
+  .box-shadow-float {
+    width: 180px; height: 12px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.2), transparent);
+    border-radius: 50%;
+    margin-top: 8px;
+    animation: float 3s ease-in-out infinite reverse;
+  }
+
+  /* ─── FLAT VIEW ─── */
+  .flat-box { width: 280px; }
+  .flat-face {
+    background: #111;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: rgba(201,168,76,0.6); font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .flat-lid-top { height: 28px; border-radius: 4px 4px 0 0; background: #1a1a1a; }
+  .flat-main-row { display: flex; }
+  .flat-side-l { width: 40px; height: 70px; }
+  .flat-face-front { flex: 1; height: 70px; background: linear-gradient(135deg, #111, #1c1c1c); position: relative; overflow: hidden; }
+  .flat-face-front::before {
+    content: '';
+    position: absolute; top: 0; right: 25px; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent, #C9A84C, transparent);
+    opacity: 0.5;
+  }
+  .flat-side-r { width: 40px; height: 70px; background: #1a1a1a; }
+  .flat-lid-bot { height: 28px; border-radius: 0 0 4px 4px; background: #1a1a1a; }
+
+  /* ─── TOGGLE BUTTONS ─── */
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tbtn { background: #F1F5F9; border: 1px solid #E2E8F0; border-radius: 7px; padding: 6px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; color: #64748B; cursor: pointer; }
+  .tbtn.active { background: #0F1729; border-color: #0F1729; color: white; }
+
+  /* ─── TECH BREAKDOWN ─── */
+  .tech-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 24px; }
+  .tech-card { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; }
+  .tech-card h4 { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .tech-card ul { font-size: 11px; color: #64748B; line-height: 1.8; padding-left: 14px; }
+  .highlight { background: #FFFBEB; border-color: #FDE68A; }
+</style>
+</head>
+<body>
+
+<h2>Box Preview — CSS Fake 3D (No Three.js)</h2>
+<p class="sub">1 shape duy nhất · 6 mặt cố định · CSS transforms · Nhẹ hơn 95% so với WebGL</p>
+
+<!-- APPROACH COMPARE -->
+<div class="compare">
+  <div class="approach">
+    <div class="tag-bad">❌ THREE.JS — Không cần</div>
+    <h3>React Three Fiber / WebGL</h3>
+    <p>Load ~600KB library · Setup phức tạp · Cần GLTF model · Overkill cho 1 shape cố định · Performance nặng trên mobile · Khó customize texture realtime</p>
+  </div>
+  <div class="approach" style="border-color:#FDE68A;background:#FFFBEB">
+    <div class="tag-good">✅ CSS FAKE 3D — Recommended</div>
+    <h3>CSS transforms + Canvas texture</h3>
+    <p>0KB library · 6 div faces + CSS skewX/Y · Texture = Canvas element update realtime khi user nhập · Nhẹ, nhanh, mobile-friendly · 1 shape = 1 lần code, dùng mãi</p>
+  </div>
+</div>
+
+<!-- BOX DEMOS -->
+<div class="demo-area">
+  <div class="demo-title">Angle options — pick 1</div>
+  <div class="demos-row">
+
+    <!-- OPTION A: Classic isometric-ish -->
+    <div class="demo-item">
+      <div class="box-float">
+        <div class="box-3d">
+          <!-- TOP -->
+          <div class="face-top"></div>
+          <!-- FRONT -->
+          <div class="face-front">
+            <div class="face-front-content">
+              <div class="face-car-placeholder">🚗 car image</div>
+              <div class="face-front-text">
+                <div class="face-brand">Mini GT</div>
+                <div class="face-name">Huracán<br>GT EVO</div>
+                <div class="face-name-sub">LB Silhouette Works</div>
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT -->
+          <div class="face-right"></div>
+        </div>
+        <div class="box-shadow-float"></div>
+      </div>
+      <div class="demo-label">A — Classic (Front + Top + Side)</div>
+    </div>
+
+    <!-- OPTION B: More top-down angle -->
+    <div class="demo-item">
+      <div class="box-float" style="animation-delay:-1.5s">
+        <div class="box-3d angle-2">
+          <div class="face-top"></div>
+          <div class="face-front">
+            <div class="face-front-content">
+              <div class="face-car-placeholder">🚗 car image</div>
+              <div class="face-front-text">
+                <div class="face-brand">Mini GT</div>
+                <div class="face-name">Huracán<br>GT EVO</div>
+                <div class="face-name-sub">LB Silhouette Works</div>
+              </div>
+            </div>
+          </div>
+          <div class="face-right"></div>
+        </div>
+        <div class="box-shadow-float" style="animation-delay:-1.5s"></div>
+      </div>
+      <div class="demo-label">B — More top visible</div>
+    </div>
+
+    <!-- FLAT VIEW -->
+    <div class="demo-item">
+      <div class="flat-box">
+        <div class="flat-face flat-lid-top">LID TOP</div>
+        <div class="flat-main-row">
+          <div class="flat-face flat-side-l" style="font-size:8px">SIDE</div>
+          <div class="flat-face flat-face-front">
+            <span style="position:absolute;font-size:9px;color:rgba(201,168,76,0.5)">FRONT (main)</span>
+          </div>
+          <div class="flat-face flat-side-r" style="font-size:8px">SIDE</div>
+        </div>
+        <div class="flat-face flat-lid-bot">LID BOT</div>
+      </div>
+      <div class="demo-label">Flat View — kiểm tra layout in</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TECH BREAKDOWN -->
+<div class="demo-area" style="margin-bottom:0">
+  <div class="demo-title">Cách implementation — 3 layer</div>
+  <div class="tech-grid">
+    <div class="tech-card highlight">
+      <h4>🎨 Layer 1 — Canvas Texture</h4>
+      <ul>
+        <li>Mỗi mặt = 1 &lt;canvas&gt; element</li>
+        <li>User nhập text → drawText() lên canvas</li>
+        <li>Upload ảnh xe → drawImage() lên canvas</li>
+        <li>Color picker → fillRect() background</li>
+        <li>Logo variant → drawImage() logo PNG</li>
+        <li>Update realtime, 0 lag</li>
+      </ul>
+    </div>
+    <div class="tech-card highlight">
+      <h4>📦 Layer 2 — CSS 3D Box</h4>
+      <ul>
+        <li>6 div, mỗi div background = canvas.toDataURL()</li>
+        <li>CSS skewX/Y tạo góc nhìn perspective</li>
+        <li>1 shape cố định → code 1 lần</li>
+        <li>Hover → subtle rotate animation</li>
+        <li>Toggle "Flat View" → remove skew transforms</li>
+        <li>Không cần WebGL, không cần 3D model</li>
+      </ul>
+    </div>
+    <div class="tech-card">
+      <h4>📄 Layer 3 — PDF Export</h4>
+      <ul>
+        <li>Server nhận canvas data URLs</li>
+        <li>Render flat layout HTML (6 mặt đúng tỉ lệ thực)</li>
+        <li>Puppeteer → PDF 300dpi</li>
+        <li>Có bleed marks + cut lines</li>
+        <li>Đơn vị mm thực tế (không phải px)</li>
+        <li>CMYK-compatible colors</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:12px 16px;margin-top:14px;font-size:12px;color:#0369A1">
+    💡 <strong>Key insight:</strong> Canvas texture approach còn có bonus — text trên canvas <strong>không phải DOM text node</strong>, nên brand names (Lamborghini, Ferrari...) tự động được obfuscate khỏi crawlers mà không cần code extra. Giải quyết luôn bài toán brand protection!
+  </div>
+</div>
+
+</body>
+</html>

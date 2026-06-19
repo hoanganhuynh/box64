@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #F4F6F9;
+    --surface:   #FFFFFF;
+    --surface2:  #F8FAFC;
+    --header:    #0F1729;
+    --header2:   #1A2540;
+    --text:      #0F172A;
+    --text2:     #475569;
+    --muted:     #94A3B8;
+    --border:    #E2E8F0;
+    --gold:      #CA8A04;
+    --gold-light:#FEF3C7;
+    --gold-mid:  #D97706;
+    --red:       #EF4444;
+    --green:     #10B981;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 16px;
+    --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.5; }
+
+  .section { padding: 28px; border-bottom: 1px solid var(--border); }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 16px; }
+
+  /* ─── NAV ─── */
+  .nav {
+    background: var(--header);
+    padding: 0 24px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 8px; }
+  .logo-mark { width: 30px; height: 30px; background: var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 16px; height: 16px; fill: white; }
+  .logo-text { font-weight: 800; font-size: 17px; color: white; letter-spacing: -0.02em; }
+  .logo-text span { color: var(--gold); }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.6); cursor: pointer; }
+  .nav-link.active { background: rgba(255,255,255,0.12); color: white; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-track { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; cursor: pointer; }
+  .nav-cta { background: var(--gold); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-family: var(--font); font-size: 12px; font-weight: 700; cursor: pointer; }
+
+  /* ─── SALE BANNER ─── */
+  .sale-banner {
+    background: linear-gradient(90deg, #1A2540 0%, var(--header2) 50%, #1A2540 100%);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .banner-text { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; }
+  .banner-highlight { color: #FCD34D; font-weight: 700; }
+  .banner-cd { display: flex; align-items: center; gap: 4px; }
+  .bcd { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 13px; font-weight: 700; color: #FCD34D; font-variant-numeric: tabular-nums; }
+  .bcd-sep { color: rgba(255,255,255,0.3); font-size: 12px; }
+  .banner-close { color: rgba(255,255,255,0.3); font-size: 16px; cursor: pointer; margin-left: 8px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--header);
+    padding: 40px 28px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-shape {
+    position: absolute; right: -60px; top: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(202,138,4,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; }
+  .hero-title { font-size: 38px; font-weight: 800; color: white; line-height: 1.1; letter-spacing: -0.02em; }
+  .hero-title .accent { color: var(--gold); }
+  .hero-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 10px; line-height: 1.6; }
+  .hero-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-hero-primary { background: var(--gold); color: white; border: none; border-radius: 10px; padding: 12px 22px; font-family: var(--font); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-hero-ghost { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 22px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .hero-stats { display: flex; gap: 24px; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .stat-val { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.02em; }
+  .stat-val span { color: var(--gold); }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+  /* ─── FILTER TABS ─── */
+  .filter-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; gap: 0; }
+  .ftab { padding: 14px 16px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+  .ftab.active { color: var(--gold-mid); border-bottom-color: var(--gold-mid); }
+
+  /* ─── PRODUCT GRID ─── */
+  .shop-body { padding: 20px 24px; }
+  .shop-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .result-count { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .sort-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  .pcard {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+    cursor: pointer;
+  }
+  .pcard:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+  .pcard-img {
+    background: var(--surface2);
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .pcard-img.tint-gold { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); }
+  .pcard-img.tint-blue { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); }
+  .pcard-img.tint-slate { background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%); }
+
+  .box-thumb {
+    width: 72px; height: 50px;
+    background: #111;
+    border-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.3);
+    position: relative;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+  }
+  .box-thumb::after {
+    content: '';
+    position: absolute; top: 2px; right: -5px;
+    width: 72px; height: 50px;
+    background: #1a1a1a;
+    border-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.1);
+    z-index: -1;
+  }
+  .box-gold-line { position: absolute; top: 6px; bottom: 6px; right: 8px; width: 1px; background: linear-gradient(180deg, transparent, #C9A84C, transparent); opacity: 0.7; }
+
+  .pcard-badge-row { position: absolute; top: 8px; left: 8px; display: flex; gap: 4px; }
+  .pcard-brand { position: absolute; top: 8px; right: 8px; background: white; border-radius: 6px; padding: 3px 8px; font-size: 9px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; box-shadow: var(--shadow-sm); }
+
+  .pbadge { border-radius: 5px; padding: 3px 8px; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .pbadge-sale { background: #FEE2E2; color: #DC2626; }
+  .pbadge-pre  { background: var(--gold-light); color: #92400E; }
+  .pbadge-custom { background: var(--header); color: white; }
+  .pbadge-new  { background: #D1FAE5; color: #065F46; }
+
+  .cd-mini { position: absolute; bottom: 7px; right: 8px; display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.5); border-radius: 5px; padding: 3px 7px; backdrop-filter: blur(4px); }
+  .cd-mini-num { font-size: 10px; font-weight: 700; color: #FCD34D; font-variant-numeric: tabular-nums; }
+  .cd-mini-sep { color: rgba(255,255,255,0.3); font-size: 9px; }
+
+  .pcard-body { padding: 12px 14px; }
+  .pcard-size { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+  .pcard-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .pcard-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .pcard-price { font-size: 17px; font-weight: 800; color: var(--text); }
+  .pcard-price-old { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
+  .pcard-add { background: var(--gold); color: white; border: none; border-radius: 8px; padding: 7px 12px; font-family: var(--font); font-size: 11px; font-weight: 700; cursor: pointer; }
+
+  /* ─── DESIGNER ─── */
+  .designer { display: flex; min-height: 260px; }
+  .d-form { flex: 0 0 42%; background: var(--surface); border-right: 1px solid var(--border); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .d-preview { flex: 1; background: var(--surface2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; }
+
+  .step-indicator { display: flex; gap: 6px; margin-bottom: 4px; }
+  .si { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .si.active { color: var(--gold-mid); }
+  .si.done { color: var(--green); }
+  .si-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: var(--muted); }
+  .si.active .si-dot { background: var(--gold); color: white; }
+  .si.done .si-dot { background: var(--green); color: white; }
+  .si-line { width: 16px; height: 1px; background: var(--border); }
+  .si.done .si-line { background: var(--green); }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { font-size: 11px; font-weight: 600; color: var(--text2); }
+  .field-input { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-family: var(--font); font-size: 13px; color: var(--text); width: 100%; }
+  .field-input:focus, .field-input.focused { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(202,138,4,0.1); }
+  .two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .logo-tabs { display: flex; gap: 6px; }
+  .logo-tab { flex: 1; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px; font-size: 11px; font-weight: 600; color: var(--text2); text-align: center; cursor: pointer; }
+  .logo-tab.sel { border-color: var(--gold); color: var(--gold-mid); background: var(--gold-light); }
+  .color-row { display: flex; gap: 6px; align-items: center; }
+  .cdot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+  .cdot.sel { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(202,138,4,0.2); }
+
+  .box-3d-lg {
+    width: 110px; height: 76px;
+    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+    border-radius: 4px;
+    border: 1px solid rgba(201,168,76,0.35);
+    position: relative;
+    box-shadow: 6px 6px 16px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+  }
+  .box-3d-lg::before {
+    content: '';
+    position: absolute; top: -1px; right: -10px;
+    width: 10px; height: 100%;
+    background: linear-gradient(180deg, #222, #151515);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-left: none;
+  }
+  .box-3d-lg::after {
+    content: '';
+    position: absolute; left: 0; bottom: -10px;
+    width: 100%; height: 10px;
+    background: linear-gradient(90deg, #131313, #0a0a0a);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-top: none;
+  }
+  .gold-stripe-v { position: absolute; top: 8px; bottom: 8px; right: 10px; width: 1px; background: linear-gradient(180deg, transparent, #C9A84C, transparent); opacity: 0.6; }
+  .preview-label { font-size: 11px; color: var(--text2); font-weight: 500; }
+  .view-toggle { position: absolute; bottom: 12px; right: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 10px; font-weight: 600; color: var(--text2); cursor: pointer; box-shadow: var(--shadow-sm); }
+
+  /* ─── CART DRAWER ─── */
+  .drawer-scene { display: flex; min-height: 240px; }
+  .drawer-overlay { flex: 1; background: rgba(15,23,42,0.35); }
+  .cart-drawer-panel { width: 65%; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.08); }
+  .cd-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .cd-title { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.01em; }
+  .cd-count { background: var(--gold); color: white; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
+  .cd-items { flex: 1; padding: 12px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .cd-item { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .cd-item-img { width: 44px; height: 30px; background: #111; border-radius: 5px; border: 1px solid rgba(201,168,76,0.25); flex-shrink: 0; }
+  .cd-item-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .cd-item-meta { font-size: 11px; color: var(--muted); }
+  .upsell-card { margin: 0 18px 10px; background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1px solid #FDE68A; border-radius: 10px; padding: 10px 12px; }
+  .upsell-top { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+  .upsell-icon { font-size: 14px; }
+  .upsell-msg { font-size: 12px; font-weight: 600; color: #92400E; }
+  .upsell-bar-bg { background: #FDE68A; border-radius: 10px; height: 5px; }
+  .upsell-bar-fill { background: linear-gradient(90deg, var(--gold), var(--gold-mid)); border-radius: 10px; height: 5px; width: 60%; }
+  .upsell-hint { font-size: 10px; color: #B45309; margin-top: 4px; }
+  .cd-footer { padding: 12px 18px; border-top: 1px solid var(--border); }
+  .cd-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .cd-total-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+  .cd-total-val { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+  .cd-checkout-btn { background: var(--header); color: white; border: none; border-radius: 10px; width: 100%; padding: 12px; font-family: var(--font); font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: -0.01em; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<div class="nav">
+  <div class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/></svg>
+    </div>
+    <div class="logo-text">BOX<span>64</span></div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-link active">Shop</div>
+    <div class="nav-link">Design</div>
+    <div class="nav-link">Track Order</div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-track">🛒 3 items</span>
+    <button class="nav-cta">Start Designing</button>
+  </div>
+</div>
+
+<!-- ═══ SALE BANNER ═══ -->
+<div class="sale-banner">
+  <span class="banner-text">⚡ <span class="banner-highlight">SUMMER SALE</span> — Giảm 20% tất cả Box Custom. Còn lại:</span>
+  <div class="banner-cd">
+    <div class="bcd">02</div><span class="bcd-sep">:</span>
+    <div class="bcd">14</div><span class="bcd-sep">:</span>
+    <div class="bcd">37</div><span class="bcd-sep">:</span>
+    <div class="bcd">09</div>
+  </div>
+  <span class="banner-close">×</span>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-bg-shape"></div>
+  <div class="hero-eyebrow">1:64 Scale · MiniGT · Poprace</div>
+  <div class="hero-title">Custom collector boxes<br><span class="accent">designed by you.</span></div>
+  <div class="hero-sub">Upload ảnh xe · Chọn template · In & ship toàn SEA trong 5 ngày.</div>
+  <div class="hero-actions">
+    <button class="btn-hero-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Start Designing
+    </button>
+    <button class="btn-hero-ghost">Browse Catalog →</button>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-val">500<span>+</span></div>
+      <div class="stat-label">Designs completed</div>
+    </div>
+    <div>
+      <div class="stat-val">5</div>
+      <div class="stat-label">Ngày ship tối đa</div>
+    </div>
+    <div>
+      <div class="stat-val">2</div>
+      <div class="stat-label">Size: MiniGT · Poprace</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SHOP ═══ -->
+<div class="filter-bar">
+  <div class="ftab active">Box Custom</div>
+  <div class="ftab">Card Custom</div>
+  <div class="ftab">Accessories 1/64</div>
+</div>
+<div class="shop-body">
+  <div class="shop-meta">
+    <div class="result-count">12 sản phẩm</div>
+    <button class="sort-btn">Sort: Mới nhất ▾</button>
+  </div>
+  <div class="grid-3">
+
+    <!-- Card 1 - Sale -->
+    <div class="pcard">
+      <div class="pcard-img tint-gold">
+        <div class="box-thumb"><div class="box-gold-line"></div></div>
+        <div class="pcard-badge-row"><span class="pbadge pbadge-sale">SALE −20%</span></div>
+        <div class="pcard-brand">MiniGT</div>
+        <div class="cd-mini">
+          <span class="cd-mini-num">14</span><span class="cd-mini-sep">:</span>
+          <span class="cd-mini-num">37</span><span class="cd-mini-sep">:</span>
+          <span class="cd-mini-num">09</span>
+        </div>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-size">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          Box Custom · 1:64
+        </div>
+        <div class="pcard-name">Lamborghini Huracán GT EVO</div>
+        <div class="pcard-bottom">
+          <div><span class="pcard-price">120.000₫</span><span class="pcard-price-old">150.000₫</span></div>
+          <button class="pcard-add">+ Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 - Pre-order -->
+    <div class="pcard">
+      <div class="pcard-img tint-blue">
+        <div class="box-thumb"><div class="box-gold-line"></div></div>
+        <div class="pcard-badge-row"><span class="pbadge pbadge-pre">PRE-ORDER</span></div>
+        <div class="pcard-brand">Poprace</div>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-size">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          Box Custom · 1:64
+        </div>
+        <div class="pcard-name">Ferrari 488 GTB · LB Works</div>
+        <div class="pcard-bottom">
+          <div><span class="pcard-price">95.000₫</span></div>
+          <button class="pcard-add">+ Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 - New -->
+    <div class="pcard">
+      <div class="pcard-img tint-slate">
+        <div class="box-thumb"><div class="box-gold-line"></div></div>
+        <div class="pcard-badge-row"><span class="pbadge pbadge-custom">CUSTOM</span></div>
+        <div class="pcard-brand">MiniGT</div>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-size">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          Box Custom · 1:64
+        </div>
+        <div class="pcard-name">Porsche 911 GT3 RS · Widebody</div>
+        <div class="pcard-bottom">
+          <div><span class="pcard-price">110.000₫</span></div>
+          <button class="pcard-add">+ Cart</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ BOX DESIGNER ═══ -->
+<div style="border-top:1px solid var(--border)">
+  <div style="background:var(--surface);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px">/design — Box Designer</span>
+    <span style="font-size:11px;color:var(--muted)">Step 3 of 4 — Customize</span>
+  </div>
+  <div class="designer">
+    <div class="d-form">
+      <div class="step-indicator">
+        <div class="si done">
+          <div class="si-dot">✓</div>
+        </div>
+        <div class="si-line" style="background:var(--green)"></div>
+        <div class="si done">
+          <div class="si-dot">✓</div>
+        </div>
+        <div class="si-line" style="background:var(--green)"></div>
+        <div class="si active">
+          <div class="si-dot">3</div>
+          <span>Customize</span>
+        </div>
+        <div class="si-line"></div>
+        <div class="si">
+          <div class="si-dot">4</div>
+          <span style="color:var(--muted)">Preview</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Tên xe</label>
+        <input class="field-input focused" value="Huracán GT EVO" readonly>
+      </div>
+      <div class="two-fields">
+        <div class="field-group">
+          <label class="field-label">Power</label>
+          <input class="field-input" value="1,500+ hp" readonly>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Top Speed</label>
+          <input class="field-input" value="350+ km/h" readonly>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Logo Variant</label>
+        <div class="logo-tabs">
+          <div class="logo-tab sel">MiniGT</div>
+          <div class="logo-tab">Poprace</div>
+          <div class="logo-tab">Custom</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Màu nền hộp</label>
+        <div class="color-row">
+          <div class="cdot sel" style="background:#0a0a0a"></div>
+          <div class="cdot" style="background:#1a1a2e"></div>
+          <div class="cdot" style="background:#1a1028"></div>
+          <div class="cdot" style="background:#1a0808"></div>
+          <div class="cdot" style="background:#0a1a0a"></div>
+          <div class="cdot" style="background:#f5f5f0;border:1.5px solid var(--border)"></div>
+          <div style="width:22px;height:22px;border-radius:50%;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-size:12px;color:var(--muted)">+</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="d-preview">
+      <div class="box-3d-lg">
+        <div class="gold-stripe-v"></div>
+      </div>
+      <div class="preview-label">3D Preview · Drag to rotate</div>
+      <div class="view-toggle">⊞ Flat View</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CART DRAWER ═══ -->
+<div style="border-top:1px solid var(--border)">
+  <div style="background:var(--surface);padding:14px 18px;border-bottom:1px solid var(--border)">
+    <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px">Cart Drawer</span>
+  </div>
+  <div class="drawer-scene">
+    <div class="drawer-overlay"></div>
+    <div class="cart-drawer-panel">
+      <div class="cd-header">
+        <div class="cd-title">Your Cart</div>
+        <span class="cd-count">3 items</span>
+      </div>
+      <div class="cd-items">
+        <div class="cd-item">
+          <div class="cd-item-img"></div>
+          <div style="flex:1">
+            <div class="cd-item-name">Huracán GT · Custom</div>
+            <div class="cd-item-meta">MiniGT · 120.000₫ × 2</div>
+          </div>
+          <div style="font-weight:700;font-size:13px">240.000₫</div>
+        </div>
+        <div class="cd-item">
+          <div class="cd-item-img"></div>
+          <div style="flex:1">
+            <div class="cd-item-name">Ferrari 488 · Catalog</div>
+            <div class="cd-item-meta">Poprace · 90.000₫ × 1</div>
+          </div>
+          <div style="font-weight:700;font-size:13px">90.000₫</div>
+        </div>
+      </div>
+      <div class="upsell-card">
+        <div class="upsell-top">
+          <span class="upsell-icon">🎁</span>
+          <span class="upsell-msg">Thêm <strong>2 box</strong> nữa → FREE SHIP toàn quốc!</span>
+        </div>
+        <div class="upsell-bar-bg"><div class="upsell-bar-fill"></div></div>
+        <div class="upsell-hint">Bạn đang có 3/5 box · Còn thiếu 2 box</div>
+      </div>
+      <div class="cd-footer">
+        <div class="cd-total-row">
+          <span class="cd-total-label">Subtotal</span>
+          <span class="cd-total-val">330.000₫</span>
+        </div>
+        <button class="cd-checkout-btn">Proceed to Checkout →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
