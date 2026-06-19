@@ -54,7 +54,7 @@ export default function FlashSaleSection() {
         {/* Cards — reuse ProductCard for consistent hierarchy + Add to Cart */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
           {products.slice(0, 3).map(p => (
-            <ProductCard key={p.id} product={p} variant="light" />
+            <ProductCard key={p.id} product={p} variant="light" showFlashProgress />
           ))}
         </div>
       </div>

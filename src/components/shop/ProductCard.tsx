@@ -13,6 +13,7 @@ import { useCartStore } from '@/lib/store/cart'
 interface Props {
   product: Product
   variant?: 'dark' | 'light'
+  showFlashProgress?: boolean
 }
 
 const FLASH_TOTAL = 20
@@ -27,7 +28,7 @@ function getFlashSoldCount(slug: string): number {
   return (sum % 15) + 3  // 3–17 sold out of 20
 }
 
-export default function ProductCard({ product, variant = 'dark' }: Props) {
+export default function ProductCard({ product, variant = 'dark', showFlashProgress = false }: Props) {
   const promo = product.promotion
   const isActive = promo && new Date(promo.ends_at) > new Date()
   const isFlashSale = isActive && promo!.type === 'flash_sale'
@@ -38,7 +39,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
   const [added, setAdded] = useState(false)
 
   const sold = getSoldCount(product.slug)
-  const flashSold = isFlashSale ? getFlashSoldCount(product.slug) : 0
+  const flashSold = (isFlashSale && showFlashProgress) ? getFlashSoldCount(product.slug) : 0
   const flashPct = Math.round((flashSold / FLASH_TOTAL) * 100)
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -140,7 +141,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
               {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
             </span>
           )}
-          {!isFlashSale && (
+          {!(isFlashSale && showFlashProgress) && (
             <span className={`text-[10px] font-semibold ml-auto ${dark ? 'text-white/30' : 'text-[#B0A090]'}`}>
               {sold} sold
             </span>
@@ -168,35 +169,35 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
           </div>
         </Link>
 
-        {/* Flash sale progress bar — "đang cháy hàng" */}
-        {isFlashSale && (
+        {/* Flash sale progress bar — "đang cháy hàng" — only in FlashSaleSection */}
+        {isFlashSale && showFlashProgress && (
           <div
             className="relative h-[26px] rounded-full overflow-hidden"
-            style={{ background: '#7B0010' }}
+            style={{ background: '#6B2500' }}
             role="meter"
             aria-valuenow={flashSold}
             aria-valuemax={FLASH_TOTAL}
             aria-label={`Đã bán ${flashSold}/${FLASH_TOTAL} suất`}
           >
-            {/* Red fill — sold portion */}
+            {/* Orange fill — sold portion */}
             <div
               className="absolute inset-y-0 left-0 transition-none"
               style={{
                 width: `${flashPct}%`,
-                background: 'linear-gradient(90deg, #D90020 0%, #FF1A35 100%)',
+                background: 'linear-gradient(90deg, #C2410C 0%, #F97316 100%)',
               }}
             />
-            {/* Subtle shimmer on the fill */}
+            {/* Shimmer on fill */}
             <div
               className="absolute inset-y-0 left-0 pointer-events-none"
               style={{
                 width: `${flashPct}%`,
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%)',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%)',
               }}
             />
             {/* Icon + text */}
             <div className="relative h-full flex items-center gap-1 px-2.5">
-              <Flash size={11} color="#FFD600" variant="Bold" />
+              <Flash size={11} color="#FCD34D" variant="Bold" />
               <span className="text-white text-[10px] font-bold tracking-wide leading-none drop-shadow-sm">
                 Đã bán {flashSold}/{FLASH_TOTAL} suất
               </span>
