@@ -220,7 +220,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Custom-box how-it-works note */}
             {product.type === 'box_custom' && (
-              <div className="bg-gold/5 border border-gold/[0.10] rounded-sm px-4 py-3 text-xs text-muted leading-relaxed">
+              <div className="bg-gold/5 border border-white/[0.07] rounded-sm px-4 py-3 text-xs text-muted leading-relaxed">
                 <span className="flex items-center gap-1.5 font-semibold text-primary mb-0.5">
                   <InfoCircle size={13} color="rgba(245,158,11,0.6)" variant="Bold" />
                   How custom orders work
