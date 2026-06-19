@@ -105,7 +105,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="pt-1">
-                <span className="text-white/20 text-xs leading-relaxed block">Mon–Sat · 9:00–21:00</span>
+                <span className="text-white/50 text-xs leading-relaxed block">Mon–Sat · 9:00–21:00</span>
               </li>
             </ul>
           </div>
@@ -120,11 +120,11 @@ export default function Footer() {
         style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, transparent)' }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <p className="text-white/20 text-xs">
+        <p className="text-white/50 text-xs">
           © {new Date().getFullYear()} figbox.store · All rights reserved.
         </p>
         <div className="flex items-center gap-3">
-          <p className="text-white/20 text-xs">
+          <p className="text-white/50 text-xs">
             Handmade for 1:64 collectors · Vietnam
           </p>
           <a

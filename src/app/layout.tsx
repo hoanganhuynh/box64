@@ -22,6 +22,16 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata: Metadata = {
   title: 'figbox.store — Premium Custom 1:64 Diecast Box',
   description: 'Premium custom packaging for 1:64 MiniGT diecast model cars. Designed in Illustrator, printed on 350gsm, laser-cut, hand folded. Nationwide delivery.',
+  openGraph: {
+    title: 'figbox.store — Premium Custom 1:64 Diecast Box',
+    description: 'Premium custom packaging for 1:64 MiniGT diecast model cars. Handmade in Vietnam.',
+    images: [{ url: '/banner.jpg', width: 1200, height: 630 }],
+    siteName: 'figbox.store',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/banner.jpg'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

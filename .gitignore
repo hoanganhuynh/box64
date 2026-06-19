@@ -39,3 +39,5 @@ admin-ui/
 ecommerce-ui/
 dummy-product/
 .superpowers/
+docs/*.docx
+docs/gen-docx.js
