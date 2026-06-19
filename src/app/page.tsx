@@ -230,7 +230,6 @@ export default function HomePage() {
             <div className="grid grid-cols-7 gap-2">
               {PROCESS.map((step, i) => {
                 const Icon = step.icon
-                const alpha = Math.max(0.18, 1 - i * 0.12)
                 return (
                   <div
                     key={i}
@@ -239,20 +238,17 @@ export default function HomePage() {
                   >
                     <div
                       className="relative w-14 h-14 rounded-full bg-surface flex items-center justify-center"
-                      style={{ border: `1.5px solid rgba(245,158,11,${(alpha * 0.7).toFixed(2)})` }}
+                      style={{ border: '1.5px solid rgba(245,158,11,0.7)' }}
                     >
-                      <Icon size={20} color={`rgba(245,158,11,${alpha.toFixed(2)})`} variant="Bold" />
+                      <Icon size={20} color="rgba(245,158,11,1)" variant="Bold" />
                       <span
                         className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-bg border border-border flex items-center justify-center font-display font-extrabold"
-                        style={{ fontSize: '9px', color: `rgba(245,158,11,${alpha.toFixed(2)})` }}
+                        style={{ fontSize: '9px', color: 'rgba(245,158,11,1)' }}
                       >
                         {String(i + 1).padStart(2, '0')}
                       </span>
                     </div>
-                    <p
-                      className="font-display font-extrabold uppercase text-center text-[10px] tracking-[0.15em] leading-tight"
-                      style={{ color: `rgba(240,237,232,${alpha.toFixed(2)})` }}
-                    >
+                    <p className="font-display font-extrabold uppercase text-center text-[10px] tracking-[0.15em] leading-tight text-primary">
                       {step.label}
                     </p>
                   </div>
@@ -271,7 +267,6 @@ export default function HomePage() {
             <div className="flex flex-col">
               {PROCESS.map((step, i) => {
                 const Icon = step.icon
-                const alpha = Math.max(0.2, 1 - i * 0.1)
                 return (
                   <div
                     key={i}
@@ -280,20 +275,17 @@ export default function HomePage() {
                   >
                     <div
                       className="absolute left-0 z-10 w-[35px] h-[35px] rounded-full bg-bg flex items-center justify-center"
-                      style={{ border: `1.5px solid rgba(245,158,11,${(alpha * 0.65).toFixed(2)})` }}
+                      style={{ border: '1.5px solid rgba(245,158,11,0.65)' }}
                     >
                       <span
                         className="font-display font-extrabold"
-                        style={{ fontSize: '9px', color: `rgba(245,158,11,${alpha.toFixed(2)})` }}
+                        style={{ fontSize: '9px', color: 'rgba(245,158,11,1)' }}
                       >
                         {String(i + 1).padStart(2, '0')}
                       </span>
                     </div>
-                    <Icon size={15} color={`rgba(245,158,11,${alpha.toFixed(2)})`} variant="Bold" />
-                    <p
-                      className="font-display font-extrabold uppercase text-[11px] tracking-[0.12em]"
-                      style={{ color: `rgba(240,237,232,${alpha.toFixed(2)})` }}
-                    >
+                    <Icon size={15} color="rgba(245,158,11,1)" variant="Bold" />
+                    <p className="font-display font-extrabold uppercase text-[11px] tracking-[0.12em] text-primary">
                       {step.label}
                     </p>
                   </div>
