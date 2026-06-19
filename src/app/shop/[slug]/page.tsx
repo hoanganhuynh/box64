@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast } from 'iconsax-react'
+import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast, InfoCircle } from 'iconsax-react'
 import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
 
 export function generateStaticParams() {
@@ -220,8 +220,11 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
             {/* Custom-box how-it-works note */}
             {product.type === 'box_custom' && (
-              <div className="bg-gold/5 border border-gold/20 rounded-sm px-4 py-3 text-xs text-muted leading-relaxed">
-                <span className="font-semibold text-primary block mb-0.5">How custom orders work</span>
+              <div className="bg-gold/5 border border-gold/[0.10] rounded-sm px-4 py-3 text-xs text-muted leading-relaxed">
+                <span className="flex items-center gap-1.5 font-semibold text-primary mb-0.5">
+                  <InfoCircle size={13} color="rgba(245,158,11,0.6)" variant="Bold" />
+                  How custom orders work
+                </span>
                 After checkout, we&apos;ll email you instructions to upload your car photo. Our team designs and prints your personalised box.
               </div>
             )}
