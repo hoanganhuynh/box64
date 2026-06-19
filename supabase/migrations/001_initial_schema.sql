@@ -2,9 +2,12 @@
 create extension if not exists "uuid-ossp";
 
 -- ─── PROFILES ───
+-- Auth method: Google OAuth only (no phone/OTP)
 create table profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
-  phone      text unique,
+  email      text unique,
+  full_name  text,
+  avatar_url text,
   created_at timestamptz default now()
 );
 
@@ -18,12 +21,17 @@ create policy "Users can update own profile"
   on profiles for update
   using (auth.uid() = id);
 
--- Auto-create profile on user signup
+-- Auto-create profile on Google OAuth signup
 create or replace function handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into profiles (id, phone)
-  values (new.id, new.phone);
+  insert into profiles (id, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data ->> 'full_name',
+    new.raw_user_meta_data ->> 'avatar_url'
+  );
   return new;
 end;
 $$;
