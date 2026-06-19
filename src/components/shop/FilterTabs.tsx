@@ -3,11 +3,9 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 const TABS = [
-  { label: 'All',         value: ''           },
-  { label: 'Box Catalog', value: 'box_catalog' },
-  { label: 'Box Custom',  value: 'box_custom'  },
-  { label: 'Pre-order',   value: 'pre_order'   },
-  { label: 'Sale',        value: 'sale'        },
+  { label: 'Tất cả',      value: '' },
+  { label: 'Đang sale',   value: 'sale' },
+  { label: 'Pre-order',   value: 'pre_order' },
 ]
 
 export default function FilterTabs() {
@@ -26,8 +24,8 @@ export default function FilterTabs() {
             className={`
               px-4 py-2 rounded-sm text-sm font-medium transition-colors
               ${isActive
-                ? 'bg-primary text-white'
-                : 'bg-surface border border-border text-muted hover:border-primary hover:text-primary'}
+                ? 'bg-gold text-[#09090F]'
+                : 'bg-surface border border-border text-muted hover:border-gold/40 hover:text-primary'}
             `}
           >
             {tab.label}

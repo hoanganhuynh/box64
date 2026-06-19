@@ -17,6 +17,7 @@ export interface Product {
   status: ProductStatus
   promotion?: Promotion
   description?: string
+  tags?: Array<'bestseller' | 'new' | 'hot' | 'limited'>
   created_at?: string
 }
 
@@ -122,6 +123,14 @@ export interface Template {
     logo_tint: string
   }
   preview_url: string
+}
+
+export interface Profile {
+  id: string             // matches auth.users(id)
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  created_at: string
 }
 
 export interface CartItem {

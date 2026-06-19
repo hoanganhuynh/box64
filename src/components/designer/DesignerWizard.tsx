@@ -13,7 +13,6 @@ import Step4Preview from './Step4Preview'
 
 const STEP_LABELS = ['Photo', 'Details', 'Colors', 'Preview']
 
-const STEPS = [Step1Upload, Step2CarInfo, Step3Visual]
 
 export default function DesignerWizard() {
   const { step } = useDesignerStore()

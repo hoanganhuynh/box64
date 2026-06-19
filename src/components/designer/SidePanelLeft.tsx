@@ -17,7 +17,6 @@ const BOX_SIZES = [
 export default function SidePanelLeft() {
   const store = useDesignerStore()
   const { car_image_url, car_name, specs_line, bg_color, accent_color, text_color, box_size,
-          spec_engine, spec_power, spec_torque, spec_acceleration, spec_top_speed, spec_bodykit, spec_social,
           car_image_scale,
           setField, setCarImageUrl } = store
 

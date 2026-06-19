@@ -1,7 +1,6 @@
 import { jsPDF } from 'jspdf'
 import type { BoxSize, DesignState } from '@/lib/types'
 
-const MM_PER_PX = 0.2645833
 
 type FaceDef = {
   name: 'front' | 'back' | 'top' | 'bottom' | 'side' | 'side2'

@@ -9,6 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Dark theme
         bg:             'var(--bg)',
         surface:        'var(--surface)',
         header:         'var(--header)',
@@ -22,6 +23,13 @@ const config: Config = {
         faint:          'var(--text-faint)',
         error:          'var(--error)',
         success:        'var(--success)',
+        // Light theme
+        warm:           'var(--bg-warm)',
+        'warm-surface': 'var(--surface-warm)',
+        ink:            'var(--ink)',
+        'ink-muted':    'var(--ink-muted)',
+        'ink-faint':    'var(--ink-faint)',
+        'border-warm':  'var(--border-warm)',
       },
       borderRadius: {
         DEFAULT: 'var(--radius)',
