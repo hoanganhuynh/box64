@@ -20,7 +20,10 @@ export default function StickyCartBar({ product, salePrice }: Props) {
     const el = sentinelRef.current
     if (!el) return
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(!entry.isIntersecting),
+      ([entry]) => {
+        const isBelowViewport = entry.boundingClientRect.top > 0
+        setVisible(!entry.isIntersecting && !isBelowViewport)
+      },
       { threshold: 0 }
     )
     observer.observe(el)
@@ -39,7 +42,7 @@ export default function StickyCartBar({ product, salePrice }: Props) {
   return (
     <>
       {/* Sentinel - must be placed directly after AddToCartButton in the parent */}
-      <div ref={sentinelRef} aria-hidden="true" />
+      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
 
       {/* Sticky bar */}
       <div
