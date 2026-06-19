@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 const TABS = [
-  { label: 'Tất cả',      value: '' },
-  { label: 'Đang sale',   value: 'sale' },
-  { label: 'Pre-order',   value: 'pre_order' },
+  { label: 'All',        value: '' },
+  { label: 'On Sale',    value: 'sale' },
+  { label: 'Pre-order',  value: 'pre_order' },
 ]
 
 export default function FilterTabs() {

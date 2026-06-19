@@ -111,7 +111,7 @@ export default function ReviewsStrip() {
         </div>
 
         {/* Scroll hint */}
-        <p className="text-center text-faint text-[10px] mt-3">← Vuốt để xem thêm →</p>
+        <p className="text-center text-faint text-[10px] mt-3">← Swipe to see more →</p>
       </div>
     </section>
   )

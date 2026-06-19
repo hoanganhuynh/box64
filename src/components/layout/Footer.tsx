@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="font-jakarta font-light text-white/35 text-sm ml-0.5">.store</span>
             </Link>
             <p className="text-white/45 text-sm leading-relaxed mb-4">
-              Hộp đựng xe mô hình 1:64 custom cao cấp. Thiết kế tỉ mỉ, in chuyên nghiệp.
+              Premium custom packaging for 1:64 diecast model cars. Designed with care, printed professionally.
             </p>
             <a
               href="tel:+84901234567"
@@ -27,26 +27,26 @@ export default function Footer() {
           <div>
             <p className="text-white/70 font-semibold text-sm mb-3">Shop</p>
             <ul className="space-y-2">
-              <li><Link href="/shop" className="text-white/40 hover:text-white text-sm transition-colors">Tất cả sản phẩm</Link></li>
-              <li><Link href="/shop?type=sale" className="text-white/40 hover:text-white text-sm transition-colors">Đang khuyến mãi</Link></li>
-              <li><Link href="/cart" className="text-white/40 hover:text-white text-sm transition-colors">Giỏ hàng</Link></li>
+              <li><Link href="/shop" className="text-white/40 hover:text-white text-sm transition-colors">All Products</Link></li>
+              <li><Link href="/shop?type=sale" className="text-white/40 hover:text-white text-sm transition-colors">On Sale</Link></li>
+              <li><Link href="/cart" className="text-white/40 hover:text-white text-sm transition-colors">Cart</Link></li>
             </ul>
           </div>
 
           <div>
-            <p className="text-white/70 font-semibold text-sm mb-3">Hỗ trợ</p>
+            <p className="text-white/70 font-semibold text-sm mb-3">Support</p>
             <ul className="space-y-2">
-              <li><Link href="/track" className="text-white/40 hover:text-white text-sm transition-colors">Theo dõi đơn hàng</Link></li>
-              <li><Link href="/login" className="text-white/40 hover:text-white text-sm transition-colors">Tài khoản</Link></li>
+              <li><Link href="/track" className="text-white/40 hover:text-white text-sm transition-colors">Track Order</Link></li>
+              <li><Link href="/login" className="text-white/40 hover:text-white text-sm transition-colors">Account</Link></li>
             </ul>
           </div>
 
           <div>
-            <p className="text-white/70 font-semibold text-sm mb-3">Liên hệ</p>
+            <p className="text-white/70 font-semibold text-sm mb-3">Contact</p>
             <ul className="space-y-2 text-sm">
               <li><a href="tel:+84901234567" className="text-white/40 hover:text-gold transition-colors">0901 234 567</a></li>
               <li><a href="mailto:hello@figbox.store" className="text-white/40 hover:text-white transition-colors">hello@figbox.store</a></li>
-              <li className="text-white/25 text-xs leading-relaxed pt-1">T2–T7 · 9:00–21:00</li>
+              <li className="text-white/25 text-xs leading-relaxed pt-1">Mon–Sat · 9:00–21:00</li>
             </ul>
           </div>
         </div>

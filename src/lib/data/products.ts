@@ -49,6 +49,12 @@ export const DUMMY_PRODUCTS: Product[] = [
     status: 'active',
     tags: ['hot'],
     description: 'Custom box phong cách Porsche 911 GT3-R #77/#80 AO Racing "Roxy" Pink — IMSA 2023/2024.',
+    promotion: {
+      id: 'p3', type: 'flash_sale', label: 'FLASH -12%', discount_pct: 12,
+      starts_at: new Date(now - h(1)).toISOString(),
+      ends_at:   new Date(now + h(5)).toISOString(),
+      product_ids: ['fb-03'], priority: 2,
+    },
   },
   {
     id: 'fb-04',

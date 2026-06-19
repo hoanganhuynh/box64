@@ -18,10 +18,10 @@ import ReviewsStrip from '@/components/home/ReviewsStrip'
 // ── SEO ───────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'figbox.store — Hộp Đựng Xe Mô Hình 1:64 Custom | MiniGT Box',
+  title: 'figbox.store — Premium Custom 1:64 Diecast Box | MiniGT',
   description:
-    'figbox.store cung cấp hộp đựng xe mô hình 1:64 custom cao cấp cho MiniGT. Thiết kế bằng Adobe Illustrator, in 350gsm, cắt laser, gấp tay. Giao hàng toàn quốc.',
-  keywords: ['hộp xe mô hình', 'miniGT box', 'diecast box', 'custom box 1:64', 'figbox', 'hộp đựng xe 1:64'],
+    'figbox.store makes premium custom packaging for 1:64 MiniGT diecast cars. Designed in Illustrator, printed on 350gsm, laser-cut, hand folded. Nationwide delivery.',
+  keywords: ['miniGT box', 'diecast box', 'custom box 1:64', 'figbox', '1:64 packaging', 'diecast packaging vietnam'],
   openGraph: {
     title: 'figbox.store — Premium Custom Diecast Box',
     description: 'Custom 1:64 diecast box packaging. Handcrafted in Vietnam. Ship nationwide.',
@@ -35,38 +35,38 @@ export const metadata: Metadata = {
 const PROCESS = [
   {
     icon: Designtools,
-    title: 'Thiết kế trên\nAdobe Illustrator',
-    desc: 'Mỗi hộp là một file AI riêng biệt. Màu sắc, font chữ, layout được dàn dựng tỉ mỉ đến từng mm.',
+    title: 'Design in\nIllustrator',
+    desc: 'Each box is a dedicated AI file. Colors, fonts, and layout crafted down to the millimetre.',
   },
   {
     icon: Printer,
-    title: 'In thử\nnghiệm',
-    desc: 'In test trên giấy thường để kiểm tra bố cục và màu sắc trước khi ra bản in thật.',
+    title: 'Test\nPrint',
+    desc: 'A draft print on regular paper checks layout and color accuracy before committing to premium stock.',
   },
   {
     icon: TickCircle,
-    title: 'Duyệt mẫu\n& QC',
-    desc: 'So màu, kiểm tra chi tiết từng milimet. Chỉ khi đạt chuẩn mới tiến hành in thật.',
+    title: 'Review\n& QC',
+    desc: 'Color-match and millimetre-level inspection. Only approved designs move to the final print.',
   },
   {
     icon: Box,
-    title: 'In thật trên\ngiấy 350gsm',
-    desc: 'In offset trên giấy couché 350gsm tráng matte — dày, cứng, màu trung thực.',
+    title: 'Print on\n350gsm Stock',
+    desc: 'Offset-printed on 350gsm matte-coated board — thick, rigid, true-to-color.',
   },
   {
     icon: Scissor,
-    title: 'Cắt laser\nchính xác',
-    desc: 'Máy cắt CNC định vị từng đường cắt theo file AI, không sai lệch dù 0.5mm.',
+    title: 'Precision\nLaser Cut',
+    desc: 'CNC laser follows the AI file exactly. Zero deviation, even at 0.5 mm.',
   },
   {
     icon: Layer,
-    title: 'Gấp tay\n& đóng seal',
-    desc: 'Mỗi hộp được gấp và seal thủ công. Góc gấp chuẩn, không bị bong tróc hay lệch.',
+    title: 'Hand Fold\n& Seal',
+    desc: 'Every box is folded and sealed by hand. Sharp corners, no peeling, no shifting.',
   },
   {
     icon: TruckFast,
-    title: 'Đóng gói\n& giao hàng',
-    desc: 'Bọc bong bóng, hộp carton, giao toàn quốc 3–5 ngày qua GHTK · J&T · VN Post.',
+    title: 'Pack\n& Ship',
+    desc: 'Bubble-wrapped, boxed, and dispatched nationwide in 3–5 days via GHTK · J&T · VN Post.',
   },
 ]
 
@@ -82,15 +82,15 @@ export default function HomePage() {
       <div className="bg-gold text-[#07070C] text-[11px] font-semibold py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
           <span className="flex items-center gap-1.5">
-            <TruckFast size={12} color="currentColor" /> Free ship đơn từ 500k
+            <TruckFast size={12} color="currentColor" /> Free shipping on orders 500k+
           </span>
           <span className="w-px h-3 bg-black/20 hidden sm:block" />
           <span className="flex items-center gap-1.5">
-            <Flash size={12} color="currentColor" variant="Bold" /> Flash Sale đang diễn ra — giảm đến 15%
+            <Flash size={12} color="currentColor" variant="Bold" /> Flash Sale live — up to 15% off
           </span>
           <span className="w-px h-3 bg-black/20 hidden sm:block" />
           <span className="hidden sm:flex items-center gap-1.5">
-            <Star1 size={11} color="currentColor" variant="Bold" /> 4.9★ · 500+ hộp đã giao
+            <Star1 size={11} color="currentColor" variant="Bold" /> 4.9★ · 500+ boxes shipped
           </span>
         </div>
       </div>
@@ -105,29 +105,39 @@ export default function HomePage() {
           className="object-cover object-center"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07070C]/96 via-[#07070C]/80 to-[#07070C]/25" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07070C]/50 via-transparent to-transparent" aria-hidden="true" />
+        {/* Base dark layer */}
+        <div className="absolute inset-0 bg-[#07070C]/65" aria-hidden="true" />
+        {/* Left-heavy gradient for text zone */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07070C] from-[35%] via-[#07070C]/60 via-[65%] to-transparent" aria-hidden="true" />
+        {/* Bottom vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07070C]/60 via-transparent to-transparent" aria-hidden="true" />
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <div className="max-w-xl">
             <p className="text-gold text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
               1:64 Scale · MiniGT · Handcrafted in Vietnam
             </p>
-            <h1 id="hero-heading" className="font-jakarta font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.07] mb-5">
+            <h1
+              id="hero-heading"
+              className="font-jakarta font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-[1.07] mb-5"
+              style={{ textShadow: '0 2px 24px rgba(0,0,0,0.7)' }}
+            >
               Custom Box<br />
-              cho{' '}
-              <span className="text-gold">Diecast</span><br />
-              của bạn
+              for your{' '}
+              <span className="text-gold">Diecast</span>
             </h1>
-            <p className="text-white/55 text-base md:text-lg mb-8 leading-relaxed">
-              Thiết kế tỉ mỉ trên Adobe Illustrator. In 350gsm. Cắt laser. Gấp tay. Giao toàn quốc.
+            <p
+              className="text-white/75 text-base md:text-lg mb-8 leading-relaxed"
+              style={{ textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}
+            >
+              Designed in Illustrator. Printed on 350gsm. Laser-cut. Hand folded. Nationwide delivery.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <Link
                 href="/shop"
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
               >
-                Xem mẫu box <ArrowRight2 size={15} color="currentColor" />
+                View Boxes <ArrowRight2 size={15} color="currentColor" />
               </Link>
               <a
                 href="tel:+84901234567"
@@ -138,9 +148,9 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-6">
               {[
-                { value: '500+', label: 'boxes giao thành công' },
+                { value: '500+', label: 'boxes shipped' },
                 { value: '4.9★', label: 'collector rating' },
-                { value: '3–5d', label: 'giao hàng toàn quốc' },
+                { value: '3–5d', label: 'nationwide delivery' },
               ].map(({ value, label }) => (
                 <div key={label}>
                   <span className="font-jakarta font-black text-white text-xl leading-none block">{value}</span>
@@ -160,13 +170,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-1">Được yêu thích nhất</p>
+              <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-1">Community Favourites</p>
               <h2 id="top-boxes-heading" className="font-jakarta font-extrabold text-ink text-2xl">
                 Top Boxes
               </h2>
             </div>
             <Link href="/shop" className="flex items-center gap-1 text-sm font-medium text-gold-mid hover:text-gold transition-colors">
-              Xem tất cả <ArrowRight2 size={14} color="currentColor" />
+              View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -180,13 +190,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-1">Mới nhất</p>
+              <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-1">Just Dropped</p>
               <h2 id="new-arrivals-heading" className="font-jakarta font-extrabold text-primary text-2xl">
                 New Arrivals
               </h2>
             </div>
             <Link href="/shop" className="flex items-center gap-1 text-sm font-medium text-gold hover:text-gold-mid transition-colors">
-              Xem tất cả <ArrowRight2 size={14} color="currentColor" />
+              View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -216,7 +226,7 @@ export default function HomePage() {
                   href={`/shop/${preOrderItem.slug}`}
                   className="inline-flex items-center gap-2 h-10 px-5 rounded-sm bg-gold-mid text-white font-semibold text-xs hover:bg-gold transition-colors"
                 >
-                  Pre-order ngay <ArrowRight2 size={12} color="currentColor" />
+                  Pre-order Now <ArrowRight2 size={12} color="currentColor" />
                 </Link>
               </div>
             </div>
@@ -231,13 +241,13 @@ export default function HomePage() {
       <section aria-labelledby="process-heading" className="bg-warm-surface border-y border-border-warm py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-2">Thủ Công Tỉ Mỉ</p>
+            <p className="text-gold-mid text-[10px] font-bold tracking-widest uppercase mb-2">Handcrafted with Care</p>
             <h2 id="process-heading" className="font-jakarta font-extrabold text-ink text-2xl sm:text-3xl mb-3">
-              Quy Trình Làm Box
+              Our Box Making Process
             </h2>
             <p className="text-ink-muted text-sm max-w-lg mx-auto leading-relaxed">
-              Mỗi chiếc hộp được làm qua 7 bước thủ công — từ bản vẽ Illustrator đến tay bạn.
-              Không dùng template sẵn. Không in hàng loạt. Chỉ có một chiếc cho xe của bạn.
+              Every box passes through 7 handcrafted steps — from Illustrator sketch to your doorstep.
+              No templates. No batch runs. One box, made for your car.
             </p>
           </div>
 
@@ -247,7 +257,6 @@ export default function HomePage() {
               const Icon = step.icon
               return (
                 <div key={i} className="flex flex-col items-center text-center gap-3 px-1">
-                  {/* Step number + icon */}
                   <div className="relative">
                     <div className="w-14 h-14 rounded-full bg-[#FFF3E8] border-2 border-[#F5D4A8] flex items-center justify-center">
                       <Icon size={22} color="var(--gold-mid)" variant="Bold" />
@@ -256,11 +265,9 @@ export default function HomePage() {
                       {i + 1}
                     </span>
                   </div>
-                  {/* Title */}
                   <p className="font-jakarta font-bold text-ink text-xs leading-snug whitespace-pre-line">
                     {step.title}
                   </p>
-                  {/* Desc – hidden on mobile to save space */}
                   <p className="hidden lg:block text-ink-muted text-[10px] leading-relaxed">
                     {step.desc}
                   </p>
@@ -269,7 +276,7 @@ export default function HomePage() {
             })}
           </div>
 
-          {/* Expanded desc on mobile/tablet as collapsible or show below */}
+          {/* Mobile/tablet expanded list */}
           <div className="lg:hidden mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {PROCESS.map((step, i) => {
               const Icon = step.icon
@@ -301,10 +308,10 @@ export default function HomePage() {
           {/* Trust signals */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
             {([
-              { icon: ShieldTick,  title: 'Đảm bảo chất lượng',   desc: 'In lại nếu có lỗi khi nhận hàng.' },
-              { icon: TruckFast,   title: 'Giao toàn quốc',        desc: 'GHTK · J&T · VN Post express.' },
-              { icon: Box,         title: 'Giấy 350gsm coated',    desc: 'Dày, cứng, matte laminate cao cấp.' },
-              { icon: Star1,       title: '4.9 ★ collector',       desc: '500+ đơn hàng thành công.' },
+              { icon: ShieldTick, title: 'Quality Guarantee',      desc: 'We reprint at no charge if anything arrives wrong.' },
+              { icon: TruckFast,  title: 'Nationwide Shipping',    desc: 'GHTK · J&T · VN Post express.' },
+              { icon: Box,        title: '350gsm Coated Stock',    desc: 'Thick, rigid, matte-laminate finish.' },
+              { icon: Star1,      title: '4.9★ Collector Rating',  desc: '500+ successful orders and counting.' },
             ] as const).map(({ icon: Icon, title, desc }) => (
               <div key={title} className="flex flex-col gap-2 p-4 rounded-sm bg-white/15 border border-white/20">
                 <Icon size={18} color="white" variant="Bold" />
@@ -317,14 +324,14 @@ export default function HomePage() {
           {/* CTA */}
           <div className="text-center">
             <h2 id="cta-heading" className="font-jakarta font-extrabold text-white text-2xl sm:text-3xl mb-3">
-              Bạn muốn một chiếc hộp riêng?
+              Want a box made just for you?
             </h2>
             <p className="text-white/70 text-sm mb-7 max-w-md mx-auto">
-              Chụp ảnh xe, gửi cho chúng tôi — còn lại để <strong>figbox.store</strong> lo.
+              Share your car photo with us — we&apos;ll handle everything from design to delivery.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/shop" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-sm bg-white text-gold-mid font-bold text-sm hover:bg-white/90 transition-colors">
-                Xem mẫu box <ArrowRight2 size={14} color="currentColor" />
+                Browse Boxes <ArrowRight2 size={14} color="currentColor" />
               </Link>
               <a href="tel:+84901234567" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-sm border-2 border-white/40 text-white font-semibold text-sm hover:bg-white/15 transition-colors">
                 <Call size={14} color="currentColor" /> 0901 234 567

@@ -18,53 +18,68 @@ export default function FlashSaleSection() {
     <section aria-labelledby="flash-sale-heading" className="bg-gold-mid">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {/* ── Header ── */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-7">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Flash size={24} color="#FFF" variant="Bold" />
+              <Flash size={22} color="#FFF" variant="Bold" />
               <h2 id="flash-sale-heading" className="font-jakarta font-black text-white text-2xl sm:text-3xl uppercase tracking-tight">
                 Flash Sale
               </h2>
             </div>
             <span className="hidden sm:block w-px h-7 bg-white/30" />
-            <div className="hidden sm:flex items-center gap-3 text-white/80 text-sm font-medium">
-              Kết thúc sau <FlashCountdown endDate={endDate} />
+            <div className="hidden sm:flex items-center gap-3 text-white/85 text-sm font-medium">
+              Ends in <FlashCountdown endDate={endDate} />
             </div>
           </div>
           <Link href="/shop?type=sale" className="flex items-center gap-1 text-white text-xs font-semibold hover:text-white/70 transition-colors">
-            Xem tất cả <ArrowRight2 size={14} color="currentColor" />
+            View all <ArrowRight2 size={14} color="currentColor" />
           </Link>
         </div>
 
         {/* Mobile countdown */}
-        <div className="flex sm:hidden items-center gap-2 text-white/80 text-xs mb-5 font-medium">
-          Kết thúc sau <FlashCountdown endDate={endDate} />
+        <div className="flex sm:hidden items-center gap-2 text-white/85 text-xs mb-6 font-medium">
+          Ends in <FlashCountdown endDate={endDate} />
         </div>
 
-        {/* ── Product cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* ── 3 vertical product cards ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {products.slice(0, 3).map(p => {
             const salePrice = getDiscountedPrice(p)
             return (
               <Link
                 key={p.id}
                 href={`/shop/${p.slug}`}
-                className="group flex bg-white/15 border border-white/20 hover:bg-white/25 rounded-sm overflow-hidden transition-all"
+                className="group flex flex-col bg-white rounded overflow-hidden shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200"
               >
-                <div className="relative w-28 sm:w-32 shrink-0 bg-black/20">
-                  <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="33vw" />
-                  <span className="absolute top-2 left-2 bg-white text-[#EA580C] text-[9px] font-black px-1.5 py-0.5 rounded-sm tracking-wider">
-                    -{p.promotion!.discount_pct}%
-                  </span>
+                {/* Large image */}
+                <div className="relative aspect-square overflow-hidden bg-[#F5F0EA]">
+                  <Image
+                    src={p.images[0]}
+                    alt={p.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                  />
+                  {/* Big bold badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-white text-[#EA580C] font-black text-sm px-3 py-1.5 rounded shadow-md leading-none">
+                      -{p.promotion!.discount_pct}%
+                    </span>
+                  </div>
                 </div>
-                <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
-                  <p className="text-white font-semibold text-sm leading-snug line-clamp-2 group-hover:text-white/80 transition-colors">
+
+                {/* Info */}
+                <div className="flex flex-col p-4 gap-3 flex-1">
+                  <p className="text-ink font-semibold text-sm leading-snug line-clamp-2 flex-1 group-hover:text-[#EA580C] transition-colors">
                     {p.name}
                   </p>
-                  <div className="flex items-baseline gap-2 mt-3">
-                    <span className="font-black text-white text-base">{formatVND(salePrice)}</span>
-                    <span className="line-through text-white/50 text-xs">{formatVND(p.price)}</span>
+                  <div className="flex items-baseline gap-2 pt-2 border-t border-[#F0E8E0]">
+                    <span className="font-black text-[#EA580C] text-lg leading-none">{formatVND(salePrice)}</span>
+                    <span className="line-through text-[#B0A090] text-sm">{formatVND(p.price)}</span>
                   </div>
+                  <span className="inline-flex items-center gap-1 text-[#EA580C] text-xs font-semibold">
+                    Shop now <ArrowRight2 size={11} color="currentColor" />
+                  </span>
                 </div>
               </Link>
             )
