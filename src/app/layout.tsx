@@ -33,10 +33,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: ['/banner.jpg'],
   },
-  icons: {
-    icon: '/logo.svg',
-    shortcut: '/logo.svg',
-  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
