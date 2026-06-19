@@ -33,42 +33,42 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 bg-header border-b border-white/8">
+    <header className="sticky top-0 z-50 bg-header border-b border-border">
       {/* ── Single row ──────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4" style={{ height: '56px' }}>
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center shrink-0" aria-label="figbox.store — home">
-          <span className="font-jakarta font-black text-white text-xl tracking-tight">fig</span>
-          <span className="font-jakarta font-black text-gold text-xl tracking-tight">box</span>
-          <span className="font-jakarta font-light text-white/35 text-sm tracking-tight ml-0.5">.store</span>
-        </Link>
-
-        {/* Desktop nav (center) */}
-        <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
-          <Link href="/shop" className="text-sm font-medium text-white/60 hover:text-white transition-colors">
-            Shop
+        {/* Logo + Desktop nav */}
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center shrink-0" aria-label="figbox.store — home">
+            <span className="font-jakarta font-black text-white text-xl tracking-tight">fig</span>
+            <span className="font-jakarta font-black text-gold text-xl tracking-tight">box</span>
+            <span className="font-jakarta font-light text-white/35 text-sm tracking-tight ml-0.5">.store</span>
           </Link>
-          <Link href="/track" className="text-sm font-medium text-white/60 hover:text-white transition-colors">
-            Track Order
-          </Link>
-        </nav>
+          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
+            <Link href="/shop" className="text-sm font-medium text-white/60 hover:text-white transition-colors">
+              Shop
+            </Link>
+            <Link href="/track" className="text-sm font-medium text-white/60 hover:text-white transition-colors">
+              Track Order
+            </Link>
+          </nav>
+        </div>
 
         {/* Right: phone + login + cart */}
         <div className="flex items-center gap-1">
           <a
             href={PHONE_HREF}
             aria-label="Call us"
-            className="hidden md:flex items-center gap-1.5 text-[12px] text-white/50 hover:text-gold transition-colors font-medium mr-2"
+            className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-2"
           >
-            <Call size={13} color="currentColor" /> {PHONE}
+            <Call size={15} color="currentColor" /> {PHONE}
           </a>
           <Link
             href="/login"
             aria-label="Login"
-            className="hidden md:flex items-center gap-1.5 text-[12px] text-white/50 hover:text-gold transition-colors font-medium mr-1"
+            className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-1"
           >
-            <ProfileCircle size={15} color="currentColor" /> Login
+            <ProfileCircle size={17} color="currentColor" /> Login
           </Link>
 
           {/* Mobile: phone icon */}
@@ -91,7 +91,7 @@ export default function Header() {
 
       {/* ── Mobile menu ──────────────────────────────────────────── */}
       {menuOpen && (
-        <nav aria-label="Mobile navigation" className="md:hidden border-t border-white/8 bg-header">
+        <nav aria-label="Mobile navigation" className="md:hidden border-t border-border bg-header">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-1">
             <Link href="/shop" onClick={() => setMenuOpen(false)}
               className="py-2.5 px-3 text-sm font-medium text-white/65 hover:text-white hover:bg-white/5 rounded-sm transition-colors">Shop</Link>

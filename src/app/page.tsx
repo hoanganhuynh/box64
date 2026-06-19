@@ -1,30 +1,33 @@
 import type { Metadata } from 'next'
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
   ArrowRight2, ShieldTick, TruckFast, Flash, Star1,
   Designtools, Printer, Scissor, Layer, TickCircle, Box,
   Call,
+  type Icon,
 } from 'iconsax-react'
 import {
   BESTSELLERS, NEW_ARRIVALS,
-  getPreOrderProducts, getDiscountedPrice,
+  getPreOrderProducts,
 } from '@/lib/data/products'
-import { formatVND } from '@/lib/utils/format'
 import ProductCard from '@/components/shop/ProductCard'
 import FlashSaleSection from '@/components/home/FlashSaleSection'
 import ReviewsStrip from '@/components/home/ReviewsStrip'
+import PreOrderSpotlight from '@/components/home/PreOrderSpotlight'
+import RaceMarquee from '@/components/home/RaceMarquee'
 
 // ── SEO ───────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'figbox.store — Premium Custom 1:64 Diecast Box | MiniGT',
+  title: 'figbox.store — Custom Diecast Box & 1:64 Scale Packaging Vietnam',
   description:
-    'figbox.store makes premium custom packaging for 1:64 MiniGT diecast cars. Designed in Illustrator, printed on 350gsm, laser-cut, hand folded. Nationwide delivery.',
-  keywords: ['miniGT box', 'diecast box', 'custom box 1:64', 'figbox', '1:64 packaging', 'diecast packaging vietnam'],
+    'Premium custom packaging for 1:64 diecast and MiniGT collectors. AI-designed, 350gsm matte print, laser-cut and hand-folded in Vietnam. Ships nationwide 3–5 days.',
+  keywords: ['custom diecast box', 'miniGT box packaging', 'diecast box vietnam', 'custom box 1:64', 'figbox', '1:64 packaging', '1:64 diecast box'],
   openGraph: {
-    title: 'figbox.store — Premium Custom Diecast Box',
-    description: 'Custom 1:64 diecast box packaging. Handcrafted in Vietnam. Ship nationwide.',
+    title: 'figbox.store — Custom Diecast Box · 1:64 Packaging',
+    description: 'Premium custom packaging for 1:64 diecast collectors. 350gsm matte print, laser-cut, hand-folded. Ships nationwide.',
     type: 'website',
     siteName: 'figbox.store',
   },
@@ -32,42 +35,14 @@ export const metadata: Metadata = {
 
 // ── Production process steps ──────────────────────────────────────────────────
 
-const PROCESS = [
-  {
-    icon: Designtools,
-    title: 'Design in\nIllustrator',
-    desc: 'Each box is a dedicated AI file. Colors, fonts, and layout crafted down to the millimetre.',
-  },
-  {
-    icon: Printer,
-    title: 'Test\nPrint',
-    desc: 'A draft print on regular paper checks layout and color accuracy before committing to premium stock.',
-  },
-  {
-    icon: TickCircle,
-    title: 'Review\n& QC',
-    desc: 'Color-match and millimetre-level inspection. Only approved designs move to the final print.',
-  },
-  {
-    icon: Box,
-    title: 'Print on\n350gsm Stock',
-    desc: 'Offset-printed on 350gsm matte-coated board — thick, rigid, true-to-color.',
-  },
-  {
-    icon: Scissor,
-    title: 'Precision\nLaser Cut',
-    desc: 'CNC laser follows the AI file exactly. Zero deviation, even at 0.5 mm.',
-  },
-  {
-    icon: Layer,
-    title: 'Hand Fold\n& Seal',
-    desc: 'Every box is folded and sealed by hand. Sharp corners, no peeling, no shifting.',
-  },
-  {
-    icon: TruckFast,
-    title: 'Pack\n& Ship',
-    desc: 'Bubble-wrapped, boxed, and dispatched nationwide in 3–5 days via GHTK · J&T · VN Post.',
-  },
+const PROCESS: { icon: Icon; label: string }[] = [
+  { icon: Designtools, label: 'Design'       },
+  { icon: Printer,     label: 'Test Print'   },
+  { icon: TickCircle,  label: 'QC Check'     },
+  { icon: Box,         label: '350gsm Print' },
+  { icon: Scissor,     label: 'Laser Cut'    },
+  { icon: Layer,       label: 'Hand Fold'    },
+  { icon: TruckFast,   label: 'Ship'         },
 ]
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -78,24 +53,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ─── 1. ANNOUNCEMENT BAR ─── gold ──────────────────────── */}
-      <div className="bg-gold text-[#07070C] text-xs font-semibold py-2 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <TruckFast size={13} color="currentColor" /> Free shipping on orders 500k+
-          </span>
-          <span className="w-px h-3 bg-black/20 hidden sm:block" />
-          <span className="flex items-center gap-1.5">
-            <Flash size={13} color="currentColor" variant="Bold" /> Flash Sale live — up to 15% off
-          </span>
-          <span className="w-px h-3 bg-black/20 hidden sm:block" />
-          <span className="hidden sm:flex items-center gap-1.5">
-            <Star1 size={12} color="currentColor" variant="Bold" /> 4.9★ · 500+ boxes shipped
-          </span>
-        </div>
-      </div>
-
-      {/* ─── 2. HERO ─── dark + banner.jpg ─────────────────────── */}
+      {/* ─── 1. HERO ─── dark + banner.jpg ─────────────────────── */}
       <section aria-labelledby="hero-heading" className="relative overflow-hidden min-h-[480px] md:min-h-[560px] flex items-center">
         <Image
           src="/banner.jpg"
@@ -105,17 +63,29 @@ export default function HomePage() {
           className="object-cover object-center"
           sizes="100vw"
         />
-        {/* Base dark layer */}
-        <div className="absolute inset-0 bg-[#07070C]/65" aria-hidden="true" />
-        {/* Left-heavy gradient for text zone */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07070C] from-[35%] via-[#07070C]/60 via-[65%] to-transparent" aria-hidden="true" />
+        {/* Base dark layer — light tint only, keep image visible */}
+        <div className="absolute inset-0 bg-[#07070C]/30" aria-hidden="true" />
+        {/* Left-heavy gradient — darkens text zone, fades right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07070C]/95 from-[25%] via-[#07070C]/50 via-[55%] to-transparent" aria-hidden="true" />
         {/* Bottom vignette */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07070C]/60 via-transparent to-transparent" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07070C]/40 via-transparent to-transparent" aria-hidden="true" />
+        {/* Racing telemetry grid */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        {/* Diagonal speed lines */}
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/2 -translate-y-1/2 right-[-10%] flex flex-col gap-8" style={{ transform: 'rotate(-14deg) translateY(-50%)' }}>
+            <div className="w-[560px] h-px bg-gold/[0.16]" />
+            <div className="w-[700px] h-px bg-gold/[0.09]" />
+            <div className="w-[440px] h-px bg-white/[0.06]" />
+            <div className="w-[620px] h-px bg-gold/[0.12]" />
+            <div className="w-[380px] h-px bg-white/[0.04]" />
+          </div>
+        </div>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <div className="max-w-xl">
             <p className="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4">
-              1:64 Scale · MiniGT · Handcrafted in Vietnam
+              <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>Custom Diecast Box · 1:64 Scale · Made in Vietnam
             </p>
             <h1
               id="hero-heading"
@@ -130,14 +100,14 @@ export default function HomePage() {
               className="text-white/80 text-base md:text-lg mb-8 leading-relaxed font-light"
               style={{ textShadow: '0 1px 12px rgba(0,0,0,0.6)' }}
             >
-              Designed in Illustrator. Printed on 350gsm. Laser-cut. Hand folded. Nationwide delivery.
+              Designed to the millimetre. Printed on 350gsm matte stock. Laser-cut and hand-folded in Vietnam. Ships in 3–5 days.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <Link
                 href="/shop"
                 className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
               >
-                View Boxes <ArrowRight2 size={15} color="currentColor" />
+                Shop All Boxes <ArrowRight2 size={15} color="currentColor" />
               </Link>
               <a
                 href="tel:+84901234567"
@@ -145,18 +115,6 @@ export default function HomePage() {
               >
                 <Call size={15} color="currentColor" /> 0901 234 567
               </a>
-            </div>
-            <div className="flex items-center gap-6">
-              {[
-                { value: '500+', label: 'boxes shipped' },
-                { value: '4.9★', label: 'collector rating' },
-                { value: '3–5d', label: 'nationwide delivery' },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <span className="font-jakarta font-black text-white text-xl leading-none block">{value}</span>
-                  <span className="text-white/40 text-[11px] font-medium uppercase tracking-wider">{label}</span>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -170,9 +128,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-1">Community Favourites</p>
+              <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-1">
+                <span className="opacity-40 mr-1.5">◆</span>Fan Favourites
+              </p>
               <h2 id="top-boxes-heading" className="font-display font-extrabold text-ink text-3xl sm:text-4xl">
-                Top Boxes
+                Best-Selling Boxes
               </h2>
             </div>
             <Link href="/shop" className="flex items-center gap-1 text-sm font-medium text-gold-mid hover:text-gold transition-colors">
@@ -180,17 +140,42 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {BESTSELLERS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
+            {BESTSELLERS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} variant="light" />)}
           </div>
         </div>
       </section>
 
+      {/* ─── Race marquee ───────────────────────────────────────── */}
+      <RaceMarquee />
+
       {/* ─── 5. NEW ARRIVALS ─── dark ───────────────────────────── */}
-      <section aria-labelledby="new-arrivals-heading" className="bg-bg py-14">
+      <section
+        aria-labelledby="new-arrivals-heading"
+        className="relative overflow-hidden bg-bg py-14"
+        style={{
+          backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px)',
+          backgroundSize: '8px 8px',
+        }}
+      >
+        {/* Racing number watermark */}
+        <div
+          aria-hidden="true"
+          className="absolute -top-6 -right-4 font-display font-extrabold leading-none select-none pointer-events-none"
+          style={{
+            fontSize: 'clamp(140px, 22vw, 260px)',
+            color: 'rgba(255,255,255,0.028)',
+            letterSpacing: '-0.04em',
+          }}
+        >
+          03
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
-              <p className="text-gold text-xs font-bold tracking-widest uppercase mb-1">Just Dropped</p>
+              <p className="text-gold text-xs font-bold tracking-widest uppercase mb-1">
+                <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>Just Dropped
+              </p>
               <h2 id="new-arrivals-heading" className="font-display font-extrabold text-primary text-3xl sm:text-4xl">
                 New Arrivals
               </h2>
@@ -205,96 +190,116 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── 6. PRE-ORDER ─── orange-tint ─────────────────────── */}
-      {preOrderItem && (
-        <section aria-labelledby="preorder-heading" className="bg-[#FFF3E8] border-y border-[#F5D9B8]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-center gap-8">
-            <div className="flex-1 text-center sm:text-left">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-gold-mid uppercase tracking-widest border border-gold-mid/40 px-2.5 py-1 rounded-sm mb-3">
-                Coming Soon
-              </span>
-              <h2 id="preorder-heading" className="font-jakarta font-extrabold text-ink text-2xl mb-2">
-                {preOrderItem.name}
-              </h2>
-              <p className="text-ink-muted text-sm max-w-md mb-5">{preOrderItem.description}</p>
-              <div className="flex items-center gap-4 justify-center sm:justify-start">
-                <div>
-                  <p className="text-xs text-ink-faint uppercase tracking-wider mb-0.5">Launch price</p>
-                  <p className="font-black text-gold-mid text-xl">{formatVND(getDiscountedPrice(preOrderItem))}</p>
-                </div>
-                <Link
-                  href={`/shop/${preOrderItem.slug}`}
-                  className="inline-flex items-center gap-2 h-10 px-5 rounded-sm bg-gold-mid text-white font-semibold text-xs hover:bg-gold transition-colors"
-                >
-                  Pre-order Now <ArrowRight2 size={12} color="currentColor" />
-                </Link>
-              </div>
-            </div>
-            <div className="relative w-44 h-44 shrink-0">
-              <Image src={preOrderItem.images[0]} alt={preOrderItem.name} fill className="object-cover rounded-sm" sizes="176px" />
-            </div>
-          </div>
-        </section>
-      )}
+      {/* ─── 6. PRE-ORDER ─── cinematic spotlight ──────────────── */}
+      {preOrderItem && <PreOrderSpotlight product={preOrderItem} />}
 
-      {/* ─── 7. PRODUCTION PROCESS ─── light cream ──────────────── */}
-      <section aria-labelledby="process-heading" className="bg-warm-surface border-y border-border-warm py-16">
+      {/* ─── 7. PRODUCTION PROCESS ─── dark race track ──────────── */}
+      <section
+        aria-labelledby="process-heading"
+        className="relative overflow-hidden bg-bg border-y border-border py-16"
+        style={{
+          backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px)',
+          backgroundSize: '8px 8px',
+        }}
+      >
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <p className="text-gold-mid text-xs font-bold tracking-widest uppercase mb-2">Handcrafted with Care</p>
-            <h2 id="process-heading" className="font-display font-extrabold text-ink text-3xl sm:text-4xl mb-3">
-              Our Box Making Process
-            </h2>
-            <p className="text-ink-muted text-sm max-w-lg mx-auto leading-relaxed">
-              Every box passes through 7 handcrafted steps — from Illustrator sketch to your doorstep.
-              No templates. No batch runs. One box, made for your car.
+          <div className="text-center mb-14">
+            <p className="text-gold text-xs font-bold tracking-[0.22em] uppercase mb-3">
+              <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>How It&apos;s Made
             </p>
+            <h2 id="process-heading" className="font-display font-extrabold text-white uppercase leading-none text-4xl sm:text-5xl">
+              7 Steps. Zero Compromise.
+            </h2>
           </div>
 
-          {/* Timeline grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 lg:gap-2">
-            {PROCESS.map((step, i) => {
-              const Icon = step.icon
-              return (
-                <div key={i} className="flex flex-col items-center text-center gap-3 px-1">
-                  <div className="relative">
-                    <div className="w-14 h-14 rounded-full bg-[#FFF3E8] border-2 border-[#F5D4A8] flex items-center justify-center">
-                      <Icon size={22} color="var(--gold-mid)" variant="Bold" />
+          {/* ── Desktop: horizontal race track ── */}
+          <div className="hidden lg:block relative">
+            <div
+              className="absolute"
+              style={{
+                top: '28px',
+                left: 'calc(100% / 14)',
+                right: 'calc(100% / 14)',
+                height: '1px',
+                background: 'linear-gradient(90deg, rgba(245,158,11,0.55) 0%, rgba(245,158,11,0.06) 100%)',
+              }}
+              aria-hidden="true"
+            />
+            <div className="grid grid-cols-7 gap-2">
+              {PROCESS.map((step, i) => {
+                const Icon = step.icon
+                const alpha = Math.max(0.18, 1 - i * 0.12)
+                return (
+                  <div
+                    key={i}
+                    className="step-reveal flex flex-col items-center gap-3"
+                    style={{ animationDelay: `${i * 0.09}s` } as React.CSSProperties}
+                  >
+                    <div
+                      className="relative w-14 h-14 rounded-full bg-surface flex items-center justify-center"
+                      style={{ border: `1.5px solid rgba(245,158,11,${(alpha * 0.7).toFixed(2)})` }}
+                    >
+                      <Icon size={20} color={`rgba(245,158,11,${alpha.toFixed(2)})`} variant="Bold" />
+                      <span
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-bg border border-border flex items-center justify-center font-display font-extrabold"
+                        style={{ fontSize: '9px', color: `rgba(245,158,11,${alpha.toFixed(2)})` }}
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
                     </div>
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gold-mid text-white text-[9px] font-black flex items-center justify-center">
-                      {i + 1}
-                    </span>
+                    <p
+                      className="font-display font-extrabold uppercase text-center text-[10px] tracking-[0.15em] leading-tight"
+                      style={{ color: `rgba(240,237,232,${alpha.toFixed(2)})` }}
+                    >
+                      {step.label}
+                    </p>
                   </div>
-                  <p className="font-jakarta font-bold text-ink text-xs leading-snug whitespace-pre-line">
-                    {step.title}
-                  </p>
-                  <p className="hidden lg:block text-ink-muted text-[10px] leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
 
-          {/* Mobile/tablet expanded list */}
-          <div className="lg:hidden mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PROCESS.map((step, i) => {
-              const Icon = step.icon
-              return (
-                <div key={i} className="flex gap-3 items-start p-4 rounded-sm bg-[#FFF8F0] border border-[#EFE0CC]">
-                  <div className="w-8 h-8 rounded-sm bg-white border border-[#F5D4A8] flex items-center justify-center shrink-0">
-                    <Icon size={16} color="var(--gold-mid)" variant="Bold" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-ink text-xs mb-0.5">
-                      <span className="text-gold-mid mr-1">{i + 1}.</span>
-                      {step.title.replace('\n', ' ')}
+          {/* ── Mobile / tablet: vertical track ── */}
+          <div className="lg:hidden relative">
+            <div
+              className="absolute left-[17px] top-0 bottom-0 w-px"
+              style={{ background: 'linear-gradient(to bottom, rgba(245,158,11,0.5), rgba(245,158,11,0.04))' }}
+              aria-hidden="true"
+            />
+            <div className="flex flex-col">
+              {PROCESS.map((step, i) => {
+                const Icon = step.icon
+                const alpha = Math.max(0.2, 1 - i * 0.1)
+                return (
+                  <div
+                    key={i}
+                    className="step-reveal relative flex items-center gap-4 py-3.5 pl-12"
+                    style={{ animationDelay: `${i * 0.08}s` } as React.CSSProperties}
+                  >
+                    <div
+                      className="absolute left-0 z-10 w-[35px] h-[35px] rounded-full bg-bg flex items-center justify-center"
+                      style={{ border: `1.5px solid rgba(245,158,11,${(alpha * 0.65).toFixed(2)})` }}
+                    >
+                      <span
+                        className="font-display font-extrabold"
+                        style={{ fontSize: '9px', color: `rgba(245,158,11,${alpha.toFixed(2)})` }}
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <Icon size={15} color={`rgba(245,158,11,${alpha.toFixed(2)})`} variant="Bold" />
+                    <p
+                      className="font-display font-extrabold uppercase text-[11px] tracking-[0.12em]"
+                      style={{ color: `rgba(240,237,232,${alpha.toFixed(2)})` }}
+                    >
+                      {step.label}
                     </p>
-                    <p className="text-ink-muted text-[10px] leading-relaxed">{step.desc}</p>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -302,40 +307,109 @@ export default function HomePage() {
       {/* ─── 8. REVIEWS ─── dark ────────────────────────────────── */}
       <ReviewsStrip />
 
-      {/* ─── 9. TRUST + CTA ─── orange ──────────────────────────── */}
-      <section aria-labelledby="cta-heading" className="bg-gold-mid py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {/* Trust signals */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      {/* ─── 9. CTA ─── dark racing ─────────────────────────────── */}
+      <section
+        aria-labelledby="cta-heading"
+        className="relative overflow-hidden bg-bg"
+        style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '48px 48px' }}
+      >
+        {/* Gold top accent stripe */}
+        <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-transparent via-gold to-transparent" aria-hidden="true" />
+        {/* Ambient gold glow */}
+        <div aria-hidden="true" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[320px] rounded-full bg-gold opacity-[0.05] blur-[140px] pointer-events-none" />
+
+        {/* ── Timing-board stat bar ── */}
+        <div className="relative border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-3 divide-x divide-border">
             {([
-              { icon: ShieldTick, title: 'Quality Guarantee',      desc: 'We reprint at no charge if anything arrives wrong.' },
-              { icon: TruckFast,  title: 'Nationwide Shipping',    desc: 'GHTK · J&T · VN Post express.' },
-              { icon: Box,        title: '350gsm Coated Stock',    desc: 'Thick, rigid, matte-laminate finish.' },
-              { icon: Star1,      title: '4.9★ Collector Rating',  desc: '500+ successful orders and counting.' },
-            ] as const).map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex flex-col gap-2 p-4 rounded-sm bg-white/15 border border-white/20">
-                <Icon size={18} color="white" variant="Bold" />
-                <p className="font-semibold text-white text-xs">{title}</p>
-                <p className="text-white/65 text-[10px] leading-relaxed">{desc}</p>
+              { value: '500+', label: 'Boxes Shipped' },
+              { value: '4.9★', label: 'Collector Rating' },
+              { value: '3–5d', label: 'Nationwide Delivery' },
+            ] as const).map(({ value, label }) => (
+              <div key={label} className="py-6 sm:py-8 flex flex-col items-center gap-1">
+                <span className="font-display font-extrabold text-white text-3xl sm:text-5xl tabular-nums leading-none">{value}</span>
+                <span className="text-faint text-[10px] font-bold uppercase tracking-[0.18em] mt-1">{label}</span>
               </div>
             ))}
           </div>
+        </div>
 
-          {/* CTA */}
-          <div className="text-center">
-            <h2 id="cta-heading" className="font-display font-extrabold text-white text-3xl sm:text-4xl mb-3">
-              Want a box made just for you?
-            </h2>
-            <p className="text-white/70 text-sm mb-7 max-w-md mx-auto">
-              Share your car photo with us — we&apos;ll handle everything from design to delivery.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/shop" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-sm bg-white text-gold-mid font-bold text-sm hover:bg-white/90 transition-colors">
-                Browse Boxes <ArrowRight2 size={14} color="currentColor" />
-              </Link>
-              <a href="tel:+84901234567" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-sm border-2 border-white/40 text-white font-semibold text-sm hover:bg-white/15 transition-colors">
-                <Call size={14} color="currentColor" /> 0901 234 567
-              </a>
+        {/* ── Main CTA body ── */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10 lg:gap-12">
+
+            {/* Left: headline */}
+            <div className="flex-1">
+              <p className="text-gold text-xs font-bold tracking-[0.22em] uppercase mb-5">
+                <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>Custom Order
+              </p>
+              <h2
+                id="cta-heading"
+                className="font-display font-extrabold uppercase text-white leading-[0.9] text-5xl sm:text-6xl lg:text-7xl mb-6"
+              >
+                Your car.<br />
+                Your rules.<br />
+                <span className="text-gold">Your box.</span>
+              </h2>
+              <p className="text-muted text-sm leading-relaxed max-w-md">
+                Send us your car photo — we handle design, print, and delivery.
+              </p>
+            </div>
+
+            {/* Center: floating product showcase — desktop only */}
+            <div className="hidden lg:flex shrink-0 items-center justify-center">
+              <div
+                className="relative w-[220px] aspect-square rounded-xl overflow-hidden"
+                style={{
+                  transform: 'rotate(-6deg)',
+                  boxShadow: '0 32px 80px rgba(0,0,0,0.75), 0 0 50px rgba(245,158,11,0.12)',
+                }}
+              >
+                <Image
+                  src="/products/p1.jpg"
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="220px"
+                />
+                <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 60px rgba(7,7,12,0.45)' }} aria-hidden="true" />
+              </div>
+            </div>
+
+            {/* Right: CTAs + spec badges */}
+            <div className="flex flex-col items-start lg:items-end gap-5 shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
+                  style={{ boxShadow: '0 4px 24px rgba(245,158,11,0.35)' }}
+                >
+                  Browse Boxes <ArrowRight2 size={15} color="currentColor" />
+                </Link>
+                <a
+                  href="tel:+84901234567"
+                  className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-border text-white font-semibold text-sm hover:bg-surface transition-colors"
+                >
+                  <Call size={15} color="currentColor" /> 0901 234 567
+                </a>
+              </div>
+
+              {/* Spec badges */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { icon: ShieldTick, label: 'Quality Guarantee' },
+                  { icon: TruckFast,  label: 'Free Nationwide Ship' },
+                  { icon: Box,        label: '350gsm Matte Stock' },
+                ].map(({ icon: Icon, label }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30 border border-white/[0.08] px-3 py-1.5 rounded-full"
+                  >
+                    <Icon size={10} color="currentColor" />
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -75,3 +75,24 @@ a, button, [role="button"], label[for], summary {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+/* ── Racing marquee ─────────────────────────────────────────────────── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+/* ── Process step reveal ────────────────────────────────────────────── */
+@keyframes step-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-reveal {
+  animation: step-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

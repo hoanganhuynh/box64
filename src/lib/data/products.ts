@@ -18,7 +18,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    description: 'Hộp custom theo phong cách LB-WORKS GT-R R35 Nismo Supercar Advocates. Thiết kế trên AI, in 350gsm matte.',
+    material: 'box_seal', release_date: '2025-01-20',
+    description: 'Custom box in LB-WORKS GT-R R35 Nismo Supercar Advocates livery. AI-designed artwork, 350gsm matte print.',
     promotion: {
       id: 'p1', type: 'sale', label: 'SALE 20%', discount_pct: 20,
       starts_at: new Date(now - h(2)).toISOString(),
@@ -36,7 +37,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    description: 'Custom box Pandem Pocket Bunny GT-R R32 + Suzuki Twin R. Livery Sunoco retro, Tokyo Auto Salon 2026.',
+    material: 'box_only', release_date: '2025-02-15',
+    description: 'Custom box for the Pandem Pocket Bunny GT-R R32 + Suzuki Twin R. Retro Sunoco livery, Tokyo Auto Salon 2026.',
   },
   {
     id: 'fb-03',
@@ -48,7 +50,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['hot'],
-    description: 'Custom box phong cách Porsche 911 GT3-R #77/#80 AO Racing "Roxy" Pink — IMSA 2023/2024.',
+    material: 'box_seal', release_date: '2025-03-10',
+    description: 'Custom box in Porsche 911 GT3-R #77/#80 AO Racing "Roxy" Pink livery — IMSA 2023/2024.',
     promotion: {
       id: 'p3', type: 'flash_sale', label: 'FLASH -12%', discount_pct: 12,
       starts_at: new Date(now - h(1)).toISOString(),
@@ -66,7 +69,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 0,
     status: 'pre_order',
     tags: ['limited'],
-    description: 'Custom box Porsche 911 GT3 RS (992) Weissach Package Guards Red. Pre-order — giao tháng 7/2026.',
+    material: 'box_seal', release_date: '2026-07-01',
+    description: 'Custom box for the Porsche 911 GT3 RS (992) Weissach Package in Guards Red. Pre-order — ships July 2026.',
     promotion: {
       id: 'p2', type: 'pre_order', label: 'PRE-ORDER', discount_pct: 0,
       starts_at: new Date(now - h(48)).toISOString(),
@@ -84,7 +88,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['hot', 'limited'],
-    description: 'Custom box Porsche 911 GT3 R #9 Pfaff Motorsports. IMSA 2023 Sebring 12Hrs Winner, GTD PRO.',
+    material: 'box_seal', release_date: '2025-03-25',
+    description: 'Custom box for the Porsche 911 GT3 R #9 Pfaff Motorsports. IMSA 2023 Sebring 12 Hours Winner, GTD PRO class.',
     promotion: {
       id: 'p3', type: 'flash_sale', label: 'FLASH SALE', discount_pct: 15,
       starts_at: new Date(now - h(1)).toISOString(),
@@ -102,7 +107,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new', 'hot'],
-    description: 'Custom box Porsche 911 GT3-R AO Racing "Roxy" Green. IMSA Sebring 2023 + Daytona 2024.',
+    material: 'box_seal', release_date: '2025-04-10',
+    description: 'Custom box for the Porsche 911 GT3-R AO Racing "Roxy" Green livery. IMSA Sebring 2023 + Daytona 2024.',
     promotion: {
       id: 'p4', type: 'flash_sale', label: 'FLASH SALE', discount_pct: 15,
       starts_at: new Date(now - h(1)).toISOString(),
@@ -120,7 +126,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new'],
-    description: 'Custom box Porsche 911 Dakar #185, Roughroads. Rallye Design Package White/Gentian Blue.',
+    material: 'box_only', release_date: '2025-05-05',
+    description: 'Custom box for the Porsche 911 Dakar #185, Roughroads. Rallye Design Package in White/Gentian Blue.',
     created_at: new Date(now - h(72)).toISOString(),
   },
   {
@@ -133,7 +140,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new'],
-    description: 'Custom box Porsche 911 GT3 R #28 Cooler Master × HubAuto Racing. FIA GT World Cup Macau GP.',
+    material: 'box_seal', release_date: '2025-05-15',
+    description: 'Custom box for the Porsche 911 GT3 R #28 Cooler Master × HubAuto Racing. FIA GT World Cup Macau GP.',
     created_at: new Date(now - h(48)).toISOString(),
   },
   {
@@ -146,7 +154,8 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    description: 'Custom box LB-WORKS Nissan GT-R R35 Nismo Final Edition. Blue-white racing livery.',
+    material: 'box_only', release_date: '2024-12-10',
+    description: 'Custom box for the LB-WORKS Nissan GT-R R35 Nismo Final Edition. Blue-white racing livery.',
     promotion: {
       id: 'p5', type: 'sale', label: 'SALE 10%', discount_pct: 10,
       starts_at: new Date(now - h(12)).toISOString(),
@@ -164,7 +173,22 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 3,
     status: 'active',
     tags: ['bestseller', 'limited'],
-    description: 'Custom box Porsche 911 GT3 RS (992) Weissach Package. Matte black finish với gold foil detail.',
+    material: 'box_seal', release_date: '2025-05-20',
+    description: 'Custom box for the Porsche 911 GT3 RS (992) Weissach Package. Matte black finish with gold foil detail.',
+  },
+  {
+    id: 'fb-11',
+    type: 'box_custom',
+    name: 'Nissan Z GT500 NISMO — SUPER GT 2024',
+    slug: 'nissan-z-gt500-nismo-super-gt-2024',
+    price: 78000,
+    images: ['/products/p6.jpg'],
+    stock: 999,
+    status: 'active',
+    tags: ['new'],
+    material: 'box_only', release_date: '2025-06-01',
+    description: 'Custom box for the Nissan Z NISMO GT500 #3 XANAVI NISMO. Super GT 2024 livery, matte carbon black with neon red.',
+    created_at: new Date(now - h(18)).toISOString(),
   },
 ]
 

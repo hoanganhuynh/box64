@@ -18,6 +18,8 @@ export interface Product {
   promotion?: Promotion
   description?: string
   tags?: Array<'bestseller' | 'new' | 'hot' | 'limited'>
+  material?: 'box_only' | 'box_seal'
+  release_date?: string   // YYYY-MM-DD
   created_at?: string
 }
 

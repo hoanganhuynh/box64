@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { formatCountdown } from '@/lib/utils/format'
 
-export default function FlashCountdown({ endDate }: { endDate: string }) {
+export default function FlashCountdown({ endDate, large }: { endDate: string; large?: boolean }) {
   const [delta, setDelta] = useState(() => new Date(endDate).getTime() - Date.now())
 
   useEffect(() => {
@@ -18,15 +18,15 @@ export default function FlashCountdown({ endDate }: { endDate: string }) {
     : [{ v: String(hours).padStart(2, '0'), l: 'H' }, { v: String(minutes).padStart(2, '0'), l: 'M' }, { v: String(seconds).padStart(2, '0'), l: 'S' }]
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       {parts.map(({ v, l }, i) => (
-        <span key={l} className="flex items-center gap-1.5">
+        <span key={l} className="flex items-center gap-2">
           <span className="flex flex-col items-center">
-            <span className="font-mono font-black text-white text-xl tabular-nums leading-none">{v}</span>
-            <span className="text-[8px] text-white/40 font-bold uppercase tracking-widest leading-none mt-0.5">{l}</span>
+            <span className={`font-display font-extrabold text-white tabular-nums leading-none ${large ? 'text-4xl sm:text-5xl' : 'text-xl font-mono'}`}>{v}</span>
+            <span className={`text-white/50 font-bold uppercase tracking-widest leading-none mt-1 ${large ? 'text-[10px]' : 'text-[8px]'}`}>{l}</span>
           </span>
           {i < parts.length - 1 && (
-            <span className="font-mono font-black text-white/40 text-base -mt-2">:</span>
+            <span className={`font-display font-extrabold text-white/30 -mt-3 ${large ? 'text-3xl' : 'text-base'}`}>:</span>
           )}
         </span>
       ))}
