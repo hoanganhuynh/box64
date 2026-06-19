@@ -112,7 +112,7 @@ function SortSelect({ current, type }: { current: string; type: string }) {
         <option value="price_asc">Price: Low to High</option>
         <option value="price_desc">Price: High to Low</option>
       </select>
-      <button type="submit" className="text-xs bg-primary text-white px-3 py-1.5 rounded-sm hover:bg-primary/80 transition-colors">
+      <button type="submit" className="text-xs bg-surface border border-border text-muted hover:text-primary hover:border-gold/40 px-3 py-1.5 rounded-sm transition-colors">
         Go
       </button>
     </form>
