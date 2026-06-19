@@ -11,7 +11,7 @@ import { formatVND, formatCountdown } from '@/lib/utils/format'
 function CountdownBlock({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1 min-w-[52px]">
-      <span className="font-display font-extrabold text-white text-4xl sm:text-5xl tabular-nums leading-none">
+      <span className="font-display font-extrabold text-white text-3xl sm:text-5xl tabular-nums leading-none">
         {String(value).padStart(2, '0')}
       </span>
       <span className="text-[11px] font-bold uppercase tracking-widest text-white/40">{label}</span>
@@ -105,7 +105,7 @@ export default function PreOrderSpotlight({ product }: { product: Product }) {
           <div>
             <h2
               id="preorder-heading"
-              className="font-display font-extrabold text-primary uppercase text-4xl sm:text-5xl lg:text-[3.25rem] leading-[1.0] mb-3"
+              className="font-display font-extrabold text-primary uppercase text-3xl sm:text-4xl lg:text-5xl leading-[1.0] mb-3"
             >
               {product.name}
             </h2>

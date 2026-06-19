@@ -89,7 +89,7 @@ export default function HomePage() {
             </p>
             <h1
               id="hero-heading"
-              className="font-display font-extrabold uppercase text-white text-6xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight mb-5"
+              className="font-display font-extrabold uppercase text-white text-5xl sm:text-7xl lg:text-8xl leading-[0.95] tracking-tight mb-5"
               style={{ textShadow: '0 2px 32px rgba(0,0,0,0.8)' }}
             >
               Custom Box<br />
@@ -105,13 +105,13 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 mb-10">
               <Link
                 href="/shop"
-                className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
               >
                 Shop All Boxes <ArrowRight2 size={15} color="currentColor" />
               </Link>
               <a
                 href="tel:+84901234567"
-                className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
               >
                 <Call size={15} color="currentColor" /> 0901 234 567
               </a>
@@ -139,7 +139,7 @@ export default function HomePage() {
               View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {BESTSELLERS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} variant="light" />)}
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function HomePage() {
               View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {NEW_ARRIVALS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>
@@ -205,7 +205,7 @@ export default function HomePage() {
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8 sm:mb-14">
             <p className="text-gold text-xs font-bold tracking-[0.22em] uppercase mb-3">
               <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>How It&apos;s Made
             </p>
@@ -345,7 +345,7 @@ export default function HomePage() {
               </p>
               <h2
                 id="cta-heading"
-                className="font-display font-extrabold uppercase text-white leading-[0.9] text-5xl sm:text-6xl lg:text-7xl mb-6"
+                className="font-display font-extrabold uppercase text-white leading-[0.9] text-4xl sm:text-5xl lg:text-7xl mb-6"
               >
                 Your car.<br />
                 Your rules.<br />
@@ -381,14 +381,14 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
                   style={{ boxShadow: '0 4px 24px rgba(245,158,11,0.35)' }}
                 >
                   Browse Boxes <ArrowRight2 size={15} color="currentColor" />
                 </Link>
                 <a
                   href="tel:+84901234567"
-                  className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-border text-white font-semibold text-sm hover:bg-surface transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-border text-white font-semibold text-sm hover:bg-surface transition-colors"
                 >
                   <Call size={15} color="currentColor" /> 0901 234 567
                 </a>

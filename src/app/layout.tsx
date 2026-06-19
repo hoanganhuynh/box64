@@ -51,12 +51,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         {/* ── Announcement bar ── */}
         <div className="bg-gold text-[#07070C] text-xs font-semibold py-2 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 sm:gap-8 flex-wrap">
-            <span className="flex items-center gap-1.5">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 sm:gap-8">
+            {/* Mobile: single most-impactful message */}
+            <span className="flex sm:hidden items-center gap-1.5">
+              <Flash size={13} color="currentColor" variant="Bold" /> Flash Sale — up to 15% off
+            </span>
+            {/* sm+: all three */}
+            <span className="hidden sm:flex items-center gap-1.5">
               <TruckFast size={13} color="currentColor" /> Free shipping on orders 500k+
             </span>
             <span className="w-px h-3 bg-black/20 hidden sm:block" />
-            <span className="flex items-center gap-1.5">
+            <span className="hidden sm:flex items-center gap-1.5">
               <Flash size={13} color="currentColor" variant="Bold" /> Flash Sale live — up to 15% off
             </span>
             <span className="w-px h-3 bg-black/20 hidden sm:block" />

@@ -104,7 +104,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
       </Link>
 
       {/* ── Info ── */}
-      <div className="p-4 flex flex-col gap-2.5 flex-1">
+      <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-2.5 flex-1">
 
         {/* MiniGT badge + material */}
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -139,7 +139,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
               dark={dark}
             />
             {product.stock > 0 && product.stock <= 5 && (
-              <span className="text-xs text-error font-medium shrink-0">Only {product.stock} left</span>
+              <span className="hidden sm:inline text-xs text-error font-medium shrink-0">Only {product.stock} left</span>
             )}
           </div>
         </Link>

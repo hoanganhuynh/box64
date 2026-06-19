@@ -250,7 +250,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               What Collectors Say
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {reviews.map((r, i) => (
               <article key={i} className="bg-surface border border-border rounded-sm p-4 flex flex-col gap-3">
                 <div className="flex gap-0.5">
@@ -286,7 +286,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 View all →
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {related.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>

@@ -67,7 +67,7 @@ export default function StickyCartBar({ product, salePrice }: Props) {
 
           {/* Name + price */}
           <div className="flex-1 min-w-0">
-            <p className="text-white/45 text-[10px] truncate leading-none mb-1">{product.name}</p>
+            <p className="text-white/50 text-[11px] truncate leading-none mb-1">{product.name}</p>
             <p className="text-white font-bold text-base leading-none">{formatVND(salePrice)}</p>
           </div>
 
@@ -75,7 +75,7 @@ export default function StickyCartBar({ product, salePrice }: Props) {
           <button
             onClick={handleAdd}
             disabled={isOutOfStock}
-            className="shrink-0 inline-flex items-center gap-2 bg-gold text-[#07070C] text-xs font-bold px-5 py-3 rounded-sm uppercase tracking-wide transition-opacity hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="shrink-0 inline-flex items-center gap-2 bg-gold text-[#07070C] text-xs font-bold h-11 px-5 rounded-sm uppercase tracking-wide transition-opacity hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {added ? (
               <><Check size={14} strokeWidth={2.5} /> Added!</>
