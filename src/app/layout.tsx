@@ -20,6 +20,7 @@ const barlowCondensed = Barlow_Condensed({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://figbox.store'),
   title: 'figbox.store — Premium Custom 1:64 Diecast Box',
   description: 'Premium custom packaging for 1:64 MiniGT diecast model cars. Designed in Illustrator, printed on 350gsm, laser-cut, hand folded. Nationwide delivery.',
   openGraph: {

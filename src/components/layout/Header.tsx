@@ -18,7 +18,7 @@ function CartBadge() {
     <Link
       href="/cart"
       aria-label={`Cart${count > 0 ? ` — ${count} items` : ''}`}
-      className="relative w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/65 hover:text-white"
+      className="relative w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/65 hover:text-white"
     >
       <Bag2 size={20} color="currentColor" />
       {count > 0 && (
@@ -71,7 +71,7 @@ export default function Header() {
           </Link>
 
           {/* Mobile: phone icon */}
-          <a href={PHONE_HREF} className="md:hidden w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/55 hover:text-gold">
+          <a href={PHONE_HREF} className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/55 hover:text-gold">
             <Call size={18} color="currentColor" />
           </a>
 
@@ -81,7 +81,7 @@ export default function Header() {
             onClick={() => setMenuOpen(v => !v)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/60"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/60"
           >
             {menuOpen ? <CloseSquare size={19} color="currentColor" /> : <HambergerMenu size={19} color="currentColor" />}
           </button>

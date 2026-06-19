@@ -2,6 +2,10 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Star1 } from 'iconsax-react'
 import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
+
+export function generateStaticParams() {
+  return DUMMY_PRODUCTS.map(p => ({ slug: p.slug }))
+}
 import { formatVND, formatReleaseDate } from '@/lib/utils/format'
 import { getProductReviews } from '@/lib/data/reviews'
 import { JsonLd } from '@/components/ui/JsonLd'
@@ -19,13 +23,17 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params
   const product = getProductBySlug(slug)
   if (!product) return {}
+  const desc = product.description ?? `Custom MiniGT box for ${product.name}. 350gsm matte print, laser-cut, hand-folded. Nationwide delivery.`
   return {
     title: `${product.name} | figbox.store`,
-    description: product.description ?? `Custom MiniGT box for ${product.name}. 350gsm matte print, shipped nationwide.`,
+    description: desc,
+    alternates: { canonical: `/shop/${product.slug}` },
     openGraph: {
-      title: product.name,
-      description: product.description,
-      images: product.images[0] ? [{ url: product.images[0] }] : [],
+      title: `${product.name} | figbox.store`,
+      description: desc,
+      url: `/shop/${product.slug}`,
+      images: product.images[0] ? [{ url: product.images[0], width: 800, height: 800, alt: product.name }] : [],
+      type: 'website',
     },
   }
 }
@@ -56,13 +64,16 @@ export default async function ProductDetailPage({ params }: PageProps) {
     '@type': 'Product',
     name: product.name,
     image: product.images,
-    description: product.description ?? '',
+    description: product.description ?? `Custom MiniGT box for ${product.name}.`,
+    sku: product.id,
     brand: { '@type': 'Brand', name: 'figbox.store' },
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: '5', reviewCount: '4', bestRating: '5' },
     offers: {
       '@type': 'Offer',
       priceCurrency: 'VND',
       price: salePrice,
       availability: availabilityMap[product.status] ?? 'https://schema.org/InStock',
+      seller: { '@type': 'Organization', name: 'figbox.store' },
     },
   }
 

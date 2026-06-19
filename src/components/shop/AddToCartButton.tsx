@@ -28,7 +28,7 @@ export default function AddToCartButton({ product }: Props) {
         <div className="flex items-center border border-border rounded-sm overflow-hidden bg-surface">
           <button
             onClick={() => setQty(q => Math.max(1, q - 1))}
-            className="w-9 h-11 flex items-center justify-center text-muted hover:bg-bg hover:text-primary transition-colors text-lg font-light"
+            className="w-11 h-11 flex items-center justify-center text-muted hover:bg-bg hover:text-primary transition-colors text-lg font-light"
             disabled={qty <= 1}
           >
             −
@@ -36,7 +36,7 @@ export default function AddToCartButton({ product }: Props) {
           <span className="w-10 text-center text-sm font-semibold text-primary">{qty}</span>
           <button
             onClick={() => setQty(q => Math.min(99, q + 1))}
-            className="w-9 h-11 flex items-center justify-center text-muted hover:bg-bg hover:text-primary transition-colors text-lg font-light"
+            className="w-11 h-11 flex items-center justify-center text-muted hover:bg-bg hover:text-primary transition-colors text-lg font-light"
             disabled={qty >= 99}
           >
             +

@@ -148,7 +148,7 @@ export default function ProductCard({ product, variant = 'dark' }: Props) {
         <button
           onClick={handleAdd}
           disabled={isOutOfStock}
-          className={`w-full h-10 rounded-sm text-xs font-bold tracking-wide uppercase transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${
+          className={`w-full h-11 rounded-sm text-xs font-bold tracking-wide uppercase transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${
             isOutOfStock
               ? dark
                 ? 'bg-surface border border-border text-faint cursor-not-allowed'

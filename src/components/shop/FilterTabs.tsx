@@ -22,7 +22,7 @@ export default function FilterTabs() {
             key={tab.value}
             href={href}
             className={`
-              px-4 py-2 rounded-sm text-sm font-medium transition-colors
+              h-11 px-4 rounded-sm text-sm font-medium transition-colors inline-flex items-center
               ${isActive
                 ? 'bg-gold text-[#09090F]'
                 : 'bg-surface border border-border text-muted hover:border-gold/40 hover:text-primary'}

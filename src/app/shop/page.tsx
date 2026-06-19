@@ -1,9 +1,21 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { DUMMY_PRODUCTS } from '@/lib/data/products'
 import ProductGrid from '@/components/shop/ProductGrid'
 import FilterTabs from '@/components/shop/FilterTabs'
 import SaleBanner from '@/components/shop/SaleBanner'
 import type { Product } from '@/lib/types'
+
+export const metadata: Metadata = {
+  title: 'Shop — figbox.store | Custom 1:64 MiniGT Diecast Boxes',
+  description: 'Browse premium custom boxes for MiniGT 1:64 diecast cars. 350gsm matte print, laser-cut, hand-folded. Nationwide delivery in Vietnam.',
+  alternates: { canonical: '/shop' },
+  openGraph: {
+    title: 'Shop — figbox.store',
+    description: 'Premium custom packaging for MiniGT 1:64 diecast collectors.',
+    url: '/shop',
+  },
+}
 
 function filterProducts(products: Product[], type: string): Product[] {
   if (!type) return products

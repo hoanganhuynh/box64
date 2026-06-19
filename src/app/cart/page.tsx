@@ -65,14 +65,14 @@ export default function CartPage() {
                   <div className="flex items-center border border-border rounded-sm overflow-hidden bg-bg">
                     <button
                       onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
+                      className="w-11 h-11 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
                     >
                       −
                     </button>
                     <span className="w-8 text-center text-sm font-semibold text-primary">{item.quantity}</span>
                     <button
                       onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
+                      className="w-11 h-11 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
                     >
                       +
                     </button>

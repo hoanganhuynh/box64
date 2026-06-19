@@ -60,6 +60,14 @@ a, button, [role="button"], label[for], summary {
   cursor: pointer;
 }
 
+/* ── Mobile touch: eliminate 300ms tap delay, prevent pull-to-refresh ── */
+a, button, [role="button"] {
+  touch-action: manipulation;
+}
+body {
+  overscroll-behavior-y: contain;
+}
+
 /* ── Reduced motion (WCAG 2.3.3) ───────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
