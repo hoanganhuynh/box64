@@ -7,6 +7,7 @@ import { Flash } from 'iconsax-react'
 import type { Product } from '@/lib/types'
 import CountdownBadge from './CountdownBadge'
 import PriceDisplay from './PriceDisplay'
+import BrandLogo from '@/components/ui/BrandLogo'
 
 interface Props {
   product: Product
@@ -153,7 +154,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
       {/* ── Info ── */}
       <div className="p-3 sm:p-4 flex flex-col gap-2 sm:gap-2.5 flex-1">
 
-        {/* MiniGT logo + material + sold */}
+        {/* MiniGT logo + brand + material + sold */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <Image
             src="/mini-gt-seeklogo.svg"
@@ -162,6 +163,9 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             height={18}
             className={`object-contain shrink-0 ${dark ? 'invert' : ''}`}
           />
+          {product.brand && product.brand !== 'other' && (
+            <BrandLogo brand={product.brand} size={14} />
+          )}
           {product.material && (
             <span className={`text-[10px] border rounded px-1.5 py-0.5 leading-none ${
               dark ? 'text-[#a08070] border-[#3a2e28]' : 'text-[#A08070] border-[#EBE0D5]'
