@@ -13,7 +13,7 @@ describe('Product type', () => {
       stock: 10,
       status: 'active',
     }
-    expectTypeOf(p.type).toMatchTypeOf<'box_catalog' | 'box_custom' | 'accessory'>()
+    expectTypeOf(p.type).toMatchTypeOf<'box_catalog' | 'box_custom' | 'water_decal' | 'accessory_3d'>()
     expectTypeOf(p.status).toMatchTypeOf<'active' | 'pre_order' | 'out_of_stock'>()
   })
 })

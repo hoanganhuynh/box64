@@ -1,5 +1,6 @@
-export type ProductType = 'box_catalog' | 'box_custom' | 'accessory'
+export type ProductType = 'box_catalog' | 'box_custom' | 'water_decal' | 'accessory_3d'
 export type ProductStatus = 'active' | 'pre_order' | 'out_of_stock'
+export type CarBrand = 'nissan' | 'porsche' | 'lamborghini' | 'ferrari' | 'mclaren' | 'bmw' | 'toyota' | 'honda' | 'mercedes' | 'audi' | 'other'
 export type OrderStatus = 'pending' | 'printing' | 'shipped' | 'delivered' | 'cancelled'
 export type PaymentMethod = 'vnpay' | 'momo' | 'paypal'
 export type PromotionType = 'sale' | 'pre_order' | 'flash_sale'
@@ -18,8 +19,9 @@ export interface Product {
   promotion?: Promotion
   description?: string
   tags?: Array<'bestseller' | 'new' | 'hot' | 'limited'>
-  material?: 'box_only' | 'box_seal'
-  release_date?: string   // YYYY-MM-DD
+  material?: 'box_only' | 'box_protect'
+  brand?: CarBrand
+  release_date?: string   // YYYY-MM-DD — kept in data, not rendered in UI
   created_at?: string
 }
 
