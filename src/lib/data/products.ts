@@ -5,7 +5,7 @@ const h = (hours: number) => hours * 60 * 60 * 1000
 
 /**
  * figbox.store — custom MiniGT box showcase
- * All products are type box_custom; images are examples of boxes we've made
+ * All box products are type box_custom; images are examples of boxes we've made
  */
 export const DUMMY_PRODUCTS: Product[] = [
   {
@@ -18,7 +18,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    material: 'box_seal', release_date: '2025-01-20',
+    material: 'box_protect',
+    brand: 'nissan',
+    release_date: '2025-01-20',
     description: 'Custom box in LB-WORKS GT-R R35 Nismo Supercar Advocates livery. AI-designed artwork, 350gsm matte print.',
     promotion: {
       id: 'p1', type: 'sale', label: 'SALE 20%', discount_pct: 20,
@@ -37,7 +39,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    material: 'box_only', release_date: '2025-02-15',
+    material: 'box_only',
+    brand: 'nissan',
+    release_date: '2025-02-15',
     description: 'Custom box for the Pandem Pocket Bunny GT-R R32 + Suzuki Twin R. Retro Sunoco livery, Tokyo Auto Salon 2026.',
   },
   {
@@ -50,7 +54,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['hot'],
-    material: 'box_seal', release_date: '2025-03-10',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2025-03-10',
     description: 'Custom box in Porsche 911 GT3-R #77/#80 AO Racing "Roxy" Pink livery — IMSA 2023/2024.',
     promotion: {
       id: 'p3', type: 'flash_sale', label: 'FLASH -12%', discount_pct: 12,
@@ -69,7 +75,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 0,
     status: 'pre_order',
     tags: ['limited'],
-    material: 'box_seal', release_date: '2026-07-01',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2026-07-01',
     description: 'Custom box for the Porsche 911 GT3 RS (992) Weissach Package in Guards Red. Pre-order — ships July 2026.',
     promotion: {
       id: 'p2', type: 'pre_order', label: 'PRE-ORDER', discount_pct: 0,
@@ -88,7 +96,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['hot', 'limited'],
-    material: 'box_seal', release_date: '2025-03-25',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2025-03-25',
     description: 'Custom box for the Porsche 911 GT3 R #9 Pfaff Motorsports. IMSA 2023 Sebring 12 Hours Winner, GTD PRO class.',
     promotion: {
       id: 'p3', type: 'flash_sale', label: 'FLASH SALE', discount_pct: 15,
@@ -107,7 +117,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new', 'hot'],
-    material: 'box_seal', release_date: '2025-04-10',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2025-04-10',
     description: 'Custom box for the Porsche 911 GT3-R AO Racing "Roxy" Green livery. IMSA Sebring 2023 + Daytona 2024.',
     promotion: {
       id: 'p4', type: 'flash_sale', label: 'FLASH SALE', discount_pct: 15,
@@ -126,7 +138,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new'],
-    material: 'box_only', release_date: '2025-05-05',
+    material: 'box_only',
+    brand: 'porsche',
+    release_date: '2025-05-05',
     description: 'Custom box for the Porsche 911 Dakar #185, Roughroads. Rallye Design Package in White/Gentian Blue.',
     created_at: new Date(now - h(72)).toISOString(),
   },
@@ -140,7 +154,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new'],
-    material: 'box_seal', release_date: '2025-05-15',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2025-05-15',
     description: 'Custom box for the Porsche 911 GT3 R #28 Cooler Master × HubAuto Racing. FIA GT World Cup Macau GP.',
     created_at: new Date(now - h(48)).toISOString(),
   },
@@ -154,7 +170,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['bestseller'],
-    material: 'box_only', release_date: '2024-12-10',
+    material: 'box_only',
+    brand: 'nissan',
+    release_date: '2024-12-10',
     description: 'Custom box for the LB-WORKS Nissan GT-R R35 Nismo Final Edition. Blue-white racing livery.',
     promotion: {
       id: 'p5', type: 'sale', label: 'SALE 10%', discount_pct: 10,
@@ -173,7 +191,9 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 3,
     status: 'active',
     tags: ['bestseller', 'limited'],
-    material: 'box_seal', release_date: '2025-05-20',
+    material: 'box_protect',
+    brand: 'porsche',
+    release_date: '2025-05-20',
     description: 'Custom box for the Porsche 911 GT3 RS (992) Weissach Package. Matte black finish with gold foil detail.',
   },
   {
@@ -186,9 +206,52 @@ export const DUMMY_PRODUCTS: Product[] = [
     stock: 999,
     status: 'active',
     tags: ['new'],
-    material: 'box_only', release_date: '2025-06-01',
+    material: 'box_only',
+    brand: 'nissan',
+    release_date: '2025-06-01',
     description: 'Custom box for the Nissan Z NISMO GT500 #3 XANAVI NISMO. Super GT 2024 livery, matte carbon black with neon red.',
     created_at: new Date(now - h(18)).toISOString(),
+  },
+  {
+    id: 'fb-12',
+    type: 'water_decal',
+    name: 'Porsche 911 GT3-R IMSA — Water Slide Decal Set',
+    slug: 'porsche-911-gt3r-imsa-water-decal',
+    price: 45000,
+    images: ['/products/p3.jpg'],
+    stock: 999,
+    status: 'active',
+    tags: ['new'],
+    brand: 'porsche',
+    description: 'High-resolution water slide decal set for 1:64 Porsche 911 GT3-R IMSA liveries. Print on decal paper, apply with water. Includes 3 livery variants.',
+    created_at: new Date(now - h(24)).toISOString(),
+  },
+  {
+    id: 'fb-13',
+    type: 'water_decal',
+    name: 'Nissan GT-R R35 LB-Works — Water Slide Decal Set',
+    slug: 'nissan-gtr-r35-lb-works-water-decal',
+    price: 45000,
+    images: ['/products/p1.jpg'],
+    stock: 999,
+    status: 'active',
+    tags: ['new'],
+    brand: 'nissan',
+    description: 'High-resolution water slide decal set for 1:64 Nissan GT-R R35 LB-Works builds. Includes 4 livery variants. Apply with water, no cutting required.',
+    created_at: new Date(now - h(24)).toISOString(),
+  },
+  {
+    id: 'fb-14',
+    type: 'accessory_3d',
+    name: '1:64 Diecast Display Stand — Acrylic with Name Plate',
+    slug: '1-64-display-stand-acrylic-name-plate',
+    price: 35000,
+    images: ['/products/p7.jpg'],
+    stock: 999,
+    status: 'active',
+    tags: ['new'],
+    description: 'Acrylic display stand for 1:64 diecast models. Includes custom name plate engraving slot. Fits MiniGT and most 1:64 brands. Sold per unit.',
+    created_at: new Date(now - h(12)).toISOString(),
   },
 ]
 
@@ -217,4 +280,44 @@ export function getProductBySlug(slug: string): Product | undefined {
 export function getDiscountedPrice(product: Product): number {
   if (!product.promotion || product.promotion.discount_pct === 0) return product.price
   return Math.round(product.price * (1 - product.promotion.discount_pct / 100))
+}
+
+// ── Smart related products ───────────────────────────────────────────────────
+
+const STOPWORDS = new Set([
+  'the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'for', 'of', 'to', 'by', 'with',
+  'x', 'gt', 'rs', 'r', 'cup',
+  // Color words — excluded because "pink" and "green" variants of same car should score by event, not color
+  'red', 'blue', 'green', 'black', 'white', 'pink', 'silver', 'gold', 'orange', 'yellow',
+  'grey', 'gray', 'carbon', 'matte', 'gloss',
+])
+
+export function extractKeywords(name: string): string[] {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 1 && !STOPWORDS.has(w))
+}
+
+function scoreRelevance(target: Product, candidate: Product): number {
+  if (target.id === candidate.id) return -1
+  const tkw = extractKeywords(target.name)
+  const ckw = extractKeywords(candidate.name)
+  const targetSet = new Set(tkw)
+  let score = 0
+  for (const kw of ckw) {
+    if (targetSet.has(kw)) score += 1
+  }
+  if (target.brand && candidate.brand && target.brand === candidate.brand) score += 3
+  return score
+}
+
+export function getRelatedProducts(product: Product, limit = 4): Product[] {
+  return DUMMY_PRODUCTS
+    .filter(p => p.id !== product.id)
+    .map(p => ({ product: p, score: scoreRelevance(product, p) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(r => r.product)
 }
