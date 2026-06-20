@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowUp2, Call, Sms, Clock, Location } from 'iconsax-react'
+import { ArrowUp2, Location } from 'iconsax-react'
 import SampleRequestForm from './SampleRequestForm'
 
 const SHOP_LINKS = [
@@ -88,22 +88,6 @@ export default function Footer() {
               Contact
             </p>
             <ul className="space-y-3">
-              <li>
-                <a href="tel:+84901234567" className="flex items-center gap-2 text-white/40 hover:text-gold transition-colors group">
-                  <Call size={13} color="currentColor" variant="Bold" className="shrink-0 text-gold/50 group-hover:text-gold" />
-                  <span className="text-sm">0901 234 567</span>
-                </a>
-              </li>
-              <li>
-                <a href="mailto:hello@figbox.store" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors group">
-                  <Sms size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/25 group-hover:text-white/60" />
-                  <span className="text-sm">hello@figbox.store</span>
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-white/35">
-                <Clock size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/20" />
-                <span className="text-xs">Mon–Sat · 9:00–21:00</span>
-              </li>
               <li className="flex items-start gap-2 text-white/35">
                 <Location size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/20 mt-0.5" />
                 <span className="text-xs leading-relaxed">P.26, Bình Thạnh<br />TP. Hồ Chí Minh</span>
