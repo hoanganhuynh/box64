@@ -3,10 +3,17 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart'
 import { useEffect, useState } from 'react'
-import { Bag2, Call, ProfileCircle, HambergerMenu, CloseSquare } from 'iconsax-react'
+import { Bag2, ProfileCircle, HambergerMenu, CloseSquare } from 'iconsax-react'
 
-const PHONE = '0901 234 567'
-const PHONE_HREF = 'tel:+84901234567'
+const FB_HREF = 'https://www.facebook.com/figbox.gr'
+
+function FbIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+    </svg>
+  )
+}
 
 function CartBadge() {
   const totalItems = useCartStore(s => s.totalItems)
@@ -69,14 +76,17 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right: phone + login + cart */}
+        {/* Right: contact + login + cart */}
         <div className="flex items-center justify-end gap-1">
+          {/* Desktop: Contact → Facebook */}
           <a
-            href={PHONE_HREF}
-            aria-label="Call us"
+            href={FB_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contact us on Facebook"
             className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-2"
           >
-            <Call size={15} color="currentColor" /> {PHONE}
+            <FbIcon size={15} /> Contact
           </a>
           <Link
             href="/login"
@@ -86,9 +96,15 @@ export default function Header() {
             <ProfileCircle size={17} color="currentColor" /> Login
           </Link>
 
-          {/* Mobile: phone icon */}
-          <a href={PHONE_HREF} className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/55 hover:text-gold">
-            <Call size={18} color="currentColor" />
+          {/* Mobile: Contact icon → Facebook */}
+          <a
+            href={FB_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contact us on Facebook"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/55 hover:text-gold"
+          >
+            <FbIcon size={18} />
           </a>
 
           <CartBadge />
