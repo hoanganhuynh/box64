@@ -5,7 +5,8 @@ import Header from '../Header'
 describe('Header', () => {
   it('renders the brand logo link', () => {
     render(<Header />)
-    expect(screen.getByRole('link', { name: /box64/i })).toBeInTheDocument()
+    // Logo link has aria-label="figbox.store — home"
+    expect(screen.getByRole('link', { name: /figbox/i })).toBeInTheDocument()
   })
 
   it('renders a Shop navigation link', () => {
@@ -13,8 +14,9 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: /^shop$/i })).toBeInTheDocument()
   })
 
-  it('renders cart icon button', () => {
+  it('renders cart link', () => {
     render(<Header />)
-    expect(screen.getByRole('button', { name: /cart/i })).toBeInTheDocument()
+    // Cart is a <Link> (anchor), not a <button>
+    expect(screen.getByRole('link', { name: /cart/i })).toBeInTheDocument()
   })
 })

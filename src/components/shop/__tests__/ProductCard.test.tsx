@@ -31,11 +31,14 @@ describe('ProductCard', () => {
       },
     }
     render(<ProductCard product={withPromo} />)
-    expect(screen.getByText('SALE 20% OFF')).toBeInTheDocument()
+    // Card shows "Sale off N%" using discount_pct, not promo.label
+    expect(screen.getByText('Sale off 20%')).toBeInTheDocument()
   })
 
   it('links to product detail page', () => {
     render(<ProductCard product={mockProduct} />)
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/shop/lb-works')
+    // Card has two links (image + name/price) — verify at least one points to the detail page
+    const links = screen.getAllByRole('link')
+    expect(links.some(l => l.getAttribute('href') === '/shop/lb-works')).toBe(true)
   })
 })

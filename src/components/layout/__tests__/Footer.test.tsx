@@ -5,7 +5,8 @@ import Footer from '../Footer'
 describe('Footer', () => {
   it('renders brand name', () => {
     render(<Footer />)
-    expect(screen.getByText(/box64/i)).toBeInTheDocument()
+    // Logo img has alt="figbox.store"
+    expect(screen.getByAltText(/figbox/i)).toBeInTheDocument()
   })
 
   it('renders track order link', () => {
@@ -13,8 +14,8 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: /track order/i })).toBeInTheDocument()
   })
 
-  it('renders design your box link', () => {
+  it('renders Facebook link', () => {
     render(<Footer />)
-    expect(screen.getByRole('link', { name: /design your box/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /figbox\.gr/i })).toBeInTheDocument()
   })
 })
