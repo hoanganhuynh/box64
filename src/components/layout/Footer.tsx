@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowUp2, Call, Sms, Clock, Location } from 'iconsax-react'
+import SampleRequestForm from './SampleRequestForm'
 
 const SHOP_LINKS = [
   { label: 'All Products', href: '/shop' },
@@ -42,6 +43,30 @@ export default function Footer() {
         style={{ background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.06) 0%, transparent 70%)' }}
       />
 
+      {/* ── Sample request form ── */}
+      <div className="relative border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+            {/* Left: headline */}
+            <div className="lg:col-span-2">
+              <p className="text-gold text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
+                <span className="opacity-40 mr-1.5">//</span>Free Sample
+              </p>
+              <h2 className="font-display font-extrabold text-white text-2xl sm:text-3xl uppercase leading-tight mb-3">
+                Request a<br />Sample Box
+              </h2>
+              <p className="text-white/40 text-sm leading-relaxed max-w-xs">
+                Tell us which cars you collect. We&apos;ll send you a sample box so you can feel the quality before ordering.
+              </p>
+            </div>
+            {/* Right: form */}
+            <div className="lg:col-span-3">
+              <SampleRequestForm />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── footer body ── */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
@@ -82,6 +107,20 @@ export default function Footer() {
               <li className="flex items-start gap-2 text-white/35">
                 <Location size={13} color="currentColor" variant="Bold" className="shrink-0 text-white/20 mt-0.5" />
                 <span className="text-xs leading-relaxed">P.26, Bình Thạnh<br />TP. Hồ Chí Minh</span>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/figbox.gr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-white/40 hover:text-[#1877F2] transition-colors group"
+                >
+                  {/* Facebook icon — inline SVG, no extra dependency */}
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-[#1877F2]/50 group-hover:text-[#1877F2]" aria-hidden="true">
+                    <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                  </svg>
+                  <span className="text-sm">figbox.gr</span>
+                </a>
               </li>
             </ul>
           </div>
