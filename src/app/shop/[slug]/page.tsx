@@ -2,12 +2,12 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast, InfoCircle } from 'iconsax-react'
-import { getProductBySlug, DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
+import { getProductBySlug, getDiscountedPrice, getRelatedProducts, DUMMY_PRODUCTS } from '@/lib/data/products'
 
 export function generateStaticParams() {
   return DUMMY_PRODUCTS.map(p => ({ slug: p.slug }))
 }
-import { formatVND, formatReleaseDate } from '@/lib/utils/format'
+import { formatVND } from '@/lib/utils/format'
 import { getProductReviews } from '@/lib/data/reviews'
 import { JsonLd } from '@/components/ui/JsonLd'
 import CountdownBadge from '@/components/shop/CountdownBadge'
@@ -50,7 +50,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const isPreOrder = product.status === 'pre_order'
   const isOutOfStock = product.stock === 0 && !isPreOrder
 
-  const related = DUMMY_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4)
+  const related = getRelatedProducts(product, 4)
   const reviews = getProductReviews(product.slug)
   const racingNumber = product.id.replace(/\D/g, '').padStart(2, '0')
 
@@ -147,12 +147,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             <Image src="/mini-gt-seeklogo.svg" alt="MiniGT" width={38} height={18} className="object-contain shrink-0 invert" />
             {product.material && (
               <span className="text-[10px] text-[#a08070] border border-[#3a2e28] rounded px-1.5 py-0.5 leading-none">
-                {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
-              </span>
-            )}
-            {product.release_date && (
-              <span className="text-[10px] text-[#666] leading-none">
-                {formatReleaseDate(product.release_date)}
+                {product.material === 'box_protect' ? 'Box + Protect' : 'Box Only'}
               </span>
             )}
           </div>

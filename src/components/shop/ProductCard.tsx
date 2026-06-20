@@ -138,7 +138,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             <span className={`text-[10px] border rounded px-1.5 py-0.5 leading-none ${
               dark ? 'text-[#a08070] border-[#3a2e28]' : 'text-[#A08070] border-[#EBE0D5]'
             }`}>
-              {product.material === 'box_seal' ? 'Box + Seal' : 'Box Only'}
+              {product.material === 'box_protect' ? 'Box + Protect' : 'Box Only'}
             </span>
           )}
           {!(isFlashSale && showFlashProgress) && (
