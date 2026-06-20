@@ -97,23 +97,30 @@ export default function Header() {
 
       {/* ── Mobile menu ── */}
       {menuOpen && (
-        <nav aria-label="Mobile navigation" className="md:hidden border-t border-border bg-header">
+        <nav aria-label="Mobile navigation" className="md:hidden border-t border-white/[0.05] bg-header">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-col">
             <Link href="/shop" onClick={() => setMenuOpen(false)}
-              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40">
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05]">
               Shop
             </Link>
             <Link href="/track" onClick={() => setMenuOpen(false)}
-              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40">
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05]">
               Track Order
             </Link>
             <Link href="/login" onClick={() => setMenuOpen(false)}
-              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40 flex items-center gap-2.5">
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
               <ProfileCircle size={18} color="currentColor" /> Login
             </Link>
-            <a href={PHONE_HREF}
-              className="py-4 px-3 text-base font-semibold text-gold/80 hover:text-gold hover:bg-white/5 rounded-sm transition-colors flex items-center gap-2.5">
-              <Call size={17} color="currentColor" /> {PHONE}
+            <a
+              href="https://www.facebook.com/figbox.gr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-4 px-3 text-base font-semibold text-gold/80 hover:text-gold hover:bg-white/5 rounded-sm transition-colors flex items-center gap-2.5"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+              </svg>
+              Contact
             </a>
           </div>
         </nav>

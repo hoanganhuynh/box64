@@ -164,7 +164,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             className={`object-contain shrink-0 ${dark ? 'invert' : ''}`}
           />
           {product.brand && product.brand !== 'other' && (
-            <BrandLogo brand={product.brand} size={14} />
+            <BrandLogo brand={product.brand} size={22} />
           )}
           {product.material && (
             <span className={`text-[10px] border rounded px-1.5 py-0.5 leading-none ${
