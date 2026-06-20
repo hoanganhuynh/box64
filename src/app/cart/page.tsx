@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
+import { ShoppingCart, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 
@@ -38,6 +38,9 @@ export default function CartPage() {
         <h1 className="font-jakarta font-extrabold text-primary text-2xl sm:text-3xl">Shopping Cart</h1>
         <span className="text-muted text-sm">{count} {count === 1 ? 'item' : 'items'}</span>
       </div>
+
+      {/* Freeship progress */}
+      <FreeshipBanner subtotal={total} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -131,6 +134,34 @@ export default function CartPage() {
             </p>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+const FREESHIP_THRESHOLD = 500000
+
+function FreeshipBanner({ subtotal }: { subtotal: number }) {
+  const remaining = FREESHIP_THRESHOLD - subtotal
+  const pct = Math.min(100, Math.round((subtotal / FREESHIP_THRESHOLD) * 100))
+  const qualified = remaining <= 0
+
+  return (
+    <div className="mb-6 rounded-sm border border-border bg-surface px-4 py-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Truck size={14} className={qualified ? 'text-success' : 'text-muted'} />
+        <p className="text-xs font-medium text-primary">
+          {qualified
+            ? 'You qualify for free nationwide shipping!'
+            : <>Add <span className="text-gold font-bold">{formatVND(remaining)}</span> more for free nationwide shipping</>
+          }
+        </p>
+      </div>
+      <div className="h-1.5 rounded-full bg-bg overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${qualified ? 'bg-success' : 'bg-gold'}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   )
