@@ -58,7 +58,7 @@ export default function Header() {
             aria-expanded={menuOpen}
             className="md:hidden w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/60"
           >
-            {menuOpen ? <CloseSquare size={19} color="currentColor" /> : <HambergerMenu size={19} color="currentColor" />}
+            {menuOpen ? <CloseSquare size={22} color="currentColor" /> : <HambergerMenu size={22} color="currentColor" />}
           </button>
         </div>
 
@@ -98,18 +98,22 @@ export default function Header() {
       {/* ── Mobile menu ── */}
       {menuOpen && (
         <nav aria-label="Mobile navigation" className="md:hidden border-t border-border bg-header">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-1">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-col">
             <Link href="/shop" onClick={() => setMenuOpen(false)}
-              className="py-2.5 px-3 text-sm font-medium text-white/65 hover:text-white hover:bg-white/5 rounded-sm transition-colors">Shop</Link>
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40">
+              Shop
+            </Link>
             <Link href="/track" onClick={() => setMenuOpen(false)}
-              className="py-2.5 px-3 text-sm font-medium text-white/65 hover:text-white hover:bg-white/5 rounded-sm transition-colors">Track Order</Link>
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40">
+              Track Order
+            </Link>
             <Link href="/login" onClick={() => setMenuOpen(false)}
-              className="py-2.5 px-3 text-sm font-medium text-white/65 hover:text-white hover:bg-white/5 rounded-sm transition-colors flex items-center gap-2">
-              <ProfileCircle size={15} color="currentColor" /> Login
+              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-border/40 flex items-center gap-2.5">
+              <ProfileCircle size={18} color="currentColor" /> Login
             </Link>
             <a href={PHONE_HREF}
-              className="py-2.5 px-3 text-sm font-medium text-gold/80 hover:text-gold hover:bg-white/5 rounded-sm transition-colors flex items-center gap-2">
-              <Call size={14} color="currentColor" /> {PHONE}
+              className="py-4 px-3 text-base font-semibold text-gold/80 hover:text-gold hover:bg-white/5 rounded-sm transition-colors flex items-center gap-2.5">
+              <Call size={17} color="currentColor" /> {PHONE}
             </a>
           </div>
         </nav>
