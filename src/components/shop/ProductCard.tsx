@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Check } from 'lucide-react'
 import { Flash } from 'iconsax-react'
 import type { Product } from '@/lib/types'
 import CountdownBadge from './CountdownBadge'
 import PriceDisplay from './PriceDisplay'
-import { useCartStore } from '@/lib/store/cart'
 
 interface Props {
   product: Product
@@ -25,7 +23,7 @@ function getSoldCount(slug: string): number {
 
 function getFlashSoldCount(slug: string): number {
   const sum = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
-  return (sum % 15) + 3  // 3–17 sold out of 20
+  return (sum % 15) + 3
 }
 
 export default function ProductCard({ product, variant = 'dark', showFlashProgress = false }: Props) {
@@ -35,20 +33,28 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
   const isOutOfStock = product.stock === 0 && product.status !== 'pre_order'
   const isPreOrder = product.status === 'pre_order'
   const dark = variant === 'dark'
-  const addItem = useCartStore(s => s.addItem)
-  const [added, setAdded] = useState(false)
+
+  const images = product.images
+  const [imgIndex, setImgIndex] = useState(0)
+  const pointerStart = useRef<{ x: number; y: number } | null>(null)
 
   const sold = getSoldCount(product.slug)
   const flashSold = (isFlashSale && showFlashProgress) ? getFlashSoldCount(product.slug) : 0
   const flashPct = Math.round((flashSold / FLASH_TOTAL) * 100)
 
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (isOutOfStock) return
-    addItem(product, 1)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
+  const onPointerDown = (e: React.PointerEvent) => {
+    pointerStart.current = { x: e.clientX, y: e.clientY }
+  }
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!pointerStart.current || images.length < 2) return
+    const dx = e.clientX - pointerStart.current.x
+    const dy = e.clientY - pointerStart.current.y
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) setImgIndex(i => (i + 1) % images.length)
+      else setImgIndex(i => (i - 1 + images.length) % images.length)
+    }
+    pointerStart.current = null
   }
 
   return (
@@ -59,11 +65,17 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
     }`}>
 
       {/* ── Image ── */}
-      <Link href={`/shop/${product.slug}`} className={`relative block aspect-square overflow-hidden ${dark ? 'bg-[#0C0C18]' : 'bg-[#F5F0EA]'}`}>
+      <Link
+        href={`/shop/${product.slug}`}
+        className={`relative block aspect-square overflow-hidden select-none ${dark ? 'bg-[#0C0C18]' : 'bg-[#F5F0EA]'}`}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      >
         <Image
-          src={product.images[0]}
+          src={images[imgIndex] ?? images[0]}
           alt={product.name}
           fill
+          draggable={false}
           className={`object-cover transition-transform duration-300 ease-out group-hover:scale-105 ${isOutOfStock ? 'opacity-50' : ''}`}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
@@ -80,7 +92,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
           </span>
         )}
 
-        {/* Top-right: hot / new release / limited */}
+        {/* Top-right: hot / new / limited */}
         {product.tags?.includes('hot') && (
           <span className="absolute top-3 right-3 bg-[#EA580C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase leading-none">
             Hot
@@ -88,7 +100,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
         )}
         {!product.tags?.includes('hot') && product.tags?.includes('new') && (
           <span className="absolute top-3 right-3 bg-[#16A34A] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase leading-none">
-            New Release
+            New
           </span>
         )}
         {!product.tags?.includes('hot') && !product.tags?.includes('new') && product.tags?.includes('limited') && (
@@ -105,7 +117,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
           </div>
         )}
 
-        {/* Countdown bottom-left */}
+        {/* Countdown */}
         {isActive && (promo!.type === 'sale' || promo!.type === 'flash_sale') && (
           <div className="absolute bottom-2.5 left-2.5">
             <CountdownBadge
@@ -118,6 +130,22 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
         {isPreOrder && isActive && (
           <div className="absolute bottom-2.5 left-2.5">
             <CountdownBadge label="SHIPS IN" endDate={promo!.ends_at} variant="pre_order" />
+          </div>
+        )}
+
+        {/* Dot indicators — only if multiple images */}
+        {images.length > 1 && (
+          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`block rounded-full transition-all duration-200 ${
+                  i === imgIndex
+                    ? 'w-4 h-1.5 bg-white'
+                    : 'w-1.5 h-1.5 bg-white/40'
+                }`}
+              />
+            ))}
           </div>
         )}
       </Link>
@@ -148,7 +176,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
           )}
         </div>
 
-        {/* Name + price — clickable */}
+        {/* Name + price */}
         <Link href={`/shop/${product.slug}`} className="flex flex-col gap-1.5 flex-1">
           <h3 className={`font-semibold text-sm leading-snug line-clamp-2 transition-colors duration-200 ${
             dark
@@ -169,7 +197,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
           </div>
         </Link>
 
-        {/* Flash sale progress bar — "đang cháy hàng" — only in FlashSaleSection */}
+        {/* Flash sale progress bar — only in FlashSaleSection */}
         {isFlashSale && showFlashProgress && (
           <div
             className="relative h-[26px] rounded-full overflow-hidden"
@@ -177,56 +205,24 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             role="meter"
             aria-valuenow={flashSold}
             aria-valuemax={FLASH_TOTAL}
-            aria-label={`Đã bán ${flashSold}/${FLASH_TOTAL} suất`}
+            aria-label={`${flashSold}/${FLASH_TOTAL} slots sold`}
           >
-            {/* Orange fill — sold portion */}
             <div
               className="absolute inset-y-0 left-0 transition-none"
-              style={{
-                width: `${flashPct}%`,
-                background: 'linear-gradient(90deg, #C2410C 0%, #F97316 100%)',
-              }}
+              style={{ width: `${flashPct}%`, background: 'linear-gradient(90deg, #C2410C 0%, #F97316 100%)' }}
             />
-            {/* Shimmer on fill */}
             <div
               className="absolute inset-y-0 left-0 pointer-events-none"
-              style={{
-                width: `${flashPct}%`,
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%)',
-              }}
+              style={{ width: `${flashPct}%`, background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 60%)' }}
             />
-            {/* Icon + text */}
             <div className="relative h-full flex items-center gap-1 px-2.5">
               <Flash size={11} color="#FCD34D" variant="Bold" />
               <span className="text-white text-[10px] font-bold tracking-wide leading-none drop-shadow-sm">
-                Đã bán {flashSold}/{FLASH_TOTAL} suất
+                {flashSold}/{FLASH_TOTAL} slots sold
               </span>
             </div>
           </div>
         )}
-
-        {/* Add to Cart */}
-        <button
-          onClick={handleAdd}
-          disabled={isOutOfStock}
-          className={`w-full h-11 rounded-sm text-xs font-bold tracking-wide uppercase transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${
-            isOutOfStock
-              ? dark
-                ? 'bg-surface border border-border text-faint cursor-not-allowed'
-                : 'bg-[#F0EDE8] text-[#B0A090] cursor-not-allowed'
-              : added
-                ? 'bg-[#16A34A] text-white'
-                : dark
-                  ? 'bg-gold text-[#07070C] hover:opacity-90'
-                  : 'bg-[#07070C] text-white hover:bg-[#1a1a1a]'
-          }`}
-        >
-          {added ? (
-            <><Check size={14} strokeWidth={2.5} /> Added!</>
-          ) : isOutOfStock ? 'Out of stock' : (
-            <><ShoppingCart size={14} strokeWidth={2} /> {isPreOrder ? 'Pre-order' : 'Add to Cart'}</>
-          )}
-        </button>
       </div>
     </div>
   )
