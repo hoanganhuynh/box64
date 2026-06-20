@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowUp2, Location } from 'iconsax-react'
-import SampleRequestForm from './SampleRequestForm'
 
 const SHOP_LINKS = [
   { label: 'All Products', href: '/shop' },
@@ -42,30 +41,6 @@ export default function Footer() {
         className="absolute -top-12 left-1/2 -translate-x-1/2 w-[600px] h-32 rounded-full pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at center, rgba(245,158,11,0.06) 0%, transparent 70%)' }}
       />
-
-      {/* ── Sample request form ── */}
-      <div className="relative border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-            {/* Left: headline */}
-            <div className="lg:col-span-2">
-              <p className="text-gold text-[10px] font-bold tracking-[0.2em] uppercase mb-2">
-                <span className="opacity-40 mr-1.5">//</span>Free Sample
-              </p>
-              <h2 className="font-display font-extrabold text-white text-2xl sm:text-3xl uppercase leading-tight mb-3">
-                Request a<br />Sample Box
-              </h2>
-              <p className="text-white/40 text-sm leading-relaxed max-w-xs">
-                Tell us which cars you collect. We&apos;ll send you a sample box so you can feel the quality before ordering.
-              </p>
-            </div>
-            {/* Right: form */}
-            <div className="lg:col-span-3">
-              <SampleRequestForm />
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* ── footer body ── */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">

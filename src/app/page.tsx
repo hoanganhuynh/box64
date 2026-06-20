@@ -3,11 +3,11 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  ArrowRight2, ShieldTick, TruckFast, Flash, Star1,
+  ArrowRight2, TruckFast, Flash, Star1,
   Designtools, Printer, Scissor, Layer, TickCircle, Box,
-  Call,
   type Icon,
 } from 'iconsax-react'
+import SampleRequestForm from '@/components/layout/SampleRequestForm'
 import {
   BESTSELLERS, NEW_ARRIVALS,
   getPreOrderProducts,
@@ -110,10 +110,15 @@ export default function HomePage() {
                 Shop All Boxes <ArrowRight2 size={15} color="currentColor" />
               </Link>
               <a
-                href="tel:+84901234567"
+                href="https://www.facebook.com/figbox.gr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
               >
-                <Call size={15} color="currentColor" /> 0901 234 567
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                </svg>
+                Contact
               </a>
             </div>
           </div>
@@ -368,40 +373,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right: CTAs + spec badges */}
-            <div className="flex flex-col items-start lg:items-end gap-5 shrink-0">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  href="/shop"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
-                  style={{ boxShadow: '0 4px 24px rgba(245,158,11,0.35)' }}
-                >
-                  Browse Boxes <ArrowRight2 size={15} color="currentColor" />
-                </Link>
-                <a
-                  href="tel:+84901234567"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-7 rounded-sm border border-border text-white font-semibold text-sm hover:bg-surface transition-colors"
-                >
-                  <Call size={15} color="currentColor" /> 0901 234 567
-                </a>
-              </div>
-
-              {/* Spec badges */}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { icon: ShieldTick, label: 'Quality Guarantee' },
-                  { icon: TruckFast,  label: 'Free Nationwide Ship' },
-                  { icon: Box,        label: '350gsm Matte Stock' },
-                ].map(({ icon: Icon, label }) => (
-                  <span
-                    key={label}
-                    className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30 border border-white/[0.08] px-3 py-1.5 rounded-full"
-                  >
-                    <Icon size={10} color="currentColor" />
-                    {label}
-                  </span>
-                ))}
-              </div>
+            {/* Right: sample request form */}
+            <div className="w-full lg:w-[480px] shrink-0">
+              <SampleRequestForm />
             </div>
           </div>
         </div>
