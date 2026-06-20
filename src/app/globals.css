@@ -95,6 +95,16 @@ body {
   will-change: transform;
 }
 
+/* ── Cart badge bump ────────────────────────────────────────────────── */
+@keyframes badge-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.45); }
+  100% { transform: scale(1); }
+}
+.badge-bump {
+  animation: badge-bump 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* ── Process step reveal ────────────────────────────────────────────── */
 @keyframes step-reveal {
   from { opacity: 0; transform: translateY(10px); }

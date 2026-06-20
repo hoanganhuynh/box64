@@ -17,12 +17,13 @@ function CartBadge() {
   return (
     <Link
       href="/cart"
+      data-cart-icon
       aria-label={`Cart${count > 0 ? ` — ${count} items` : ''}`}
       className="relative w-11 h-11 flex items-center justify-center rounded-sm hover:bg-white/10 transition-colors text-white/65 hover:text-white"
     >
       <Bag2 size={20} color="currentColor" />
       {count > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-gold rounded-full text-[9px] font-bold text-[#07070C] flex items-center justify-center leading-none px-[3px]">
+        <span data-cart-badge className="absolute -top-1 -right-1 min-w-[17px] h-[17px] bg-gold rounded-full text-[9px] font-bold text-[#07070C] flex items-center justify-center leading-none px-[3px]">
           {count > 99 ? '99+' : count}
         </span>
       )}

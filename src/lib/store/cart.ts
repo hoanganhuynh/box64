@@ -4,6 +4,12 @@ import { persist } from 'zustand/middleware'
 import type { CartItem, Product } from '@/lib/types'
 import { getDiscountedPrice } from '@/lib/data/products'
 
+export interface FlyEvent {
+  id: number
+  imgSrc: string
+  startRect: { top: number; left: number; width: number; height: number }
+}
+
 interface CartStore {
   items: CartItem[]
   addItem: (product: Product, qty?: number) => void
@@ -12,6 +18,9 @@ interface CartStore {
   clearCart: () => void
   totalItems: () => number
   subtotal: () => number
+  flyEvent: FlyEvent | null
+  triggerFly: (imgSrc: string, startRect: FlyEvent['startRect']) => void
+  clearFly: () => void
 }
 
 export const useCartStore = create<CartStore>()(
@@ -58,7 +67,12 @@ export const useCartStore = create<CartStore>()(
 
       subtotal: () =>
         get().items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0),
+
+      flyEvent: null,
+      triggerFly: (imgSrc, startRect) =>
+        set({ flyEvent: { id: Date.now(), imgSrc, startRect } }),
+      clearFly: () => set({ flyEvent: null }),
     }),
-    { name: 'box64-cart' }
+    { name: 'box64-cart', partialize: (s) => ({ items: s.items }) }
   )
 )

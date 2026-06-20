@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Barlow_Condensed } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import CartFlyAnimation from '@/components/shop/CartFlyAnimation'
 import { TruckFast, Flash, Star1 } from 'iconsax-react'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Footer />
+        <CartFlyAnimation />
       </body>
     </html>
   )

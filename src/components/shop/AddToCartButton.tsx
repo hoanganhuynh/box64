@@ -8,6 +8,7 @@ interface Props { product: Product }
 
 export default function AddToCartButton({ product }: Props) {
   const addItem = useCartStore(s => s.addItem)
+  const triggerFly = useCartStore(s => s.triggerFly)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
 
@@ -18,11 +19,22 @@ export default function AddToCartButton({ product }: Props) {
     addItem(product, qty)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
+
+    // Fly animation: capture main image position
+    const imgEl = document.querySelector('[data-product-main-image]')
+    if (imgEl && product.images[0]) {
+      const rect = imgEl.getBoundingClientRect()
+      triggerFly(product.images[0], {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      })
+    }
   }
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Qty + button row */}
       <div className="flex items-center gap-3">
         {/* Quantity stepper */}
         <div className="flex items-center border border-border rounded-sm overflow-hidden bg-surface">

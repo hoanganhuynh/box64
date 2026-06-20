@@ -21,6 +21,7 @@ export default function ImageGallery({ images, name, badge }: Props) {
           src={images[active] ?? images[0]}
           alt={name}
           fill
+          data-product-main-image
           className="object-cover"
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
