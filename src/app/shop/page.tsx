@@ -17,16 +17,20 @@ export const metadata: Metadata = {
   },
 }
 
-function filterProducts(products: Product[], type: string): Product[] {
-  if (!type) return products
+function filterProducts(products: Product[], type: string, brand: string): Product[] {
+  let result = products
   if (type === 'sale') {
-    return products.filter(p => {
+    result = result.filter(p => {
       const promo = p.promotion
       return promo && ['sale', 'flash_sale'].includes(promo.type) && new Date(promo.ends_at) > new Date()
     })
+  } else if (type === 'pre_order') {
+    result = result.filter(p => p.status === 'pre_order')
+  } else if (type) {
+    result = result.filter(p => p.type === type)
   }
-  if (type === 'pre_order') return products.filter(p => p.status === 'pre_order')
-  return products.filter(p => p.type === type)
+  if (brand) result = result.filter(p => p.brand === brand)
+  return result
 }
 
 function sortProducts(products: Product[], sort: string): Product[] {
@@ -37,19 +41,20 @@ function sortProducts(products: Product[], sort: string): Product[] {
 
 const TAB_LABELS: Record<string, string> = {
   '': 'All Products',
-  'box_catalog': 'MiniGT Templates',
-  'box_custom': 'Custom Box',
+  'box_custom': 'Box Custom',
+  'water_decal': 'Water Decal',
+  'accessory_3d': '3D Accessories',
   'pre_order': 'Pre-order',
   'sale': 'On Sale',
 }
 
 interface PageProps {
-  searchParams: Promise<{ type?: string; sort?: string }>
+  searchParams: Promise<{ type?: string; brand?: string; sort?: string }>
 }
 
 export default async function ShopPage({ searchParams }: PageProps) {
-  const { type = '', sort = '' } = await searchParams
-  const filtered = filterProducts(DUMMY_PRODUCTS, type)
+  const { type = '', brand = '', sort = '' } = await searchParams
+  const filtered = filterProducts(DUMMY_PRODUCTS, type, brand)
   const products = sortProducts(filtered, sort)
 
   const hasFlashSale = DUMMY_PRODUCTS.some(p =>
@@ -74,7 +79,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
             </p>
           </div>
           <Suspense>
-            <SortSelect current={sort} type={type} />
+            <SortSelect current={sort} type={type} brand={brand} />
           </Suspense>
         </div>
 
@@ -92,13 +97,11 @@ export default async function ShopPage({ searchParams }: PageProps) {
   )
 }
 
-function SortSelect({ current, type }: { current: string; type: string }) {
-  // Server component — renders a native <select> that submits as a link
-  // The actual interactivity is handled client-side via FilterTabs already having Link hrefs
-  // For sort we use a form GET
+function SortSelect({ current, type, brand }: { current: string; type: string; brand: string }) {
   return (
     <form method="GET" action="/shop" className="flex items-center gap-2">
       {type && <input type="hidden" name="type" value={type} />}
+      {brand && <input type="hidden" name="brand" value={brand} />}
       <label htmlFor="sort" className="text-muted text-xs whitespace-nowrap">Sort by</label>
       <select
         id="sort"
