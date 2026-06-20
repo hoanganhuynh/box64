@@ -10,14 +10,25 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Webpack (production build)
   webpack(config) {
-    // Allow importing SVG files as React components via SVGR
     config.module.rules.push({
       test: /\.svg$/,
       issuer: /\.[jt]sx?$/,
       use: [{ loader: '@svgr/webpack', options: { svgo: false } }],
     })
     return config
+  },
+  // Turbopack (next dev --turbo, default in Next 15+)
+  experimental: {
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
 }
 
