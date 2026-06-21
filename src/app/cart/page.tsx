@@ -178,6 +178,9 @@ export default function CartPage() {
           <div className="bg-surface border border-border rounded-sm p-6 sticky top-24">
             <h2 className="font-jakarta font-bold text-primary text-base mb-5">Order Summary</h2>
 
+            {/* Coupon */}
+            <CouponInput />
+
             <div className="flex flex-col gap-3 text-sm mb-5">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal ({selectedCount} items)</span>
@@ -214,6 +217,53 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function CouponInput() {
+  const [code, setCode] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  async function apply() {
+    if (!code.trim()) return
+    setStatus('loading')
+    // Placeholder — wire to real API later
+    await new Promise(r => setTimeout(r, 600))
+    if (code.trim().toUpperCase() === 'FIGBOX10') {
+      setStatus('ok')
+      setMessage('Coupon applied — 10% off!')
+    } else {
+      setStatus('error')
+      setMessage('Invalid or expired coupon code.')
+    }
+  }
+
+  return (
+    <div className="mb-5">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={e => { setCode(e.target.value); setStatus('idle'); setMessage('') }}
+          onKeyDown={e => e.key === 'Enter' && apply()}
+          placeholder="Coupon code"
+          className="flex-1 h-10 px-3 rounded-sm bg-bg border border-border text-sm text-primary placeholder:text-faint focus:outline-none focus:border-gold/60 transition-colors"
+        />
+        <button
+          onClick={apply}
+          disabled={status === 'loading' || !code.trim()}
+          className="h-10 px-4 rounded-sm bg-surface border border-border text-xs font-semibold text-primary hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-40 shrink-0"
+        >
+          {status === 'loading' ? '...' : 'Apply'}
+        </button>
+      </div>
+      {message && (
+        <p className={`text-[11px] mt-1.5 ${status === 'ok' ? 'text-success' : 'text-error'}`}>
+          {message}
+        </p>
+      )}
     </div>
   )
 }
