@@ -1,7 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim()).filter(Boolean)
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -24,7 +27,17 @@ export async function proxy(request: NextRequest) {
   )
 
   // Refresh session — do not remove this
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Admin route protection (skip login page itself)
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    if (!user?.email) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+    if (!ADMIN_EMAILS.includes(user.email)) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
 
   return supabaseResponse
 }
