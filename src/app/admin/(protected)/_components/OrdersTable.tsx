@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { ExternalLink, ChevronDown } from 'lucide-react'
 import { StatusBadge, STATUS_OPTIONS } from './StatusBadge'
-import { updateOrderStatus } from '@/app/admin/actions'
+import { updateOrderStatus } from '../actions'
 import type { OrderRow } from '@/lib/admin/queries'
 
 function vnd(n: number) {
