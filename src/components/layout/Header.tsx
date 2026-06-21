@@ -212,21 +212,6 @@ export default function Header() {
             </svg>
           </a>
 
-          {/* Desktop auth: avatar dropdown or Login link */}
-          {ready && (
-            user
-              ? <UserMenu user={user} />
-              : (
-                <button
-                  onClick={handleLogin}
-                  aria-label="Login"
-                  className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-1"
-                >
-                  <ProfileCircle size={17} color="currentColor" /> Login
-                </button>
-              )
-          )}
-
           {/* Mobile: Facebook + Instagram icons */}
           <a
             href={FB_HREF}
@@ -250,6 +235,21 @@ export default function Header() {
           </a>
 
           <CartBadge />
+
+          {/* Desktop auth: avatar + greeting or Login link */}
+          {ready && (
+            user
+              ? <UserMenu user={user} />
+              : (
+                <button
+                  onClick={handleLogin}
+                  aria-label="Login"
+                  className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold ml-1"
+                >
+                  <ProfileCircle size={17} color="currentColor" /> Login
+                </button>
+              )
+          )}
         </div>
       </div>
 
