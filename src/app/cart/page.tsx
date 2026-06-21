@@ -52,13 +52,13 @@ export default function CartPage() {
               className="flex gap-4 bg-surface border border-border rounded-sm p-4 group"
             >
               {/* Thumbnail */}
-              <Link href="#" className="relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-sm overflow-hidden bg-[#0F1729]">
-                <Image src={item.image_url || '/products/p1.jpg'} alt={item.product_name} fill className="object-cover" sizes="96px" />
+              <Link href="#" className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-sm overflow-hidden bg-[#0F1729]">
+                <Image src={item.image_url || '/products/p1.jpg'} alt={item.product_name} fill className="object-cover" sizes="128px" />
               </Link>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-primary text-sm leading-snug line-clamp-2 mb-1">
+                <p className="font-semibold text-primary text-base leading-snug line-clamp-2 mb-1">
                   {item.product_name}
                 </p>
                 <p className="text-xs text-muted mb-3">{formatVND(item.unit_price)} / item</p>
