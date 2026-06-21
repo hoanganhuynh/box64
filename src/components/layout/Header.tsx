@@ -2,8 +2,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart'
-import { useEffect, useState } from 'react'
-import { Bag2, ProfileCircle, HambergerMenu, CloseSquare } from 'iconsax-react'
+import { useEffect, useRef, useState } from 'react'
+import { Bag2, ProfileCircle, HambergerMenu, CloseSquare, LogoutCurve } from 'iconsax-react'
+import type { User } from '@supabase/supabase-js'
+import { createSupabaseClient } from '@/lib/supabase/client'
 
 const FB_HREF = 'https://www.facebook.com/figbox.gr'
 
@@ -38,8 +40,105 @@ function CartBadge() {
   )
 }
 
+function UserMenu({ user }: { user: User }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const avatar = user.user_metadata?.avatar_url as string | undefined
+  const name = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? ''
+  const initials = name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  async function handleSignOut() {
+    const supabase = createSupabaseClient()
+    await supabase.auth.signOut()
+    setOpen(false)
+    window.location.href = '/'
+  }
+
+  return (
+    <div ref={ref} className="relative hidden md:block">
+      <button
+        onClick={() => setOpen(v => !v)}
+        aria-label="Account menu"
+        aria-expanded={open}
+        className="w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/20 hover:ring-gold/60 transition-all focus:outline-none"
+      >
+        {avatar
+          ? <Image src={avatar} alt={name} width={32} height={32} className="object-cover w-full h-full" />
+          : <span className="w-full h-full bg-surface-2 flex items-center justify-center text-[10px] font-bold text-gold">{initials}</span>
+        }
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+10px)] w-52 bg-surface border border-border rounded-xl shadow-[0_16px_48px_rgba(0,0,0,0.6)] overflow-hidden z-50">
+          {/* User info */}
+          <div className="px-4 pt-3.5 pb-3 border-b border-border">
+            <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+            <p className="text-sm font-semibold text-white truncate mt-0.5">{name || 'Member'}</p>
+          </div>
+          {/* Menu items */}
+          <div className="py-1.5">
+            <Link
+              href="/orders"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <Bag2 size={15} color="currentColor" />
+              My Orders
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-error/80 hover:text-error hover:bg-error/5 transition-colors"
+            >
+              <LogoutCurve size={15} color="currentColor" />
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function useAuthUser() {
+  const [user, setUser] = useState<User | null>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const supabase = createSupabaseClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+      setReady(true)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  return { user, ready }
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { user, ready } = useAuthUser()
+
+  async function handleMobileSignOut() {
+    const supabase = createSupabaseClient()
+    await supabase.auth.signOut()
+    setMenuOpen(false)
+    window.location.href = '/'
+  }
+
+  const avatar = user?.user_metadata?.avatar_url as string | undefined
+  const name = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? ''
 
   return (
     <header className="sticky top-0 z-50 bg-header border-b border-border">
@@ -76,7 +175,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Right: contact + login + cart */}
+        {/* Right: social + auth + cart */}
         <div className="flex items-center justify-end gap-1">
           {/* Desktop: Facebook + Instagram */}
           <a
@@ -99,13 +198,21 @@ export default function Header() {
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
             </svg>
           </a>
-          <Link
-            href="/login"
-            aria-label="Login"
-            className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-1"
-          >
-            <ProfileCircle size={17} color="currentColor" /> Login
-          </Link>
+
+          {/* Desktop auth: avatar dropdown or Login link */}
+          {ready && (
+            user
+              ? <UserMenu user={user} />
+              : (
+                <Link
+                  href="/login"
+                  aria-label="Login"
+                  className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-1"
+                >
+                  <ProfileCircle size={17} color="currentColor" /> Login
+                </Link>
+              )
+          )}
 
           {/* Mobile: Facebook + Instagram icons */}
           <a
@@ -145,10 +252,37 @@ export default function Header() {
               className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05]">
               Track Order
             </Link>
-            <Link href="/login" onClick={() => setMenuOpen(false)}
-              className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
-              <ProfileCircle size={18} color="currentColor" /> Login
-            </Link>
+
+            {/* Mobile auth */}
+            {user ? (
+              <>
+                {/* User info row */}
+                <div className="py-3.5 px-3 flex items-center gap-3 border-b border-white/[0.05]">
+                  {avatar
+                    ? <Image src={avatar} alt={name} width={32} height={32} className="rounded-full object-cover shrink-0 ring-1 ring-white/20" />
+                    : <span className="w-8 h-8 rounded-full bg-surface-2 flex items-center justify-center text-[11px] font-bold text-gold shrink-0">{name[0]?.toUpperCase()}</span>
+                  }
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{name || 'Member'}</p>
+                    <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <Link href="/orders" onClick={() => setMenuOpen(false)}
+                  className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
+                  <Bag2 size={18} color="currentColor" /> My Orders
+                </Link>
+                <button onClick={handleMobileSignOut}
+                  className="py-4 px-3 text-base font-semibold text-error/80 hover:text-error hover:bg-error/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5 w-full text-left">
+                  <LogoutCurve size={18} color="currentColor" /> Sign out
+                </button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setMenuOpen(false)}
+                className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
+                <ProfileCircle size={18} color="currentColor" /> Login
+              </Link>
+            )}
+
             <a
               href="https://www.facebook.com/figbox.gr"
               target="_blank"
