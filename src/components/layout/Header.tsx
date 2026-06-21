@@ -62,18 +62,23 @@ function UserMenu({ user }: { user: User }) {
     window.location.href = '/'
   }
 
+  const firstName = name.split(' ')[0]
+
   return (
     <div ref={ref} className="relative hidden md:block">
       <button
         onClick={() => setOpen(v => !v)}
         aria-label="Account menu"
         aria-expanded={open}
-        className="w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/20 hover:ring-gold/60 transition-all focus:outline-none"
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
       >
+        <span className="text-sm text-white/60 font-medium">Xin chào, <span className="text-white font-semibold">{firstName}</span></span>
+        <div className="w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/20 hover:ring-gold/60 transition-all shrink-0">
         {avatar
           ? <Image src={avatar} alt={name} width={32} height={32} className="object-cover w-full h-full" />
           : <span className="w-full h-full bg-surface-2 flex items-center justify-center text-[10px] font-bold text-gold">{initials}</span>
         }
+        </div>
       </button>
 
       {open && (
