@@ -198,11 +198,11 @@ const availabilityMap: Record<string, string> = {
                 { label: 'Lead time', value: isPreOrder ? 'Ships mid-July 2026' : '3–5 business days', Icon: Clock  },
               ]).map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
-                  <span className="text-[11px] text-muted font-medium w-28 shrink-0">{label}</span>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 w-28 shrink-0">
                     <Icon size={13} color="rgba(245,158,11,0.75)" variant="Bold" />
-                    <span className="text-[11px] text-primary">{value}</span>
+                    <span className="text-[11px] text-muted font-medium">{label}</span>
                   </div>
+                  <span className="text-[11px] text-primary">{value}</span>
                 </div>
               ))}
             </div>
