@@ -20,8 +20,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user?.email || !ADMIN_EMAILS.includes(user.email)) {
-    redirect('/')
+  if (!user?.email) {
+    redirect('/login?next=/admin')
+  }
+
+  if (!ADMIN_EMAILS.includes(user.email)) {
+    redirect('/?error=unauthorized')
   }
 
   return (
