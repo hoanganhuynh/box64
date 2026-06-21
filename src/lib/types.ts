@@ -144,5 +144,7 @@ export interface CartItem {
   unit_price: number
   quantity: number
   image_url: string
+  material?: 'box_only' | 'box_protect'
+  brand?: CarBrand
   design?: DesignState   // present for box_custom items
 }

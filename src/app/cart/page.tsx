@@ -1,14 +1,42 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import { ShoppingCart, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
+import BrandLogo from '@/components/ui/BrandLogo'
 
 export default function CartPage() {
-  const { items, removeItem, updateQty, subtotal, totalItems } = useCartStore()
-  const total = subtotal()
-  const count = totalItems()
+  const { items, removeItem, updateQty } = useCartStore()
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setSelected(new Set(items.map(i => i.id)))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Sync selected when items change (e.g. new item added)
+  useEffect(() => {
+    if (!mounted) return
+    setSelected(prev => {
+      const next = new Set(prev)
+      items.forEach(i => { if (!next.has(i.id)) next.add(i.id) })
+      return next
+    })
+  }, [items, mounted])
+
+  const count = items.length
+  const toggleItem = (id: string) =>
+    setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+  const toggleAll = () =>
+    setSelected(selected.size === items.length ? new Set() : new Set(items.map(i => i.id)))
+
+  const selectedItems = items.filter(i => selected.has(i.id))
+  const subtotal = selectedItems.reduce((s, i) => s + i.unit_price * i.quantity, 0)
+  const selectedCount = selectedItems.reduce((s, i) => s + i.quantity, 0)
 
   if (count === 0) {
     return (
@@ -40,64 +68,107 @@ export default function CartPage() {
       </div>
 
       {/* Freeship progress */}
-      <FreeshipBanner subtotal={total} />
+      <FreeshipBanner subtotal={subtotal} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* ── Items list (2/3) ── */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
-          {items.map(item => (
-            <article
-              key={item.id}
-              className="flex gap-4 bg-surface border border-border rounded-sm p-4 group"
-            >
-              {/* Thumbnail */}
-              <Link href="#" className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-sm overflow-hidden bg-[#0F1729]">
-                <Image src={item.image_url || '/products/p1.jpg'} alt={item.product_name} fill className="object-cover" sizes="128px" />
-              </Link>
+        <div className="lg:col-span-2 flex flex-col gap-3">
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-primary text-base leading-snug line-clamp-2 mb-1">
-                  {item.product_name}
-                </p>
-                <p className="text-xs text-muted mb-3">{formatVND(item.unit_price)} / item</p>
+          {/* Select all — only show when multiple items */}
+          {items.length > 1 && (
+            <label className="flex items-center gap-2.5 px-1 cursor-pointer select-none w-fit">
+              <Checkbox
+                checked={selected.size === items.length}
+                indeterminate={selected.size > 0 && selected.size < items.length}
+                onChange={toggleAll}
+              />
+              <span className="text-xs text-muted font-medium">
+                {selected.size === items.length ? 'Deselect all' : `Select all (${items.length})`}
+              </span>
+            </label>
+          )}
 
-                {/* Qty stepper + remove */}
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center border border-border rounded-sm overflow-hidden bg-bg">
+          {items.map(item => {
+            const isSelected = selected.has(item.id)
+            const materialLabel = item.material === 'box_protect' ? 'Box + Protect' : item.material === 'box_only' ? 'Box Only' : null
+
+            return (
+              <article
+                key={item.id}
+                className={`flex gap-3 sm:gap-4 bg-surface border rounded-sm p-3 sm:p-4 transition-colors ${
+                  isSelected ? 'border-border' : 'border-border opacity-50'
+                }`}
+              >
+                {/* Checkbox — only show when multiple items */}
+                {items.length > 1 && (
+                  <div className="flex items-start pt-1 shrink-0">
+                    <Checkbox checked={isSelected} onChange={() => toggleItem(item.id)} />
+                  </div>
+                )}
+
+                {/* Thumbnail */}
+                <Link href={`/shop/${item.product_id}`} className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-sm overflow-hidden bg-[#0F1729]">
+                  <Image src={item.image_url || '/products/p1.jpg'} alt={item.product_name} fill className="object-cover" sizes="128px" />
+                </Link>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  {/* Brand logo + material badge */}
+                  {(item.brand || materialLabel) && (
+                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                      {item.brand && item.brand !== 'other' && (
+                        <BrandLogo brand={item.brand} size={18} variant="dark" />
+                      )}
+                      {materialLabel && (
+                        <span className="text-[10px] border border-[#3a2e28] text-[#a08070] rounded px-1.5 py-0.5 leading-none">
+                          {materialLabel}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="font-semibold text-primary text-base leading-snug line-clamp-2 mb-1">
+                    {item.product_name}
+                  </p>
+                  <p className="text-xs text-muted mb-3">{formatVND(item.unit_price)} / item</p>
+
+                  {/* Qty stepper + remove */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center border border-border rounded-sm overflow-hidden bg-bg">
+                      <button
+                        onClick={() => updateQty(item.id, item.quantity - 1)}
+                        className="w-10 h-10 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
+                      >
+                        −
+                      </button>
+                      <span className="w-8 text-center text-sm font-semibold text-primary">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQty(item.id, item.quantity + 1)}
+                        className="w-10 h-10 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
+                      >
+                        +
+                      </button>
+                    </div>
                     <button
-                      onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-11 h-11 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
+                      onClick={() => removeItem(item.id)}
+                      className="flex items-center gap-1 text-xs text-faint hover:text-error transition-colors"
                     >
-                      −
-                    </button>
-                    <span className="w-8 text-center text-sm font-semibold text-primary">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-11 h-11 flex items-center justify-center text-muted hover:text-primary hover:bg-surface transition-colors text-base"
-                    >
-                      +
+                      <Trash2 size={12} /> Remove
                     </button>
                   </div>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="flex items-center gap-1 text-xs text-faint hover:text-error transition-colors"
-                  >
-                    <Trash2 size={12} /> Remove
-                  </button>
                 </div>
-              </div>
 
-              {/* Line total */}
-              <div className="shrink-0 text-right">
-                <p className="font-bold text-primary text-sm">{formatVND(item.unit_price * item.quantity)}</p>
-              </div>
-            </article>
-          ))}
+                {/* Line total */}
+                <div className="shrink-0 text-right">
+                  <p className="font-bold text-primary text-sm">{formatVND(item.unit_price * item.quantity)}</p>
+                </div>
+              </article>
+            )
+          })}
 
           {/* Continue shopping */}
-          <Link href="/shop" className="text-xs text-muted hover:text-primary transition-colors w-fit inline-flex items-center gap-1">
+          <Link href="/shop" className="text-xs text-muted hover:text-primary transition-colors w-fit inline-flex items-center gap-1 mt-1">
             ← Continue shopping
           </Link>
         </div>
@@ -109,8 +180,8 @@ export default function CartPage() {
 
             <div className="flex flex-col gap-3 text-sm mb-5">
               <div className="flex justify-between">
-                <span className="text-muted">Subtotal ({count} items)</span>
-                <span className="font-semibold text-primary">{formatVND(total)}</span>
+                <span className="text-muted">Subtotal ({selectedCount} items)</span>
+                <span className="font-semibold text-primary">{formatVND(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
@@ -118,16 +189,24 @@ export default function CartPage() {
               </div>
               <div className="border-t border-border pt-3 flex justify-between">
                 <span className="font-semibold text-primary">Total</span>
-                <span className="font-extrabold text-primary text-base">{formatVND(total)}</span>
+                <span className="font-extrabold text-primary text-base">{formatVND(subtotal)}</span>
               </div>
             </div>
 
             <Link
               href="/checkout"
-              className="flex items-center justify-center gap-2 w-full h-12 rounded-sm bg-gold text-white font-semibold text-sm hover:bg-gold-mid transition-colors"
+              className={`flex items-center justify-center gap-2 w-full h-12 rounded-sm font-semibold text-sm transition-colors ${
+                selected.size === 0
+                  ? 'bg-surface-2 text-muted cursor-not-allowed pointer-events-none'
+                  : 'bg-gold text-white hover:bg-gold-mid'
+              }`}
             >
               Proceed to Checkout <ArrowRight size={15} />
             </Link>
+
+            {selected.size === 0 && (
+              <p className="text-[10px] text-faint text-center mt-2">Select at least one item</p>
+            )}
 
             <p className="text-[10px] text-faint text-center mt-3">
               Secure checkout — VNPay · MoMo · PayPal
@@ -136,6 +215,32 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function Checkbox({ checked, indeterminate = false, onChange }: {
+  checked: boolean
+  indeterminate?: boolean
+  onChange: () => void
+}) {
+  return (
+    <button
+      role="checkbox"
+      aria-checked={indeterminate ? 'mixed' : checked}
+      onClick={onChange}
+      className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+        checked || indeterminate
+          ? 'bg-gold border-gold'
+          : 'bg-transparent border-border hover:border-gold/50'
+      }`}
+    >
+      {indeterminate && !checked
+        ? <span className="block w-2 h-0.5 bg-[#07070C] rounded-full" />
+        : checked
+        ? <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#07070C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        : null
+      }
+    </button>
   )
 }
 

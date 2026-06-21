@@ -46,6 +46,8 @@ export const useCartStore = create<CartStore>()(
             unit_price: getDiscountedPrice(product),
             quantity: qty,
             image_url: product.images[0] ?? '',
+            material: product.material,
+            brand: product.brand,
           }
           set(s => ({ items: [...s.items, item] }))
         }
