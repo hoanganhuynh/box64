@@ -130,6 +130,14 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { user, ready } = useAuthUser()
 
+  async function handleLogin() {
+    const supabase = createSupabaseClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    })
+  }
+
   async function handleMobileSignOut() {
     const supabase = createSupabaseClient()
     await supabase.auth.signOut()
@@ -204,13 +212,13 @@ export default function Header() {
             user
               ? <UserMenu user={user} />
               : (
-                <Link
-                  href="/login"
+                <button
+                  onClick={handleLogin}
                   aria-label="Login"
                   className="hidden md:flex items-center gap-1.5 text-sm text-white/70 hover:text-gold transition-colors font-semibold mr-1"
                 >
                   <ProfileCircle size={17} color="currentColor" /> Login
-                </Link>
+                </button>
               )
           )}
 
@@ -277,10 +285,10 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <Link href="/login" onClick={() => setMenuOpen(false)}
-                className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
+              <button onClick={() => { setMenuOpen(false); handleLogin() }}
+                className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5 w-full text-left">
                 <ProfileCircle size={18} color="currentColor" /> Login
-              </Link>
+              </button>
             )}
 
             <a
