@@ -53,9 +53,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const related = getRelatedProducts(product, 4)
   const reviews = getProductReviews(product.slug)
-  const racingNumber = product.id.replace(/\D/g, '').padStart(2, '0')
-
-  const availabilityMap: Record<string, string> = {
+const availabilityMap: Record<string, string> = {
     active: 'https://schema.org/InStock',
     pre_order: 'https://schema.org/PreOrder',
     out_of_stock: 'https://schema.org/OutOfStock',
@@ -115,14 +113,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         }}
       >
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-8">
-          {/* Racing number watermark */}
-          <div
-            aria-hidden="true"
-            className="absolute top-0 right-4 font-display font-extrabold select-none pointer-events-none leading-none"
-            style={{ fontSize: 'clamp(100px, 16vw, 200px)', color: 'rgba(255,255,255,0.028)' }}
-          >
-            {racingNumber}
-          </div>
 
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-muted mb-5">
