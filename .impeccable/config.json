@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "reason": "HTML email: Arial/Helvetica is required for Gmail/Outlook compatibility — web fonts are stripped by email clients",
+        "createdAt": "2026-06-21T04:30:21.898Z"
+      }
+    ]
+  }
+}

@@ -9,21 +9,9 @@ import { formatVND } from '@/lib/utils/format'
 import { placeOrder } from '@/app/actions/checkout'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
-const PROVINCES = [
-  'TP. Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
-  'Bình Dương', 'Đồng Nai', 'Khánh Hòa', 'Lâm Đồng', 'Nghệ An',
-  'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu',
-  'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Phước', 'Bình Thuận',
-  'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên',
-  'Đồng Tháp', 'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Tĩnh',
-  'Hải Dương', 'Hậu Giang', 'Hòa Bình', 'Hưng Yên', 'Kiên Giang',
-  'Kon Tum', 'Lai Châu', 'Lạng Sơn', 'Lào Cai', 'Long An',
-  'Nam Định', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên',
-  'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị',
-  'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên',
-  'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang',
-  'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái',
-]
+interface GeoItem { code: number; name: string }
+interface DvhcvnWard { code: string; name: string }
+interface DvhcvnProvince { code: string; name: string; wards: DvhcvnWard[] }
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -32,38 +20,182 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Address system toggle
+  const [addressType, setAddressType] = useState<'new' | 'old'>('new')
+
+  // Old system (63 provinces) — cascading API
+  const [apiProvinces, setApiProvinces] = useState<GeoItem[]>([])
+  const [districts, setDistricts] = useState<GeoItem[]>([])
+  const [wards, setWards] = useState<GeoItem[]>([])
+  const [loadingProvinces, setLoadingProvinces] = useState(true)
+  const [loadingDistricts, setLoadingDistricts] = useState(false)
+  const [loadingWards, setLoadingWards] = useState(false)
+
+  // New system (34 provinces) — local JSON
+  const [dvhcvnProvinces, setDvhcvnProvinces] = useState<DvhcvnProvince[]>([])
+  const [newWards, setNewWards] = useState<DvhcvnWard[]>([])
+  const [loadingDvhcvn, setLoadingDvhcvn] = useState(true)
+
+  // Saved address from last order
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [savedAddress, setSavedAddress] = useState<Record<string, any> | null>(null)
+  const [addressApplied, setAddressApplied] = useState(false)
+
   const [form, setForm] = useState({
-    name: '', phone: '', address: '', city: 'TP. Hồ Chí Minh', note: '',
+    name: '', phone: '', address: '',
+    provinceCode: 0, city: '',
+    districtCode: 0, district: '',
+    ward: '',
+    note: '',
   })
 
-  // Pre-fill name from Google profile
   useEffect(() => {
     setMounted(true)
+
+    // Load both address systems in parallel
+    fetch('https://provinces.open-api.vn/api/p/')
+      .then(r => r.json())
+      .then(data => { setApiProvinces(data); setLoadingProvinces(false) })
+      .catch(() => setLoadingProvinces(false))
+
+    fetch('/dvhcvn.json')
+      .then(r => r.json())
+      .then((data: DvhcvnProvince[]) => { setDvhcvnProvinces(data); setLoadingDvhcvn(false) })
+      .catch(() => setLoadingDvhcvn(false))
+
+    // Pre-fill name + fetch saved address
     const supabase = createSupabaseClient()
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (data.user?.user_metadata?.full_name) {
         setForm(f => ({ ...f, name: data.user!.user_metadata.full_name as string }))
       }
+      if (data.user?.id) {
+        const { data: lastOrder } = await supabase
+          .from('orders')
+          .select('shipping')
+          .eq('user_id', data.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        if (lastOrder?.shipping?.line1) {
+          setSavedAddress(lastOrder.shipping)
+        }
+      }
     })
   }, [])
+
+  // ── Old system handlers ──
+  async function onProvinceChange(code: number, name: string) {
+    setForm(f => ({ ...f, provinceCode: code, city: name, districtCode: 0, district: '', ward: '' }))
+    setDistricts([])
+    setWards([])
+    if (!code) return
+    setLoadingDistricts(true)
+    try {
+      const res = await fetch(`https://provinces.open-api.vn/api/p/${code}?depth=2`)
+      const data = await res.json()
+      setDistricts(data.districts ?? [])
+    } finally { setLoadingDistricts(false) }
+  }
+
+  async function onDistrictChange(code: number, name: string) {
+    setForm(f => ({ ...f, districtCode: code, district: name, ward: '' }))
+    setWards([])
+    if (!code) return
+    setLoadingWards(true)
+    try {
+      const res = await fetch(`https://provinces.open-api.vn/api/d/${code}?depth=2`)
+      const data = await res.json()
+      setWards(data.wards ?? [])
+    } finally { setLoadingWards(false) }
+  }
+
+  // ── New system handler ──
+  function onNewProvinceChange(code: string, name: string) {
+    const prov = dvhcvnProvinces.find(p => p.code === code)
+    setNewWards(prov?.wards ?? [])
+    setForm(f => ({ ...f, city: name, provinceCode: +code, district: '', districtCode: 0, ward: '' }))
+  }
+
+  // ── Switch address type ──
+  function switchAddressType(type: 'new' | 'old') {
+    setAddressType(type)
+    setForm(f => ({ ...f, city: '', provinceCode: 0, district: '', districtCode: 0, ward: '' }))
+    setDistricts([])
+    setWards([])
+    setNewWards([])
+    setAddressApplied(false)
+  }
+
+  // ── Apply saved address ──
+  async function applyAddress() {
+    if (!savedAddress) return
+    setForm(f => ({
+      ...f,
+      name: savedAddress.name ?? f.name,
+      phone: savedAddress.phone ?? f.phone,
+      address: savedAddress.line1 ?? f.address,
+    }))
+    setAddressApplied(true)
+
+    if (addressType === 'old') {
+      setForm(f => ({
+        ...f,
+        ward: savedAddress.ward ?? '',
+        district: savedAddress.district ?? '',
+        districtCode: savedAddress.district_code ?? 0,
+        city: savedAddress.city ?? '',
+        provinceCode: savedAddress.province_code ?? 0,
+      }))
+      const pCode = savedAddress.province_code
+      const dCode = savedAddress.district_code
+      if (pCode) {
+        setLoadingDistricts(true)
+        try {
+          const res = await fetch(`https://provinces.open-api.vn/api/p/${pCode}?depth=2`)
+          const data = await res.json()
+          setDistricts(data.districts ?? [])
+        } finally { setLoadingDistricts(false) }
+      }
+      if (dCode) {
+        setLoadingWards(true)
+        try {
+          const res = await fetch(`https://provinces.open-api.vn/api/d/${dCode}?depth=2`)
+          const data = await res.json()
+          setWards(data.wards ?? [])
+        } finally { setLoadingWards(false) }
+      }
+    }
+    // For new system: only fill name/phone/address — user re-selects province/ward
+  }
 
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
   const totalItems = items.reduce((s, i) => s + i.quantity, 0)
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
-    setError('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.name.trim()) return setError('Vui lòng nhập họ tên.')
     if (!form.phone.trim()) return setError('Vui lòng nhập số điện thoại.')
+    if (!/^(\+?84|0)[3-9]\d{8}$/.test(form.phone.replace(/\s/g, ''))) return setError('Số điện thoại không hợp lệ (VD: 0901 234 567).')
     if (!form.address.trim()) return setError('Vui lòng nhập địa chỉ.')
+    if (!form.city) return setError('Vui lòng chọn tỉnh/thành phố.')
+    if (addressType === 'old' && !form.district) return setError('Vui lòng chọn quận/huyện.')
     if (!items.length) return setError('Giỏ hàng trống.')
 
     setLoading(true)
-    const result = await placeOrder(form, items, subtotal)
+    const result = await placeOrder(
+      {
+        name: form.name, phone: form.phone, address: form.address,
+        ward: form.ward, district: form.district, districtCode: form.districtCode,
+        city: form.city, provinceCode: form.provinceCode, note: form.note,
+      },
+      items,
+      subtotal,
+    )
     setLoading(false)
 
     if (!result.success) {
@@ -71,6 +203,7 @@ export default function CheckoutPage() {
       return
     }
 
+    sessionStorage.setItem('lastOrder', JSON.stringify({ orderId: result.orderId, items }))
     clearCart()
     router.push(`/checkout/success?order=${result.orderId}`)
   }
@@ -109,6 +242,44 @@ export default function CheckoutPage() {
                 Thông tin giao hàng
               </h2>
 
+              {/* Address system toggle */}
+              <div className="flex rounded-xl border border-border overflow-hidden mb-5 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => switchAddressType('new')}
+                  className={`flex-1 py-2.5 transition-colors ${addressType === 'new' ? 'bg-gold text-[#07070C]' : 'text-muted hover:text-primary'}`}
+                >
+                  Hệ thống mới · 34 tỉnh
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchAddressType('old')}
+                  className={`flex-1 py-2.5 transition-colors border-l border-border ${addressType === 'old' ? 'bg-gold text-[#07070C]' : 'text-muted hover:text-primary'}`}
+                >
+                  Hệ thống cũ · 63 tỉnh
+                </button>
+              </div>
+
+              {/* Saved address card */}
+              {savedAddress && !addressApplied && (
+                <div className="flex items-start gap-3 bg-gold/5 border border-gold/20 rounded-xl p-4 mb-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-bold text-gold uppercase tracking-wider mb-1">Địa chỉ đã lưu</p>
+                    <p className="text-sm font-medium text-primary">{savedAddress.name} · {savedAddress.phone}</p>
+                    <p className="text-xs text-muted mt-0.5 truncate">
+                      {[savedAddress.line1, savedAddress.ward, savedAddress.district, savedAddress.city].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={applyAddress}
+                    className="shrink-0 text-xs font-bold text-gold border border-gold/30 rounded-lg px-3 py-1.5 hover:bg-gold/10 transition-colors whitespace-nowrap"
+                  >
+                    Dùng lại
+                  </button>
+                </div>
+              )}
+
               <div className="flex flex-col gap-4">
                 <Field icon={<User size={14} />} label="Họ và tên *">
                   <input
@@ -120,36 +291,135 @@ export default function CheckoutPage() {
                   />
                 </Field>
 
-                <Field icon={<Phone size={14} />} label="Số điện thoại *">
+                <div>
+                  <label className="flex items-center gap-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1.5">
+                    <span className="text-gold/60"><Phone size={14} /></span>
+                    Số điện thoại *
+                  </label>
                   <input
                     type="tel"
                     value={form.phone}
                     onChange={e => set('phone', e.target.value)}
+                    onBlur={() => {
+                      const v = form.phone.replace(/\s/g, '')
+                      if (v && !/^(\+?84|0)[3-9]\d{8}$/.test(v))
+                        setError('Số điện thoại không hợp lệ (VD: 0901 234 567).')
+                      else if (error.includes('điện thoại')) setError('')
+                    }}
                     placeholder="0901 234 567"
-                    className={INPUT}
+                    className={INPUT + (error.includes('điện thoại') ? ' border-error/60' : '')}
                   />
-                </Field>
+                  {error.includes('điện thoại') && (
+                    <p className="text-[11px] text-error mt-1">{error}</p>
+                  )}
+                </div>
 
-                <Field icon={<MapPin size={14} />} label="Địa chỉ *">
+                {addressType === 'new' ? (
+                  <>
+                    {/* NEW system: Tỉnh/TP → Phường/Xã */}
+                    <Field icon={<Building2 size={14} />} label="Tỉnh / Thành phố *">
+                      <select
+                        value={form.provinceCode || ''}
+                        onChange={e => {
+                          const opt = e.target.options[e.target.selectedIndex]
+                          onNewProvinceChange(e.target.value, opt.text)
+                        }}
+                        className={INPUT}
+                        disabled={loadingDvhcvn}
+                      >
+                        <option value="">
+                          {loadingDvhcvn ? 'Đang tải...' : '-- Chọn tỉnh / thành phố --'}
+                        </option>
+                        {dvhcvnProvinces.map(p => (
+                          <option key={p.code} value={p.code}>{p.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field icon={<Building2 size={14} />} label="Phường / Xã">
+                      <select
+                        value={form.ward}
+                        onChange={e => setForm(f => ({ ...f, ward: e.target.value }))}
+                        className={INPUT}
+                        disabled={!form.city}
+                      >
+                        <option value="">
+                          {form.city ? '-- Chọn phường / xã --' : '-- Chọn tỉnh trước --'}
+                        </option>
+                        {newWards.map(w => (
+                          <option key={w.code} value={w.name}>{w.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+                  </>
+                ) : (
+                  <>
+                    {/* OLD system: Tỉnh → Quận/Huyện → Phường/Xã */}
+                    <Field icon={<Building2 size={14} />} label="Tỉnh / Thành phố *">
+                      <select
+                        value={form.provinceCode}
+                        onChange={e => {
+                          const opt = e.target.options[e.target.selectedIndex]
+                          onProvinceChange(+e.target.value, opt.text)
+                        }}
+                        className={INPUT}
+                        disabled={loadingProvinces}
+                      >
+                        <option value={0}>
+                          {loadingProvinces ? 'Đang tải danh sách tỉnh...' : '-- Chọn tỉnh / thành phố --'}
+                        </option>
+                        {apiProvinces.map(p => (
+                          <option key={p.code} value={p.code}>{p.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field icon={<Building2 size={14} />} label="Quận / Huyện *">
+                      <select
+                        value={form.districtCode}
+                        onChange={e => {
+                          const opt = e.target.options[e.target.selectedIndex]
+                          onDistrictChange(+e.target.value, opt.text)
+                        }}
+                        className={INPUT}
+                        disabled={!form.provinceCode || loadingDistricts}
+                      >
+                        <option value={0}>
+                          {loadingDistricts ? 'Đang tải...' : form.provinceCode ? '-- Chọn quận / huyện --' : '-- Chọn tỉnh trước --'}
+                        </option>
+                        {districts.map(d => (
+                          <option key={d.code} value={d.code}>{d.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field icon={<Building2 size={14} />} label="Phường / Xã">
+                      <select
+                        value={form.ward}
+                        onChange={e => setForm(f => ({ ...f, ward: e.target.value }))}
+                        className={INPUT}
+                        disabled={!form.districtCode || loadingWards}
+                      >
+                        <option value="">
+                          {loadingWards ? 'Đang tải...' : form.districtCode ? '-- Chọn phường / xã --' : '-- Chọn quận trước --'}
+                        </option>
+                        {wards.map(w => (
+                          <option key={w.code} value={w.name}>{w.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+                  </>
+                )}
+
+                {/* Số nhà, tên đường — common to both systems */}
+                <Field icon={<MapPin size={14} />} label="Số nhà, tên đường *">
                   <input
                     type="text"
                     value={form.address}
                     onChange={e => set('address', e.target.value)}
-                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện"
+                    placeholder="VD: 123 Nguyễn Huệ"
                     className={INPUT}
                   />
-                </Field>
-
-                <Field icon={<Building2 size={14} />} label="Tỉnh / Thành phố *">
-                  <select
-                    value={form.city}
-                    onChange={e => set('city', e.target.value)}
-                    className={INPUT}
-                  >
-                    {PROVINCES.map(p => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
                 </Field>
 
                 <Field icon={<FileText size={14} />} label="Ghi chú">
@@ -164,40 +434,7 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Payment method — placeholder */}
-            <section className="bg-surface border border-border rounded-xl p-5 sm:p-6">
-              <h2 className="font-jakarta font-bold text-primary text-base mb-4 flex items-center gap-2">
-                <span className="text-gold">💳</span>
-                Phương thức thanh toán
-              </h2>
-
-              <div className="flex flex-col gap-2">
-                {/* Active option */}
-                <label className="flex items-center gap-3 p-3.5 rounded-lg border border-gold/40 bg-gold/5 cursor-pointer">
-                  <span className="w-4 h-4 rounded-full border-2 border-gold flex items-center justify-center shrink-0">
-                    <span className="w-2 h-2 rounded-full bg-gold" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-primary">Chuyển khoản ngân hàng</p>
-                    <p className="text-[11px] text-muted mt-0.5">Thông tin tài khoản gửi sau khi đặt hàng</p>
-                  </div>
-                </label>
-
-                {/* Coming soon */}
-                {[
-                  { name: 'VNPay QR', desc: 'Quét QR — tất cả ngân hàng VN' },
-                  { name: 'MoMo', desc: 'Ví điện tử MoMo' },
-                ].map(m => (
-                  <div key={m.name} className="flex items-center gap-3 p-3.5 rounded-lg border border-border opacity-40 cursor-not-allowed">
-                    <span className="w-4 h-4 rounded-full border-2 border-border shrink-0" />
-                    <div>
-                      <p className="text-sm font-semibold text-primary">{m.name}</p>
-                      <p className="text-[11px] text-muted">{m.desc} — <span className="text-gold/70">Sắp có</span></p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Payment — PayOS coming soon */}
           </div>
 
           {/* ── Right: Order summary (2/5) ── */}
@@ -207,7 +444,6 @@ export default function CheckoutPage() {
                 Đơn hàng ({totalItems} sản phẩm)
               </h2>
 
-              {/* Items */}
               <div className="flex flex-col gap-3 mb-5 max-h-64 overflow-y-auto pr-1">
                 {items.map(item => (
                   <div key={item.id} className="flex items-center gap-3">
@@ -223,7 +459,6 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Totals */}
               <div className="border-t border-border pt-4 flex flex-col gap-2 text-sm mb-5">
                 <div className="flex justify-between">
                   <span className="text-muted">Tạm tính</span>
@@ -239,7 +474,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {error && (
+              {error && !error.includes('điện thoại') && (
                 <p className="text-xs text-error mb-3 bg-error/10 rounded-lg px-3 py-2">{error}</p>
               )}
 

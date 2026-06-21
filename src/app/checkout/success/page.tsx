@@ -1,20 +1,37 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { CheckCircle2, Package, ArrowRight, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { formatVND } from '@/lib/utils/format'
+import type { CartItem } from '@/lib/types'
+
+interface LastOrder {
+  orderId: string
+  items: CartItem[]
+}
 
 function SuccessContent() {
   const params = useSearchParams()
   const orderId = params.get('order') ?? '—'
   const [copied, setCopied] = useState(false)
+  const [order, setOrder] = useState<LastOrder | null>(null)
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem('lastOrder')
+    if (raw) {
+      try { setOrder(JSON.parse(raw)) } catch {}
+    }
+  }, [])
 
   function copyId() {
     navigator.clipboard.writeText(orderId)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  const total = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
 
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center gap-6">
@@ -32,6 +49,9 @@ function SuccessContent() {
         <h1 className="font-jakarta font-extrabold text-primary text-2xl sm:text-3xl leading-tight">
           Cảm ơn bạn đã đặt hàng!
         </h1>
+        <p className="text-sm text-muted mt-2">
+          Chi tiết đơn hàng đã được gửi đến email của bạn.
+        </p>
       </div>
 
       {/* Order ID */}
@@ -44,53 +64,74 @@ function SuccessContent() {
             className="text-muted hover:text-gold transition-colors"
             aria-label="Copy order ID"
           >
-            {copied ? <CheckCircle2 size={14} className="text-success" /> : <Copy size={14} />}
+            {copied ? <CheckCircle2 size={14} className="text-gold" /> : <Copy size={14} />}
           </button>
         </div>
       </div>
 
-      {/* Payment instructions */}
-      <div className="w-full bg-gold/5 border border-gold/15 rounded-xl px-5 py-4 text-left">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-base">🏦</span>
-          <p className="text-sm font-bold text-primary">Thông tin chuyển khoản</p>
+      {/* Items list */}
+      {order && order.items.length > 0 && (
+        <div className="w-full bg-surface border border-border rounded-xl px-5 py-4 text-left">
+          <p className="text-[11px] text-muted uppercase tracking-widest font-bold mb-3">
+            Sản phẩm đã đặt
+          </p>
+          <div className="flex flex-col divide-y divide-border">
+            {order.items.map(item => (
+              <div key={item.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                <div className="relative w-12 h-12 rounded-sm overflow-hidden bg-[#0F1729] shrink-0">
+                  <Image
+                    src={item.image_url || '/products/p1.jpg'}
+                    alt={item.product_name}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-primary line-clamp-2 leading-snug">
+                    {item.product_name}
+                  </p>
+                  <p className="text-[11px] text-muted mt-0.5">x{item.quantity} · {formatVND(item.unit_price)}</p>
+                </div>
+                <p className="text-sm font-semibold text-primary shrink-0">
+                  {formatVND(item.unit_price * item.quantity)}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
+            <span className="text-sm font-bold text-primary">Tổng cộng</span>
+            <span className="text-base font-extrabold text-gold">{formatVND(total)}</span>
+          </div>
         </div>
-        <div className="flex flex-col gap-2 text-sm">
-          <Row label="Ngân hàng" value="Vietcombank" />
-          <Row label="Số tài khoản" value="1234567890" />
-          <Row label="Chủ tài khoản" value="NGUYEN VAN A" />
-          <Row
-            label="Nội dung CK"
-            value={orderId}
-            highlight
-          />
-        </div>
-        <p className="text-[11px] text-muted mt-3 leading-relaxed">
-          Vui lòng chuyển khoản trong vòng <span className="text-gold font-semibold">24 giờ</span>. Đơn hàng sẽ được xử lý sau khi chúng tôi xác nhận thanh toán.
-        </p>
-      </div>
+      )}
 
-      {/* What's next */}
+      {/* Support via Facebook */}
       <div className="w-full bg-surface border border-border rounded-xl px-5 py-4 text-left">
-        <p className="text-[11px] text-muted uppercase tracking-widest font-bold mb-3">Tiếp theo</p>
-        <div className="flex flex-col gap-3">
-          {[
-            { icon: '💳', text: 'Chuyển khoản theo thông tin trên' },
-            { icon: '📦', text: 'Shop xác nhận và bắt đầu in hộp' },
-            { icon: '🚚', text: 'Giao hàng toàn quốc 3–5 ngày làm việc' },
-          ].map(({ icon, text }) => (
-            <div key={text} className="flex items-center gap-3 text-sm text-muted">
-              <span className="text-base shrink-0">{icon}</span>
-              <span>{text}</span>
-            </div>
-          ))}
+        <p className="text-[11px] text-muted uppercase tracking-widest font-bold mb-3">Hỗ trợ</p>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#1877F2]/10 border border-[#1877F2]/20 flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-primary font-medium">Liên hệ qua Facebook</p>
+            <p className="text-[11px] text-muted">Phản hồi trong vòng 1–2 giờ trong giờ hành chính</p>
+          </div>
+          <a
+            href="https://www.facebook.com/figbox.gr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 h-8 px-3 rounded-lg bg-[#1877F2] text-white text-xs font-semibold flex items-center hover:bg-[#1877F2]/90 transition-colors"
+          >
+            Nhắn tin
+          </a>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 w-full">
         <Link
-          href={`/orders`}
+          href="/orders"
           className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg border border-border text-sm font-semibold text-primary hover:border-gold/40 hover:text-gold transition-colors"
         >
           <Package size={15} /> Đơn hàng của tôi
@@ -102,17 +143,6 @@ function SuccessContent() {
           Tiếp tục mua sắm <ArrowRight size={15} />
         </Link>
       </div>
-    </div>
-  )
-}
-
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-muted text-xs shrink-0">{label}</span>
-      <span className={`font-mono font-semibold text-xs text-right ${highlight ? 'text-gold' : 'text-primary'}`}>
-        {value}
-      </span>
     </div>
   )
 }

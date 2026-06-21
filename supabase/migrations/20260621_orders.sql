@@ -20,6 +20,11 @@ create table if not exists orders (
 -- Row-level security
 alter table orders enable row level security;
 
+-- Drop existing policies if re-running
+drop policy if exists "owner_select" on orders;
+drop policy if exists "anyone_insert" on orders;
+drop policy if exists "owner_update" on orders;
+
 -- Logged-in users see only their own orders
 create policy "owner_select" on orders
   for select using (auth.uid() = user_id);

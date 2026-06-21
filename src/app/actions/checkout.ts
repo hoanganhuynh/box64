@@ -7,7 +7,11 @@ export interface ShippingInput {
   name: string
   phone: string
   address: string
+  ward: string
+  district: string
+  districtCode: number
   city: string
+  provinceCode: number
   note?: string
 }
 
@@ -68,7 +72,11 @@ export async function placeOrder(
       name: shipping.name,
       phone: shipping.phone,
       line1: shipping.address,
+      ward: shipping.ward || null,
+      district: shipping.district,
+      district_code: shipping.districtCode,
       city: shipping.city,
+      province_code: shipping.provinceCode,
       country: 'VN',
     },
     subtotal,
@@ -82,6 +90,27 @@ export async function placeOrder(
   if (error) {
     console.error('placeOrder error:', error)
     return { success: false, error: error.message }
+  }
+
+  // Send order confirmation email (non-blocking — don't fail order if email fails)
+  if (user?.email) {
+    supabase.functions.invoke('send-order-email', {
+      body: {
+        orderId,
+        customerEmail: user.email,
+        customerName: shipping.name,
+        items: orderItems,
+        shipping: {
+          name: shipping.name,
+          phone: shipping.phone,
+          line1: shipping.address,
+          ward: shipping.ward || '',
+          district: shipping.district,
+          city: shipping.city,
+        },
+        total,
+      },
+    }).catch(e => console.error('send-order-email error:', e))
   }
 
   return { success: true, orderId }
