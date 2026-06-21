@@ -22,7 +22,7 @@ export default function CartPage() {
         </div>
         <Link
           href="/shop"
-          className="inline-flex items-center gap-2 h-11 px-7 rounded-sm bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 h-11 px-7 rounded-sm bg-gold text-[#07070C] font-semibold text-sm hover:bg-gold/90 transition-colors"
         >
           <ShoppingCart size={15} /> Browse Shop
         </Link>
