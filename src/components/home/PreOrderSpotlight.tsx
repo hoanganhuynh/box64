@@ -21,11 +21,10 @@ function CountdownBlock({ value, label }: { value: number; label: string }) {
 
 export default function PreOrderSpotlight({ product }: { product: Product }) {
   const launchDate = product.promotion?.ends_at ?? ''
-  const [timeLeft, setTimeLeft] = useState(
-    formatCountdown(new Date(launchDate).getTime() - Date.now())
-  )
+  const [timeLeft, setTimeLeft] = useState<ReturnType<typeof formatCountdown> | null>(null)
 
   useEffect(() => {
+    setTimeLeft(formatCountdown(new Date(launchDate).getTime() - Date.now()))
     const id = setInterval(() => {
       setTimeLeft(formatCountdown(new Date(launchDate).getTime() - Date.now()))
     }, 1000)
@@ -116,13 +115,13 @@ export default function PreOrderSpotlight({ product }: { product: Product }) {
           <div className="rounded-2xl border border-border bg-surface/60 backdrop-blur-sm px-6 py-5">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted mb-4">Launches in</p>
             <div className="flex items-end gap-3 sm:gap-5">
-              <CountdownBlock value={timeLeft.days} label="Days" />
+              <CountdownBlock value={timeLeft?.days ?? 0} label="Days" />
               <span className="font-display font-extrabold text-white/15 text-4xl pb-5 leading-none">:</span>
-              <CountdownBlock value={timeLeft.hours} label="Hours" />
+              <CountdownBlock value={timeLeft?.hours ?? 0} label="Hours" />
               <span className="font-display font-extrabold text-white/15 text-4xl pb-5 leading-none">:</span>
-              <CountdownBlock value={timeLeft.minutes} label="Min" />
+              <CountdownBlock value={timeLeft?.minutes ?? 0} label="Min" />
               <span className="font-display font-extrabold text-white/15 text-4xl pb-5 leading-none">:</span>
-              <CountdownBlock value={timeLeft.seconds} label="Sec" />
+              <CountdownBlock value={timeLeft?.seconds ?? 0} label="Sec" />
             </div>
           </div>
 

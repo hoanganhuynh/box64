@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react'
 import { formatCountdown } from '@/lib/utils/format'
 
 export default function FlashCountdown({ endDate, large }: { endDate: string; large?: boolean }) {
-  const [delta, setDelta] = useState(() => new Date(endDate).getTime() - Date.now())
+  const [delta, setDelta] = useState<number | null>(null)
 
   useEffect(() => {
+    setDelta(new Date(endDate).getTime() - Date.now())
     const tick = setInterval(() => setDelta(new Date(endDate).getTime() - Date.now()), 1000)
     return () => clearInterval(tick)
   }, [endDate])
 
-  if (delta <= 0) return null
+  if (delta === null || delta <= 0) return null
 
   const { days, hours, minutes, seconds } = formatCountdown(delta)
   const parts = days > 0
