@@ -31,11 +31,8 @@ export async function proxy(request: NextRequest) {
 
   // Admin route protection (skip login page itself)
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    if (!user?.email) {
+    if (!user?.email || !ADMIN_EMAILS.includes(user.email)) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
-    }
-    if (!ADMIN_EMAILS.includes(user.email)) {
-      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
