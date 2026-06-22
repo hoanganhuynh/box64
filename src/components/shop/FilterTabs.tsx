@@ -74,11 +74,11 @@ export default function FilterTabs() {
       </div>
 
       {/* Brand row — single scrollable line with logos */}
-      <div className="flex gap-1.5 overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch] pb-0.5">
+      <div className="flex gap-2 overflow-x-auto scrollbar-none [-webkit-overflow-scrolling:touch] pb-0.5">
         {/* All Brands pill */}
         <Link
           href={buildHref(params, 'brand', '')}
-          className={`h-7 px-3 rounded-full text-[11px] font-medium transition-colors inline-flex items-center whitespace-nowrap shrink-0 ${
+          className={`h-8 px-3.5 rounded-full text-xs font-medium transition-colors inline-flex items-center whitespace-nowrap shrink-0 ${
             !activeBrand
               ? 'bg-white/10 text-primary'
               : 'text-muted hover:text-primary'
@@ -93,13 +93,13 @@ export default function FilterTabs() {
             <Link
               key={b.value}
               href={buildHref(params, 'brand', b.value)}
-              className={`h-7 px-3 rounded-full text-[11px] font-medium transition-colors inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              className={`h-8 px-3.5 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 ${
                 isActive
                   ? 'bg-white/10 text-primary border border-gold/30'
                   : 'text-faint hover:text-muted'
               }`}
             >
-              <BrandLogo brand={b.value} size={16} active={isActive} />
+              <BrandLogo brand={b.value} size={20} active={isActive} />
               {b.label}
             </Link>
           )
