@@ -4,6 +4,7 @@ import { DUMMY_PRODUCTS } from '@/lib/data/products'
 import ProductGrid from '@/components/shop/ProductGrid'
 import FilterTabs from '@/components/shop/FilterTabs'
 import SaleBanner from '@/components/shop/SaleBanner'
+import SortSelect from '@/components/shop/SortSelect'
 import type { Product } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -34,8 +35,16 @@ function filterProducts(products: Product[], type: string, brand: string): Produ
 }
 
 function sortProducts(products: Product[], sort: string): Product[] {
-  if (sort === 'price_asc') return [...products].sort((a, b) => a.price - b.price)
+  if (sort === 'price_asc')  return [...products].sort((a, b) => a.price - b.price)
   if (sort === 'price_desc') return [...products].sort((a, b) => b.price - a.price)
+  if (sort === 'latest')     return [...products].sort((a, b) => (b.release_date ?? '').localeCompare(a.release_date ?? ''))
+  if (sort === 'sale') {
+    return [...products].sort((a, b) => {
+      const da = a.promotion?.discount_pct ?? 0
+      const db = b.promotion?.discount_pct ?? 0
+      return db - da
+    })
+  }
   return products
 }
 
@@ -79,7 +88,7 @@ export default async function ShopPage({ searchParams }: PageProps) {
             </p>
           </div>
           <Suspense>
-            <SortSelect current={sort} type={type} brand={brand} />
+            <SortSelect />
           </Suspense>
         </div>
 
@@ -97,27 +106,3 @@ export default async function ShopPage({ searchParams }: PageProps) {
   )
 }
 
-function SortSelect({ current, type, brand }: { current: string; type: string; brand: string }) {
-  return (
-    <form method="GET" action="/shop" className="flex items-center gap-2">
-      {type && <input type="hidden" name="type" value={type} />}
-      {brand && <input type="hidden" name="brand" value={brand} />}
-      <label htmlFor="sort" className="text-muted text-xs whitespace-nowrap">Sort by</label>
-      <select
-        id="sort"
-        name="sort"
-        defaultValue={current}
-        className="text-sm border border-border rounded-sm bg-surface text-primary px-3 py-1.5 focus:outline-none focus:border-gold/50 cursor-pointer"
-        // Native submit on change via js
-        onChange={undefined}
-      >
-        <option value="">Default</option>
-        <option value="price_asc">Price: Low to High</option>
-        <option value="price_desc">Price: High to Low</option>
-      </select>
-      <button type="submit" className="text-xs bg-surface border border-border text-muted hover:text-primary hover:border-gold/40 px-3 py-1.5 rounded-sm transition-colors">
-        Go
-      </button>
-    </form>
-  )
-}

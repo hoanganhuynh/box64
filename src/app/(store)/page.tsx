@@ -2,11 +2,7 @@ import type { Metadata } from 'next'
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import {
-  ArrowRight2, TruckFast, Flash, Star1,
-  Designtools, Printer, Scissor, Layer, TickCircle, Box,
-  type Icon,
-} from 'iconsax-react'
+import { ArrowRight2 } from 'iconsax-react'
 import SampleRequestForm from '@/components/layout/SampleRequestForm'
 import {
   BESTSELLERS, NEW_ARRIVALS,
@@ -32,18 +28,6 @@ export const metadata: Metadata = {
     siteName: 'figbox.store',
   },
 }
-
-// ── Production process steps ──────────────────────────────────────────────────
-
-const PROCESS: { icon: Icon; label: string }[] = [
-  { icon: Designtools, label: 'Design'       },
-  { icon: Printer,     label: 'Test Print'   },
-  { icon: TickCircle,  label: 'QC Check'     },
-  { icon: Box,         label: '350gsm Print' },
-  { icon: Scissor,     label: 'Laser Cut'    },
-  { icon: Layer,       label: 'Hand Fold'    },
-  { icon: TruckFast,   label: 'Ship'         },
-]
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -198,108 +182,8 @@ export default function HomePage() {
       {/* ─── 6. PRE-ORDER ─── cinematic spotlight ──────────────── */}
       {preOrderItem && <PreOrderSpotlight product={preOrderItem} />}
 
-      {/* ─── 7. PRODUCTION PROCESS ─── dark race track ──────────── */}
-      <section
-        aria-labelledby="process-heading"
-        className="relative overflow-hidden bg-bg border-y border-border py-16"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 8px)',
-          backgroundSize: '8px 8px',
-        }}
-      >
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" aria-hidden="true" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-8 sm:mb-14">
-            <p className="text-gold text-xs font-bold tracking-[0.22em] uppercase mb-3">
-              <span className="opacity-40 mr-1.5 tracking-[0.05em]">//</span>How It&apos;s Made
-            </p>
-            <h2 id="process-heading" className="font-display font-extrabold text-white uppercase leading-none text-4xl sm:text-5xl">
-              7 Steps. Zero Compromise.
-            </h2>
-          </div>
-
-          {/* ── Desktop: horizontal race track ── */}
-          <div className="hidden lg:block relative">
-            <div
-              className="absolute"
-              style={{
-                top: '28px',
-                left: 'calc(100% / 14)',
-                right: 'calc(100% / 14)',
-                height: '1px',
-                background: 'linear-gradient(90deg, rgba(245,158,11,0.55) 0%, rgba(245,158,11,0.06) 100%)',
-              }}
-              aria-hidden="true"
-            />
-            <div className="grid grid-cols-7 gap-2">
-              {PROCESS.map((step, i) => {
-                const Icon = step.icon
-                return (
-                  <div
-                    key={i}
-                    className="step-reveal flex flex-col items-center gap-3"
-                    style={{ animationDelay: `${i * 0.09}s` } as React.CSSProperties}
-                  >
-                    <div
-                      className="relative w-14 h-14 rounded-full bg-surface flex items-center justify-center"
-                      style={{ border: '1.5px solid rgba(245,158,11,0.7)' }}
-                    >
-                      <Icon size={20} color="rgba(245,158,11,1)" variant="Bold" />
-                      <span
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-bg border border-border flex items-center justify-center font-display font-extrabold"
-                        style={{ fontSize: '9px', color: 'rgba(245,158,11,1)' }}
-                      >
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <p className="font-display font-extrabold uppercase text-center text-[10px] tracking-[0.15em] leading-tight text-primary">
-                      {step.label}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* ── Mobile / tablet: vertical track ── */}
-          <div className="lg:hidden relative">
-            <div
-              className="absolute left-[17px] top-0 bottom-0 w-px"
-              style={{ background: 'linear-gradient(to bottom, rgba(245,158,11,0.5), rgba(245,158,11,0.04))' }}
-              aria-hidden="true"
-            />
-            <div className="flex flex-col">
-              {PROCESS.map((step, i) => {
-                const Icon = step.icon
-                return (
-                  <div
-                    key={i}
-                    className="step-reveal relative flex items-center gap-4 py-3.5 pl-12"
-                    style={{ animationDelay: `${i * 0.08}s` } as React.CSSProperties}
-                  >
-                    <div
-                      className="absolute left-0 z-10 w-[35px] h-[35px] rounded-full bg-bg flex items-center justify-center"
-                      style={{ border: '1.5px solid rgba(245,158,11,0.65)' }}
-                    >
-                      <span
-                        className="font-display font-extrabold"
-                        style={{ fontSize: '9px', color: 'rgba(245,158,11,1)' }}
-                      >
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <Icon size={15} color="rgba(245,158,11,1)" variant="Bold" />
-                    <p className="font-display font-extrabold uppercase text-[11px] tracking-[0.12em] text-primary">
-                      {step.label}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ─── 7. PRODUCTION PROCESS ─── hidden ───────────────────── */}
+      {/* Section ẩn tạm, bật lại bằng cách uncomment */}
 
       {/* ─── 8. REVIEWS ─── dark ────────────────────────────────── */}
       <ReviewsStrip />
