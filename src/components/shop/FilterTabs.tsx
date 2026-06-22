@@ -38,7 +38,7 @@ function BrandLogo({ brand, size = 16, active = false }: { brand: string; size?:
       alt=""
       width={size}
       height={size}
-      className={`object-contain transition-opacity ${active ? 'opacity-100' : 'opacity-60'}`}
+      className={`object-contain transition-all [filter:brightness(0)_invert(1)] ${active ? 'opacity-100' : 'opacity-50'}`}
     />
   )
 }
