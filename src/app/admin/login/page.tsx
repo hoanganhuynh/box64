@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, LogIn } from 'lucide-react'
+import { FigBoxLogo } from '../_ui/FigBoxLogo'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -33,59 +33,66 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#07070C] flex items-center justify-center px-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#0A0A0F] flex items-center justify-center px-4 overflow-y-auto">
       {/* Ambient glow */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0"
-        style={{ background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(240,165,0,0.06) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(240,165,0,0.05) 0%, transparent 70%)' }}
       />
 
-      <div className="relative w-full max-w-[360px]">
-        {/* Logo */}
-        <div className="flex justify-center mb-10">
-          <Image src="/logo.svg" alt="FigBox Admin" width={40} height={44} priority />
+      <div className="relative w-full max-w-[400px] py-12">
+        {/* Logo mark */}
+        <div className="flex justify-center mb-8">
+          <FigBoxLogo className="w-14 h-14 rounded-2xl" />
+        </div>
+
+        {/* Heading */}
+        <div className="text-center mb-8">
+          <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl">
+            Fig<span className="text-[#F0A500]">Box</span> Admin
+          </h1>
+          <p className="text-sm text-[#484858] mt-1.5">Đăng nhập vào trang quản trị</p>
         </div>
 
         {/* Card */}
-        <div className="bg-[#0D0D17] border border-[#1C1C26] rounded-xl px-8 py-9">
-          <div className="mb-7 text-center">
-            <p className="text-[10px] font-bold tracking-[0.22em] text-[#F0A500]/60 uppercase mb-2">Admin Portal</p>
-            <h1 className="font-jakarta font-extrabold text-white text-xl">
-              Fig<span className="text-[#F0A500]">Box</span> Admin
-            </h1>
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-8 py-8">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-[#444] uppercase tracking-[0.14em]">Email</label>
+              <label htmlFor="email" className="text-xs font-semibold text-[#7A7A90]">
+                Email
+              </label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
                 autoComplete="email"
                 placeholder="admin@figbox.store"
-                className="h-11 px-4 bg-[#07070C] border border-[#1C1C26] rounded-lg text-sm text-white placeholder-[#333] focus:outline-none focus:border-[#F0A500]/40 transition-colors"
+                className="h-11 px-4 bg-[#0F0F15] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#2A2A38] focus:outline-none focus:border-[#F0A500]/40 focus:ring-2 focus:ring-[#F0A500]/8 transition-all"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-[#444] uppercase tracking-[0.14em]">Mật khẩu</label>
+              <label htmlFor="password" className="text-xs font-semibold text-[#7A7A90]">
+                Mật khẩu
+              </label>
               <div className="relative">
                 <input
+                  id="password"
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full h-11 px-4 pr-11 bg-[#07070C] border border-[#1C1C26] rounded-lg text-sm text-white placeholder-[#333] focus:outline-none focus:border-[#F0A500]/40 transition-colors"
+                  className="w-full h-11 px-4 pr-11 bg-[#0F0F15] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#2A2A38] focus:outline-none focus:border-[#F0A500]/40 focus:ring-2 focus:ring-[#F0A500]/8 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#444] hover:text-[#888] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#484858] hover:text-[#7A7A90] transition-colors p-0.5"
                   tabIndex={-1}
                   aria-label={showPw ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                 >
@@ -95,7 +102,7 @@ export default function AdminLoginPage() {
             </div>
 
             {error && (
-              <p className="text-[12px] text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2.5">
+              <p role="alert" className="text-[12px] font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
                 {error}
               </p>
             )}
@@ -103,15 +110,25 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1 h-11 rounded-lg bg-[#F0A500] text-[#07070C] font-bold text-sm hover:bg-[#F0A500]/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-11 rounded-xl bg-[#F0A500] text-[#0A0A0F] font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#F0A500]/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-[#0A0A0F]/30 border-t-[#0A0A0F] rounded-full animate-spin" />
+                  Đang đăng nhập...
+                </>
+              ) : (
+                <>
+                  <LogIn size={15} />
+                  Đăng nhập
+                </>
+              )}
             </button>
           </form>
         </div>
 
-        <p className="text-center mt-5">
-          <a href="/" className="text-[#333] hover:text-[#555] text-xs transition-colors">
+        <p className="text-center mt-6">
+          <a href="/" className="text-xs text-[#383848] hover:text-[#484858] transition-colors">
             ← Về trang chủ
           </a>
         </p>

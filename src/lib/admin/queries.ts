@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { DesignState } from '@/lib/types'
 
 function getAdminClient() {
   return createClient(
@@ -12,7 +13,7 @@ export interface OrderRow {
   id: string
   user_id: string | null
   status: string
-  items: Array<{ product_name: string; quantity: number; unit_price: number; image_url?: string }>
+  items: Array<{ product_name: string; quantity: number; unit_price: number; image_url?: string; design_data?: DesignState }>
   shipping: { name: string; phone: string; line1: string; ward?: string; district: string; city: string }
   subtotal: number
   total: number
@@ -137,6 +138,11 @@ export async function getOrders(opts: {
     q = q.eq('status', opts.status)
   }
 
+  if (opts.search?.trim()) {
+    const s = opts.search.trim()
+    q = q.or(`id.ilike.%${s}%,shipping->>name.ilike.%${s}%,shipping->>phone.ilike.%${s}%`)
+  }
+
   const { data, error, count } = await q
   if (error) throw error
 
@@ -154,4 +160,43 @@ export async function updateOrderStatus(id: string, status: string) {
   const db = getAdminClient()
   const { error } = await db.from('orders').update({ status }).eq('id', id)
   if (error) throw error
+}
+
+export interface CustomerRow {
+  name: string
+  phone: string
+  orders: number
+  spent: number
+  lastOrder: string
+}
+
+export async function getCustomers(): Promise<CustomerRow[]> {
+  const db = getAdminClient()
+  const { data, error } = await db
+    .from('orders')
+    .select('shipping, total, created_at')
+    .neq('status', 'cancelled')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+
+  const map = new Map<string, CustomerRow>()
+  for (const order of data ?? []) {
+    const phone = order.shipping?.phone ?? ''
+    const existing = map.get(phone)
+    if (existing) {
+      existing.orders++
+      existing.spent += order.total ?? 0
+    } else {
+      map.set(phone, {
+        name: order.shipping?.name ?? 'Khách',
+        phone,
+        orders: 1,
+        spent: order.total ?? 0,
+        lastOrder: order.created_at,
+      })
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => b.spent - a.spent)
 }

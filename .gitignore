@@ -41,3 +41,8 @@ dummy-product/
 .superpowers/
 docs/*.docx
 docs/gen-docx.js
+
+# Vault admin reference template (not imported by app)
+admin-ui-v2/
+# Supabase CLI temp
+supabase/.temp/

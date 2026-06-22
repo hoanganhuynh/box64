@@ -1,15 +1,16 @@
-const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
-  pending:   { label: 'Chờ xử lý',   cls: 'bg-amber-500/15 text-amber-400 border-amber-500/25' },
-  confirmed: { label: 'Đã xác nhận', cls: 'bg-blue-500/15 text-blue-400 border-blue-500/25' },
-  shipped:   { label: 'Đang giao',   cls: 'bg-purple-500/15 text-purple-400 border-purple-500/25' },
-  delivered: { label: 'Đã giao',     cls: 'bg-green-500/15 text-green-400 border-green-500/25' },
-  cancelled: { label: 'Đã huỷ',     cls: 'bg-red-500/15 text-red-400 border-red-500/25' },
+const STATUS_CONFIG: Record<string, { label: string; dot: string; cls: string }> = {
+  pending:   { label: 'Chờ xử lý', dot: 'bg-amber-400',   cls: 'bg-amber-500/10 text-amber-400 ring-amber-500/25' },
+  printing:  { label: 'Đang in',   dot: 'bg-blue-400',    cls: 'bg-blue-500/10 text-blue-400 ring-blue-500/25' },
+  shipped:   { label: 'Đang giao', dot: 'bg-violet-400',  cls: 'bg-violet-500/10 text-violet-400 ring-violet-500/25' },
+  delivered: { label: 'Đã giao',   dot: 'bg-emerald-400', cls: 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/25' },
+  cancelled: { label: 'Đã huỷ',   dot: 'bg-red-400',     cls: 'bg-red-500/10 text-red-400 ring-red-500/25' },
 }
 
 export function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_CONFIG[status] ?? { label: status, cls: 'bg-white/10 text-white/60 border-white/10' }
+  const cfg = STATUS_CONFIG[status] ?? { label: status, dot: 'bg-white/30', cls: 'bg-white/5 text-white/50 ring-white/10' }
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide border ${cfg.cls}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ring-inset ${cfg.cls}`}>
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
       {cfg.label}
     </span>
   )

@@ -5,49 +5,49 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getOrders } from '@/lib/admin/queries'
 import { OrdersTable } from '../_components/OrdersTable'
+import { SearchInput } from './SearchInput'
 
 const STATUS_TABS = [
   { value: 'all',       label: 'Tất cả' },
   { value: 'pending',   label: 'Chờ xử lý' },
-  { value: 'confirmed', label: 'Đã xác nhận' },
+  { value: 'printing',  label: 'Đang in' },
   { value: 'shipped',   label: 'Đang giao' },
   { value: 'delivered', label: 'Đã giao' },
   { value: 'cancelled', label: 'Đã huỷ' },
 ]
 
-async function OrdersContent({ status, page }: { status: string; page: number }) {
-  const { orders, total, pageSize } = await getOrders({ status, page })
+async function OrdersContent({ status, page, search }: { status: string; page: number; search: string }) {
+  const { orders, total, pageSize } = await getOrders({ status, page, search })
   const totalPages = Math.ceil(total / pageSize)
 
   return (
     <>
-      <div className="bg-[#0D0D17] border border-[#1C1C26] rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#1C1C26] flex items-center justify-between">
-          <p className="text-[11px] font-bold text-[#444] uppercase tracking-[0.16em]">
-            {total} đơn hàng
+      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#1A1A22]">
+          <p className="text-sm font-semibold text-[#EEEEF4]">
+            {total} đơn hàng{search ? ` · "${search}"` : ''}
           </p>
         </div>
         <OrdersTable orders={orders} />
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 mt-6">
           {page > 0 && (
             <Link
-              href={`/admin/orders?status=${status}&page=${page - 1}`}
-              className="flex items-center gap-1 px-3 py-2 rounded-lg bg-[#0D0D17] border border-[#1C1C26] text-xs text-[#888] hover:text-white hover:border-[#2A2A35] transition-colors"
+              href={`/admin/orders?status=${status}&page=${page - 1}&search=${search}`}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
             >
               <ChevronLeft size={14} /> Trước
             </Link>
           )}
-          <span className="text-xs text-[#444] px-3">
+          <span className="text-xs font-medium text-[#484858] px-3 tabular-nums">
             {page + 1} / {totalPages}
           </span>
           {page < totalPages - 1 && (
             <Link
-              href={`/admin/orders?status=${status}&page=${page + 1}`}
-              className="flex items-center gap-1 px-3 py-2 rounded-lg bg-[#0D0D17] border border-[#1C1C26] text-xs text-[#888] hover:text-white hover:border-[#2A2A35] transition-colors"
+              href={`/admin/orders?status=${status}&page=${page + 1}&search=${search}`}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
             >
               Tiếp <ChevronRight size={14} />
             </Link>
@@ -61,43 +61,55 @@ async function OrdersContent({ status, page }: { status: string; page: number })
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>
+  searchParams: Promise<{ status?: string; page?: string; search?: string }>
 }) {
   const params = await searchParams
   const status = params.status ?? 'all'
   const page = Math.max(0, parseInt(params.page ?? '0', 10))
+  const search = params.search ?? ''
 
   return (
-    <div className="p-6 lg:p-8 max-w-[1400px]">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="font-jakarta font-extrabold text-white text-2xl lg:text-3xl">Đơn hàng</h1>
+    <div className="p-6 lg:p-8">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Đơn hàng</h1>
+        <a
+          href="/admin/api/export"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-semibold text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
+        >
+          ↓ Xuất CSV
+        </a>
       </div>
 
-      {/* Status filter tabs */}
-      <div className="flex gap-1 flex-wrap mb-6">
-        {STATUS_TABS.map(tab => (
-          <Link
-            key={tab.value}
-            href={`/admin/orders?status=${tab.value}&page=0`}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
-              status === tab.value
-                ? 'bg-[#F0A500] text-[#07070C]'
-                : 'bg-[#0D0D17] border border-[#1C1C26] text-[#555] hover:text-white hover:border-[#2A2A35]'
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-
-      <Suspense fallback={
-        <div className="flex items-center gap-3 text-[#444] text-sm py-8">
-          <span className="w-4 h-4 border-2 border-[#F0A500] border-t-transparent rounded-full animate-spin" />
-          Đang tải...
+      {/* Search + status tabs */}
+      <div className="flex flex-col gap-3 mb-6">
+        <SearchInput defaultValue={search} />
+        <div className="flex gap-2 flex-wrap">
+          {STATUS_TABS.map(tab => (
+            <Link
+              key={tab.value}
+              href={`/admin/orders?status=${tab.value}&page=0${search ? `&search=${search}` : ''}`}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap ${
+                status === tab.value
+                  ? 'bg-[#F0A500] text-[#0A0A0F]'
+                  : 'bg-[#111118] border border-[#1E1E28] text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38]'
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
         </div>
-      }>
-        <OrdersContent status={status} page={page} />
+      </div>
+
+      <Suspense
+        key={`${status}-${page}-${search}`}
+        fallback={
+          <div className="flex items-center gap-3 text-[#484858] text-sm py-8">
+            <span className="w-4 h-4 border-2 border-[#F0A500] border-t-transparent rounded-full animate-spin" />
+            Đang tải...
+          </div>
+        }
+      >
+        <OrdersContent status={status} page={page} search={search} />
       </Suspense>
     </div>
   )
