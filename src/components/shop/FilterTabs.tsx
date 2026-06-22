@@ -78,7 +78,7 @@ export default function FilterTabs() {
         {/* All Brands pill */}
         <Link
           href={buildHref(params, 'brand', '')}
-          className={`h-8 px-3.5 rounded-full text-xs font-medium transition-colors inline-flex items-center whitespace-nowrap shrink-0 ${
+          className={`h-10 px-4 rounded-full text-xs font-medium transition-colors inline-flex items-center whitespace-nowrap shrink-0 ${
             !activeBrand
               ? 'bg-white/10 text-primary'
               : 'text-muted hover:text-primary'
@@ -93,13 +93,13 @@ export default function FilterTabs() {
             <Link
               key={b.value}
               href={buildHref(params, 'brand', b.value)}
-              className={`h-8 px-3.5 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 ${
+              className={`h-10 px-4 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 ${
                 isActive
                   ? 'bg-white/10 text-primary border border-gold/30'
                   : 'text-faint hover:text-muted'
               }`}
             >
-              <BrandLogo brand={b.value} size={20} active={isActive} />
+              <BrandLogo brand={b.value} size={28} active={isActive} />
               {b.label}
             </Link>
           )
