@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Plus_Jakarta_Sans, Barlow_Condensed } from 'next/font/google'
+import { Plus_Jakarta_Sans, Barlow_Condensed, Figtree, Onest } from 'next/font/google'
 import './globals.css'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -13,6 +13,20 @@ const barlowCondensed = Barlow_Condensed({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
   variable: '--font-display',
+  display: 'swap',
+})
+
+const figtree = Figtree({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-figtree',
+  display: 'swap',
+})
+
+const onest = Onest({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-onest',
   display: 'swap',
 })
 
@@ -34,7 +48,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} ${barlowCondensed.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${plusJakartaSans.variable} ${barlowCondensed.variable} ${figtree.variable} ${onest.variable}`}>
       <body className="min-h-dvh bg-bg">
         {children}
       </body>

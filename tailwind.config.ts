@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark theme
+        // Store dark theme
         bg:             'var(--bg)',
         surface:        'var(--surface)',
         header:         'var(--header)',
@@ -23,13 +24,17 @@ const config: Config = {
         faint:          'var(--text-faint)',
         error:          'var(--error)',
         success:        'var(--success)',
-        // Light theme
+        // Store light theme
         warm:           'var(--bg-warm)',
         'warm-surface': 'var(--surface-warm)',
         ink:            'var(--ink)',
         'ink-muted':    'var(--ink-muted)',
         'ink-faint':    'var(--ink-faint)',
         'border-warm':  'var(--border-warm)',
+        // Admin UI v2 design tokens (scoped to .admin-root)
+        background:     'var(--background)',
+        foreground:     'var(--foreground)',
+        card:           'var(--card)',
       },
       borderRadius: {
         DEFAULT: 'var(--radius)',
@@ -40,6 +45,9 @@ const config: Config = {
       fontFamily: {
         jakarta: ['var(--font-plus-jakarta)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        // Admin UI v2 fonts
+        body:    ['var(--font-figtree)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-onest)', 'system-ui', 'sans-serif'],
       },
     },
   },
