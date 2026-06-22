@@ -17,6 +17,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
   const [mounted, setMounted] = useState(false)
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -63,9 +64,16 @@ export default function CheckoutPage() {
       .then((data: DvhcvnProvince[]) => { setDvhcvnProvinces(data); setLoadingDvhcvn(false) })
       .catch(() => setLoadingDvhcvn(false))
 
-    // Pre-fill name + fetch saved address
+    // Require login — checkout uses the logged-in account's email for the
+    // order confirmation. Redirect guests to login, return here afterwards.
     const supabase = createSupabaseClient()
     supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) {
+        router.replace('/login?next=/checkout')
+        return
+      }
+      setIsAuthed(true)
+
       if (data.user?.user_metadata?.full_name) {
         setForm(f => ({ ...f, name: data.user!.user_metadata.full_name as string }))
       }
@@ -208,7 +216,8 @@ export default function CheckoutPage() {
     router.push(`/checkout/success?order=${result.orderId}`)
   }
 
-  if (!mounted) return null
+  // Wait for mount + auth check (redirect to login happens in the effect).
+  if (!mounted || isAuthed === null) return null
 
   if (!items.length) {
     return (

@@ -92,25 +92,33 @@ export async function placeOrder(
     return { success: false, error: error.message }
   }
 
-  // Send order confirmation email (non-blocking — don't fail order if email fails)
+  // Send order confirmation email. MUST be awaited — in a serverless runtime
+  // a fire-and-forget promise is killed when the action returns, so the email
+  // never actually goes out. Wrapped in try/catch so an email failure never
+  // fails the order itself.
   if (user?.email) {
-    supabase.functions.invoke('send-order-email', {
-      body: {
-        orderId,
-        customerEmail: user.email,
-        customerName: shipping.name,
-        items: orderItems,
-        shipping: {
-          name: shipping.name,
-          phone: shipping.phone,
-          line1: shipping.address,
-          ward: shipping.ward || '',
-          district: shipping.district,
-          city: shipping.city,
+    try {
+      const { error: emailError } = await supabase.functions.invoke('send-order-email', {
+        body: {
+          orderId,
+          customerEmail: user.email,
+          customerName: shipping.name,
+          items: orderItems,
+          shipping: {
+            name: shipping.name,
+            phone: shipping.phone,
+            line1: shipping.address,
+            ward: shipping.ward || '',
+            district: shipping.district,
+            city: shipping.city,
+          },
+          total,
         },
-        total,
-      },
-    }).catch(e => console.error('send-order-email error:', e))
+      })
+      if (emailError) console.error('send-order-email error:', emailError)
+    } catch (e) {
+      console.error('send-order-email threw:', e)
+    }
   }
 
   return { success: true, orderId }
