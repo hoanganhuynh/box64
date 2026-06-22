@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { Suspense } from 'react'
 import { TrendingUp, ShoppingBag, Users, BarChart2 } from 'lucide-react'
 import { getDashboardStats } from '@/lib/admin/queries'
