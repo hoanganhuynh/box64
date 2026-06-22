@@ -132,15 +132,15 @@ function SuccessContent() {
       <div className="flex flex-col sm:flex-row gap-3 w-full">
         <Link
           href="/orders"
-          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg border border-border text-sm font-semibold text-primary hover:border-gold/40 hover:text-gold transition-colors"
+          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg border border-border bg-surface/70 px-5 py-3.5 text-base font-bold text-primary transition-all duration-200 hover:border-gold/40 hover:bg-surface hover:text-gold active:scale-[0.98]"
         >
-          <Package size={15} /> Đơn hàng của tôi
+          <Package size={18} /> Đơn hàng của tôi
         </Link>
         <Link
           href="/shop"
-          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg bg-gold text-[#07070C] text-sm font-bold hover:bg-gold/90 transition-colors"
+          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg bg-gold px-5 py-3.5 text-base font-extrabold text-[#07070C] shadow-[0_14px_32px_rgba(245,158,11,0.18)] transition-all duration-200 hover:bg-gold-mid active:scale-[0.98]"
         >
-          Tiếp tục mua sắm <ArrowRight size={15} />
+          Tiếp tục mua sắm <ArrowRight size={18} />
         </Link>
       </div>
     </div>
