@@ -31,14 +31,25 @@ function buildHref(params: URLSearchParams, key: string, value: string) {
   return `/shop${qs ? `?${qs}` : ''}`
 }
 
-function BrandLogo({ brand, size = 16, active = false }: { brand: string; size?: number; active?: boolean }) {
+const BRAND_LOGO_FILE: Record<string, string> = {
+  porsche:     '/car-brand/Porsche.png',
+  nissan:      '/car-brand/Nissan.png',
+  lamborghini: '/car-brand/Lamborghini.png',
+  ferrari:     '/car-brand/Ferrari.png',
+  bmw:         '/car-brand/bmw.png',
+  toyota:      '/car-brand/toyota.png',
+}
+
+function BrandLogo({ brand, size = 28, active = false }: { brand: string; size?: number; active?: boolean }) {
+  const src = BRAND_LOGO_FILE[brand]
+  if (!src) return null
   return (
     <Image
-      src={`/brands/${brand}.svg`}
+      src={src}
       alt=""
       width={size}
       height={size}
-      className={`object-contain transition-all [filter:brightness(0)_invert(1)] ${active ? 'opacity-100' : 'opacity-50'}`}
+      className={`object-contain transition-opacity ${active ? 'opacity-100' : 'opacity-70'}`}
     />
   )
 }
