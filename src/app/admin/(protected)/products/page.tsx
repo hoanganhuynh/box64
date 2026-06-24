@@ -66,6 +66,8 @@ const BLANK: Omit<ProductRow, 'created_at'> = {
   id: '', type: 'box_custom', name: '', slug: '', price: 89000,
   images: [], stock: 999, status: 'active',
   description: null, tags: [], material: null, brand: null,
+  sku: null, manufacturer: null, car_make: null, car_model: null,
+  color: null, color_group: null,
 }
 
 // ─── shared input styles ─────────────────────────────────────────────────────
@@ -110,6 +112,20 @@ function ProductModal({
   function handleNameChange(v: string) {
     set('name', v)
     if (isNew) set('slug', slugify(v))
+  }
+
+  function autoColorGroup() {
+    const parts = [form.manufacturer, form.car_make, form.car_model].filter(Boolean)
+    if (parts.length === 3) set('color_group', parts.map(s => slugify(s!)).join('-'))
+  }
+
+  function suggestSku() {
+    const s = (v: string | null, n: number) =>
+      (v ?? '').replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, n)
+    const parts = [s(form.manufacturer, 3), s(form.car_make, 3), s(form.car_model, 6)]
+    if (form.color) parts.push(s(form.color, 3))
+    const suggestion = parts.filter(Boolean).join('-')
+    if (suggestion) set('sku', suggestion)
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -207,6 +223,53 @@ function ProductModal({
                 </select>
                 <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#484858] pointer-events-none" />
               </div>
+            </Field>
+          </div>
+
+          {/* ── SKU & Variant fields ─────────────────────────────── */}
+          <div className="h-px bg-[#1A1A22]" />
+          <p className="text-[10px] font-bold text-[#484858] uppercase tracking-widest -mb-1">SKU & Phân loại</p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Hãng SX diecast">
+              <input value={form.manufacturer ?? ''} placeholder="mini-gt, master, poprace"
+                onChange={e => { set('manufacturer', e.target.value || null); }}
+                onBlur={autoColorGroup} className={INPUT} />
+            </Field>
+            <Field label="Hãng xe">
+              <input value={form.car_make ?? ''} placeholder="porsche, nissan, land-rover"
+                onChange={e => { set('car_make', e.target.value || null); }}
+                onBlur={autoColorGroup} className={INPUT} />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Mẫu xe">
+              <input value={form.car_model ?? ''} placeholder="911-gt3-r, defender-110"
+                onChange={e => { set('car_model', e.target.value || null); }}
+                onBlur={autoColorGroup} className={INPUT} />
+            </Field>
+            <Field label="Màu / Livery">
+              <input value={form.color ?? ''} placeholder="pink, dust-sand, supercar-advocates"
+                onChange={e => set('color', e.target.value || null)} className={INPUT} />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Mã SKU">
+              <div className="flex gap-1.5">
+                <input value={form.sku ?? ''} placeholder="MGT-POR-911GTR-PK"
+                  onChange={e => set('sku', e.target.value.toUpperCase() || null)}
+                  className={INPUT + ' font-mono uppercase'} />
+                <button type="button" onClick={suggestSku}
+                  className="shrink-0 h-9 px-2.5 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-[10px] text-[#7A7A90] hover:text-[#EEEEF4] transition-colors whitespace-nowrap">
+                  Gợi ý
+                </button>
+              </div>
+            </Field>
+            <Field label="Color group">
+              <input value={form.color_group ?? ''} placeholder="mini-gt-porsche-911-gt3r"
+                onChange={e => set('color_group', e.target.value || null)} className={INPUT} />
             </Field>
           </div>
 

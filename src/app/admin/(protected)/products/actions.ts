@@ -15,6 +15,12 @@ export interface ProductRow {
   type: string
   name: string
   slug: string
+  sku: string | null
+  manufacturer: string | null
+  car_make: string | null
+  car_model: string | null
+  color: string | null
+  color_group: string | null
   price: number
   images: string[]
   stock: number
@@ -40,6 +46,12 @@ export async function getProducts(): Promise<ProductRow[]> {
       type: p.type,
       name: p.name,
       slug: p.slug,
+      sku: p.sku ?? null,
+      manufacturer: p.manufacturer ?? null,
+      car_make: p.car_make ?? null,
+      car_model: p.car_model ?? null,
+      color: p.color ?? null,
+      color_group: p.color_group ?? null,
       price: p.price,
       images: p.images,
       stock: p.stock,

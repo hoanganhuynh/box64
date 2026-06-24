@@ -12,6 +12,12 @@ export interface Product {
   type: ProductType
   name: string
   slug: string
+  sku?: string           // MGT-POR-911GTR-PK
+  manufacturer?: string  // diecast brand slug: mini-gt, master, poprace
+  car_make?: string      // car brand: porsche, nissan, land-rover
+  car_model?: string     // car model: 911-gt3-r, defender-110
+  color?: string         // color/livery variant: pink, dust-sand
+  color_group?: string   // links same-model variants: mini-gt-porsche-911-gt3r
   price: number          // VND, integer
   images: string[]
   stock: number
