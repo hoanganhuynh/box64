@@ -209,7 +209,7 @@ export default function HomePage() {
             ] as const).map(({ value, label }) => (
               <div key={label} className="py-6 sm:py-8 flex flex-col items-center gap-1">
                 <span className="font-display font-extrabold text-white text-3xl sm:text-5xl tabular-nums leading-none">{value}</span>
-                <span className="text-faint text-[10px] font-bold uppercase tracking-[0.18em] mt-1">{label}</span>
+                <span className="text-faint text-[10px] font-bold uppercase tracking-[0.18em] mt-1 text-center">{label}</span>
               </div>
             ))}
           </div>
