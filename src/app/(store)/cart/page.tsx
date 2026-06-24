@@ -201,7 +201,7 @@ export default function CartPage() {
               className={`flex items-center justify-center gap-2 w-full h-12 rounded-sm font-semibold text-sm transition-colors ${
                 selected.size === 0
                   ? 'bg-surface-2 text-muted cursor-not-allowed pointer-events-none'
-                  : 'bg-gold text-white hover:bg-gold-mid'
+                  : 'bg-gold text-[#07070C] hover:bg-gold-mid'
               }`}
             >
               Proceed to Checkout <ArrowRight size={15} />
