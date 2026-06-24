@@ -59,6 +59,14 @@ export default function CartPage() {
   }
 
   return (
+    <>
+      {/* Sticky freeship strip — sits flush below header (top-14 = 56px) */}
+      <div className="sticky top-14 z-40 bg-header/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+          <FreeshipBanner subtotal={subtotal} />
+        </div>
+      </div>
+
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
       {/* Header */}
@@ -66,9 +74,6 @@ export default function CartPage() {
         <h1 className="font-jakarta font-extrabold text-primary text-2xl sm:text-3xl">Shopping Cart</h1>
         <span className="text-muted text-sm">{count} {count === 1 ? 'item' : 'items'}</span>
       </div>
-
-      {/* Freeship progress */}
-      <FreeshipBanner subtotal={subtotal} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -218,6 +223,7 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
@@ -302,7 +308,7 @@ function FreeshipBanner({ subtotal }: { subtotal: number }) {
   const qualified = remaining <= 0
 
   return (
-    <div className="mb-6 rounded-sm border border-border bg-surface px-4 py-3">
+    <div>
       <div className="flex items-center gap-2 mb-2">
         <Truck size={14} className={qualified ? 'text-success' : 'text-muted'} />
         <p className="text-xs font-medium text-primary">
