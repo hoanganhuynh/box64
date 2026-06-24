@@ -13,32 +13,30 @@ export default function FlashSaleSection() {
   }, products[0].promotion!.ends_at)
 
   return (
-    <section aria-labelledby="flash-sale-heading" className="relative overflow-hidden bg-gold-mid">
+    <section aria-labelledby="flash-sale-heading" className="relative bg-gold-mid">
 
-      {/* Diagonal livery stripes */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 2px, transparent 2px, transparent 16px)',
-        }}
-      />
+      {/* Decorative backgrounds — clipped inside this wrapper */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(-45deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 2px, transparent 2px, transparent 16px)',
+          }}
+        />
+        <div
+          className="absolute top-0 right-0 w-40 h-28"
+          style={{
+            backgroundImage: 'repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%)',
+            backgroundSize: '10px 10px',
+            maskImage: 'linear-gradient(to bottom-left, black 25%, transparent 75%)',
+            WebkitMaskImage: 'linear-gradient(to bottom-left, black 25%, transparent 75%)',
+          }}
+        />
+      </div>
 
-      {/* Checkered flag corner */}
-      <div
-        aria-hidden="true"
-        className="absolute top-0 right-0 w-40 h-28 pointer-events-none"
-        style={{
-          backgroundImage: 'repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%)',
-          backgroundSize: '10px 10px',
-          maskImage: 'linear-gradient(to bottom-left, black 25%, transparent 75%)',
-          WebkitMaskImage: 'linear-gradient(to bottom-left, black 25%, transparent 75%)',
-        }}
-      />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-8">
+      {/* Header */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-6">
+        <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Flash size={22} color="#FFF" variant="Bold" />
             <h2 id="flash-sale-heading" className="font-jakarta font-black text-white text-2xl sm:text-3xl uppercase tracking-tight">
@@ -50,12 +48,23 @@ export default function FlashSaleSection() {
             <FlashCountdown endDate={endDate} large />
           </div>
         </div>
+      </div>
 
-        {/* Cards — reuse ProductCard for consistent hierarchy + Add to Cart */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
-          {products.slice(0, 3).map(p => (
-            <ProductCard key={p.id} product={p} variant="light" showFlashProgress />
+      {/* Carousel — swipe ngang, 1 card + 30% card tiếp */}
+      <div className="relative pb-8">
+        <div
+          className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-4 sm:pl-6"
+        >
+          {products.map(p => (
+            <div
+              key={p.id}
+              className="snap-start shrink-0 w-[75%] sm:w-[44%] lg:w-[30%]"
+            >
+              <ProductCard product={p} variant="light" showFlashProgress />
+            </div>
           ))}
+          {/* Trailing spacer — đảm bảo card cuối scroll vào đủ */}
+          <div className="shrink-0 w-4 sm:w-6" aria-hidden="true" />
         </div>
       </div>
     </section>
