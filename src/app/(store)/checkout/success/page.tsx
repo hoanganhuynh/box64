@@ -37,8 +37,8 @@ function SuccessContent() {
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center gap-6">
 
       {/* Icon */}
-      <div className="w-20 h-20 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center">
-        <CheckCircle2 size={36} className="text-gold" />
+      <div className="w-20 h-20 rounded-full bg-success flex items-center justify-center">
+        <CheckCircle2 size={36} className="text-white" />
       </div>
 
       {/* Heading */}
