@@ -137,7 +137,7 @@ const availabilityMap: Record<string, string> = {
           <div className="flex items-center gap-2 flex-wrap mt-3">
             <Image src="/mini-gt-seeklogo.svg" alt="MiniGT" width={38} height={18} className="object-contain shrink-0 invert" />
             {product.brand && product.brand !== 'other' && (
-              <BrandLogo brand={product.brand} size={18} />
+              <BrandLogo brand={product.brand} size={22} />
             )}
             {product.material && (
               <span className="text-[10px] text-[#a08070] border border-[#3a2e28] rounded px-1.5 py-0.5 leading-none">
