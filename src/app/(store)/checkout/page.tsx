@@ -238,6 +238,7 @@ export default function CheckoutPage() {
       items,
       amount: subtotal + shippingFee,
       paymentMethod: method,
+      customerName: form.name,
     }))
     clearCart()
     router.push(`/checkout/success?order=${result.orderId}`)

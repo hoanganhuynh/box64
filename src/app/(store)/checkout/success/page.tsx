@@ -17,6 +17,19 @@ interface LastOrder {
   items: CartItem[]
   amount?: number
   paymentMethod?: string
+  customerName?: string
+}
+
+function toTransferDesc(customerName: string | undefined, orderId: string): string {
+  const name = (customerName ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D')
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+  return name ? `${name} ${orderId}` : orderId
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -34,8 +47,9 @@ function CopyButton({ text }: { text: string }) {
 }
 
 
-function VietQRSection({ orderId, amount }: { orderId: string; amount: number }) {
-  const addInfo = encodeURIComponent(orderId)
+function VietQRSection({ orderId, amount, customerName }: { orderId: string; amount: number; customerName?: string }) {
+  const transferDesc = toTransferDesc(customerName, orderId)
+  const addInfo = encodeURIComponent(transferDesc)
   const accountName = encodeURIComponent(BANK_ACCOUNT_NAME)
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${BANK_ACCOUNT}-compact2.jpg?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`
 
@@ -83,13 +97,13 @@ function VietQRSection({ orderId, amount }: { orderId: string; amount: number })
         <div className="flex justify-between items-center gap-2">
           <span className="text-muted text-xs shrink-0">Nội dung CK</span>
           <div className="flex items-center gap-1.5">
-            <span className="font-mono font-bold text-primary text-sm">{orderId}</span>
-            <CopyButton text={orderId} />
+            <span className="font-mono font-bold text-primary text-sm">{transferDesc}</span>
+            <CopyButton text={transferDesc} />
           </div>
         </div>
       </div>
 
-      <div className="bg-gold/5 border-t border-gold/15 px-5 py-3">
+      <div className="bg-gold/5 border-t border-white/10 px-5 py-3">
         <p className="text-[11px] text-muted text-center leading-relaxed">
           Đơn hàng được xử lý sau khi xác nhận chuyển khoản · thường trong 1–2 giờ
         </p>
@@ -139,7 +153,7 @@ function SuccessContent() {
 
       {/* VietQR payment block — shown first so user sees it immediately */}
       {isVietQR && total > 0 && (
-        <VietQRSection orderId={orderId} amount={total} />
+        <VietQRSection orderId={orderId} amount={total} customerName={order?.customerName} />
       )}
 
       {/* Order ID */}
