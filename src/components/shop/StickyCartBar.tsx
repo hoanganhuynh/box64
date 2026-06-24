@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ShoppingCart, Check } from 'lucide-react'
 import type { Product } from '@/lib/types'
@@ -15,17 +15,13 @@ interface Props {
 export default function StickyCartBar({ product, salePrice }: Props) {
   const [visible, setVisible] = useState(false)
   const [added, setAdded] = useState(false)
-  const sentinelRef = useRef<HTMLDivElement>(null)
   const addItem = useCartStore(s => s.addItem)
 
   useEffect(() => {
-    const el = sentinelRef.current
+    const el = document.querySelector('[data-atc-trigger]')
     if (!el) return
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isBelowViewport = entry.boundingClientRect.top > 0
-        setVisible(!entry.isIntersecting && !isBelowViewport)
-      },
+      ([entry]) => setVisible(!entry.isIntersecting),
       { threshold: 0 }
     )
     observer.observe(el)
@@ -43,9 +39,6 @@ export default function StickyCartBar({ product, salePrice }: Props) {
 
   return (
     <>
-      {/* Sentinel - must be placed directly after AddToCartButton in the parent */}
-      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
-
       {/* Sticky bar */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-50 bg-[#07070C]/95 backdrop-blur-sm border-t border-border transition-transform duration-150 ease-out ${

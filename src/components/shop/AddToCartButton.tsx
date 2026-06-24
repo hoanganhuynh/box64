@@ -34,7 +34,7 @@ export default function AddToCartButton({ product }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3" data-atc-trigger>
       <div className="flex items-center gap-3">
         {/* Quantity stepper */}
         <div className="flex items-center border border-border rounded-sm overflow-hidden bg-surface">
