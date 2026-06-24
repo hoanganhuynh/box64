@@ -10,6 +10,7 @@ import type { CartItem } from '@/lib/types'
 const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID ?? ''
 const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT ?? ''
 const BANK_ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME ?? ''
+const BANK_CONFIGURED = !!BANK_ACCOUNT && BANK_ACCOUNT !== '0123456789'
 
 interface LastOrder {
   orderId: string
@@ -32,13 +33,44 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+function DummyQR() {
+  const d = (x: number, y: number, k: string) => <rect key={k} x={x} y={y} width={8} height={8} fill="#111" rx="1"/>
+  return (
+    <svg viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg">
+      <rect width="220" height="220" fill="white" rx="8"/>
+      {/* TL finder */}
+      <rect x="12" y="12" width="56" height="56" fill="#111" rx="5"/>
+      <rect x="20" y="20" width="40" height="40" fill="white" rx="3"/>
+      <rect x="28" y="28" width="24" height="24" fill="#111" rx="2"/>
+      {/* TR finder */}
+      <rect x="152" y="12" width="56" height="56" fill="#111" rx="5"/>
+      <rect x="160" y="20" width="40" height="40" fill="white" rx="3"/>
+      <rect x="168" y="28" width="24" height="24" fill="#111" rx="2"/>
+      {/* BL finder */}
+      <rect x="12" y="152" width="56" height="56" fill="#111" rx="5"/>
+      <rect x="20" y="160" width="40" height="40" fill="white" rx="3"/>
+      <rect x="28" y="168" width="24" height="24" fill="#111" rx="2"/>
+      {/* top strip */}
+      {[[76,12],[92,12],[108,12],[124,12],[140,12],[84,28],[108,28],[132,28],[76,44],[100,44],[140,44],[92,60],[116,60],[132,60]].map(([x,y]) => d(x,y,`t${x}${y}`))}
+      {/* right strip */}
+      {[[152,76],[168,76],[192,76],[160,92],[184,92],[200,92],[152,108],[176,108],[168,124],[196,124],[152,140],[180,140],[200,140]].map(([x,y]) => d(x,y,`r${x}${y}`))}
+      {/* bottom strip */}
+      {[[76,152],[100,152],[136,152],[84,168],[116,168],[140,168],[92,184],[108,184],[132,184],[76,200],[120,200],[140,200]].map(([x,y]) => d(x,y,`b${x}${y}`))}
+      {/* left strip */}
+      {[[12,76],[36,76],[60,76],[20,92],[52,92],[12,108],[44,108],[60,108],[28,124],[52,124],[12,140],[36,140],[60,140]].map(([x,y]) => d(x,y,`l${x}${y}`))}
+      {/* T-Rex */}
+      <text x="110" y="124" fontSize="60" textAnchor="middle" dominantBaseline="middle">🦖</text>
+    </svg>
+  )
+}
+
 function VietQRSection({ orderId, amount }: { orderId: string; amount: number }) {
   const addInfo = encodeURIComponent(orderId)
   const accountName = encodeURIComponent(BANK_ACCOUNT_NAME)
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${BANK_ACCOUNT}-compact2.jpg?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`
 
   return (
-    <div className="w-full bg-surface border border-gold/25 rounded-xl overflow-hidden">
+    <div className="w-full bg-surface border border-white/10 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="px-5 pt-5 pb-3">
         <p className="text-[11px] text-gold uppercase tracking-widest font-bold mb-0.5">Thanh toán ngay</p>
@@ -47,15 +79,13 @@ function VietQRSection({ orderId, amount }: { orderId: string; amount: number })
 
       {/* QR Code */}
       <div className="flex justify-center px-5 pb-4">
-        <div className="rounded-xl overflow-hidden border border-border bg-white p-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={qrUrl}
-            alt="VietQR thanh toán"
-            width={220}
-            height={220}
-            className="block"
-          />
+        <div className="rounded-xl overflow-hidden border border-white/10 bg-white p-2">
+          {BANK_CONFIGURED ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={qrUrl} alt="VietQR thanh toán" width={220} height={220} className="block" />
+          ) : (
+            <DummyQR />
+          )}
         </div>
       </div>
 
