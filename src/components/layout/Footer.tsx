@@ -148,7 +148,7 @@ export default function Footer() {
           <a
             href="#"
             aria-label="Back to top"
-            className="w-7 h-7 rounded-full border border-white/[0.08] flex items-center justify-center text-white/20 hover:border-gold/30 hover:text-gold/50 transition-colors"
+            className="w-7 h-7 rounded-full border border-white/30 flex items-center justify-center text-white/60 hover:border-gold/50 hover:text-gold transition-colors"
           >
             <ArrowUp2 size={12} color="currentColor" />
           </a>
