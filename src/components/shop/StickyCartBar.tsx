@@ -48,7 +48,7 @@ export default function StickyCartBar({ product, salePrice }: Props) {
 
       {/* Sticky bar */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 bg-[#07070C]/95 backdrop-blur-sm border-t border-border transition-transform duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 z-50 bg-[#07070C]/95 backdrop-blur-sm border-t border-border transition-transform duration-150 ease-out ${
           visible ? 'translate-y-0' : 'translate-y-full'
         }`}
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
