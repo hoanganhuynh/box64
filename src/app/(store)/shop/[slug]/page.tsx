@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast, InfoCircle } from 'iconsax-react'
-import { getProductBySlug, getDiscountedPrice, getRelatedProducts, DUMMY_PRODUCTS } from '@/lib/data/products'
+import { getProductBySlug, getDiscountedPrice, getRelatedProducts, getColorVariants, DUMMY_PRODUCTS } from '@/lib/data/products'
 
 export function generateStaticParams() {
   return DUMMY_PRODUCTS.map(p => ({ slug: p.slug }))
@@ -16,6 +16,10 @@ import ProductCard from '@/components/shop/ProductCard'
 import AddToCartButton from '@/components/shop/AddToCartButton'
 import ImageGallery from '@/components/shop/ImageGallery'
 import StickyCartBar from '@/components/shop/StickyCartBar'
+
+function prettifySlug(s: string) {
+  return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -53,6 +57,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const related = getRelatedProducts(product, 4)
   const reviews = getProductReviews(product.slug)
+  const colorVariants = getColorVariants(product)
 const availabilityMap: Record<string, string> = {
     active: 'https://schema.org/InStock',
     pre_order: 'https://schema.org/PreOrder',
@@ -182,6 +187,33 @@ const availabilityMap: Record<string, string> = {
               <span className="inline-flex items-center bg-surface border border-border text-muted text-xs font-bold px-3 py-1.5 rounded-sm w-fit uppercase tracking-wide">
                 Out of stock
               </span>
+            )}
+
+            {/* Color variant picker */}
+            {colorVariants.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <p className="text-[11px] font-medium text-muted uppercase tracking-widest">
+                  Màu / Livery
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {/* Current color — active state */}
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/70 bg-gold/10 text-gold text-xs font-semibold leading-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold shrink-0" />
+                    {product.color ? prettifySlug(product.color) : 'This color'}
+                  </span>
+                  {/* Other color variants */}
+                  {colorVariants.map(v => (
+                    <Link
+                      key={v.id}
+                      href={`/shop/${v.slug}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border text-muted text-xs font-medium leading-none transition-colors hover:border-gold/50 hover:text-primary"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#484858] shrink-0" />
+                      {v.color ? prettifySlug(v.color) : v.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Description */}

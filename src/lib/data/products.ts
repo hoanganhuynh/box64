@@ -350,6 +350,13 @@ export function getProductBySlug(slug: string): Product | undefined {
   return DUMMY_PRODUCTS.find(p => p.slug === slug)
 }
 
+export function getColorVariants(product: Product): Product[] {
+  if (!product.color_group) return []
+  return DUMMY_PRODUCTS.filter(
+    p => p.color_group === product.color_group && p.id !== product.id
+  )
+}
+
 export function getDiscountedPrice(product: Product): number {
   if (!product.promotion || product.promotion.discount_pct === 0) return product.price
   return Math.round(product.price * (1 - product.promotion.discount_pct / 100))
