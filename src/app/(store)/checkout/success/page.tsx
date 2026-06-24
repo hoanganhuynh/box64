@@ -7,10 +7,12 @@ import { CheckCircle2, Package, ArrowRight, Copy, Check } from 'lucide-react'
 import { formatVND } from '@/lib/utils/format'
 import type { CartItem } from '@/lib/types'
 
-const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID ?? ''
-const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT ?? ''
-const BANK_ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME ?? ''
-const BANK_CONFIGURED = !!BANK_ACCOUNT && BANK_ACCOUNT !== '0123456789'
+interface BankSettings {
+  bank_id: string
+  account_number: string
+  account_name: string
+  qr_image_url: string | null
+}
 
 interface LastOrder {
   orderId: string
@@ -47,12 +49,21 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
+function VietQRSection({
+  orderId, amount, customerName, settings,
+}: {
+  orderId: string
+  amount: number
+  customerName?: string
+  settings: BankSettings | null
+}) {
+  const bankId = settings?.bank_id ?? ''
+  const account = settings?.account_number ?? ''
+  const accountName = settings?.account_name ?? ''
+  const qrImageUrl = settings?.qr_image_url
 
-function VietQRSection({ orderId, amount, customerName }: { orderId: string; amount: number; customerName?: string }) {
   const transferDesc = toTransferDesc(customerName, orderId)
-  const addInfo = encodeURIComponent(transferDesc)
-  const accountName = encodeURIComponent(BANK_ACCOUNT_NAME)
-  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${BANK_ACCOUNT}-compact2.jpg?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`
+  const qrUrl = `https://img.vietqr.io/image/${bankId}-${account}-compact2.jpg?amount=${amount}&addInfo=${encodeURIComponent(transferDesc)}&accountName=${encodeURIComponent(accountName)}`
 
   return (
     <div className="w-full bg-surface border border-white/10 rounded-xl overflow-hidden">
@@ -65,7 +76,9 @@ function VietQRSection({ orderId, amount, customerName }: { orderId: string; amo
       {/* QR Code */}
       <div className="flex justify-center px-5 pb-4">
         <div className="rounded-xl overflow-hidden border border-white/10 bg-white p-2">
-          {BANK_CONFIGURED ? (
+          {qrImageUrl ? (
+            <Image src={qrImageUrl} alt="QR chuyển khoản" width={220} height={220} className="block" unoptimized />
+          ) : account ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={qrUrl} alt="VietQR thanh toán" width={220} height={220} className="block" />
           ) : (
@@ -78,18 +91,18 @@ function VietQRSection({ orderId, amount, customerName }: { orderId: string; amo
       <div className="border-t border-border mx-5 pt-4 pb-5 flex flex-col gap-2.5 text-sm">
         <div className="flex justify-between items-center">
           <span className="text-muted text-xs">Ngân hàng</span>
-          <span className="font-semibold text-primary text-xs">{BANK_ID}</span>
+          <span className="font-semibold text-primary text-xs">{bankId}</span>
         </div>
         <div className="flex justify-between items-center gap-2">
           <span className="text-muted text-xs shrink-0">Số tài khoản</span>
           <div className="flex items-center gap-1.5">
-            <span className="font-mono font-bold text-primary text-sm">{BANK_ACCOUNT}</span>
-            <CopyButton text={BANK_ACCOUNT} />
+            <span className="font-mono font-bold text-primary text-sm">{account}</span>
+            <CopyButton text={account} />
           </div>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-muted text-xs shrink-0">Chủ tài khoản</span>
-          <span className="font-medium text-primary text-xs text-right">{BANK_ACCOUNT_NAME}</span>
+          <span className="font-medium text-primary text-xs text-right">{accountName}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-muted text-xs shrink-0">Số tiền</span>
@@ -117,12 +130,14 @@ function SuccessContent() {
   const params = useSearchParams()
   const orderId = params.get('order') ?? '—'
   const [order, setOrder] = useState<LastOrder | null>(null)
+  const [bankSettings, setBankSettings] = useState<BankSettings | null>(null)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('lastOrder')
     if (raw) {
       try { setOrder(JSON.parse(raw)) } catch {}
     }
+    fetch('/api/bank-settings').then(r => r.json()).then(setBankSettings).catch(() => {})
   }, [])
 
   const subtotal = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
@@ -153,9 +168,14 @@ function SuccessContent() {
         </p>
       </div>
 
-      {/* VietQR payment block — shown first so user sees it immediately */}
+      {/* VietQR payment block */}
       {isVietQR && total > 0 && (
-        <VietQRSection orderId={orderId} amount={total} customerName={order?.customerName} />
+        <VietQRSection
+          orderId={orderId}
+          amount={total}
+          customerName={order?.customerName}
+          settings={bankSettings}
+        />
       )}
 
       {/* Order ID */}

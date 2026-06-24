@@ -10,6 +10,7 @@ import {
   UsersThree,
   Package,
   GridFour,
+  CreditCard,
   SignOut,
   X,
   ArrowLineLeft,
@@ -35,6 +36,7 @@ const mainNav: NavItem[] = [
   { label: 'Khách hàng', href: '/admin/customers',   icon: UsersThree },
   { label: 'Sản phẩm',   href: '/admin/products',    icon: Package },
   { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
+  { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
 ]
 
 function NavLink({
