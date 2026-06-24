@@ -221,6 +221,9 @@ const availabilityMap: Record<string, string> = {
             {/* Add to cart */}
             <AddToCartButton product={product} />
 
+            {/* Sticky bar — sentinel sits right after ATC button so bar appears as soon as ATC scrolls off */}
+            <StickyCartBar product={product} salePrice={salePrice} />
+
             {/* Trust signals — inline, no bg */}
             <div className="flex items-center flex-wrap gap-x-0 gap-y-1">
               {([
@@ -235,9 +238,6 @@ const availabilityMap: Record<string, string> = {
                 </span>
               ))}
             </div>
-
-            {/* Sticky bar - sentinel div is rendered here, bar is fixed */}
-            <StickyCartBar product={product} salePrice={salePrice} />
 
           </div>
         </div>
