@@ -73,7 +73,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
         {/* ── Results grid ── */}
         {results.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {results.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         ) : q ? (
@@ -113,7 +113,7 @@ export default async function SearchPage({ searchParams }: Props) {
                 View all <ArrowRight2 size={14} color="currentColor" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {suggestions.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>

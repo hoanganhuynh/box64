@@ -128,7 +128,7 @@ export default function HomePage() {
               View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {BESTSELLERS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} variant="light" />)}
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function HomePage() {
               View all <ArrowRight2 size={14} color="currentColor" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {NEW_ARRIVALS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>
