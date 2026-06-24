@@ -56,7 +56,7 @@ export default function PreOrderSpotlight({ product }: { product: Product }) {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
         {/* ── left: product image ── */}
-        <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
+        <div className="order-1 lg:order-1 flex justify-center lg:justify-start">
           <div className="relative w-full max-w-[420px]">
             {/* glow ring behind image */}
             <div className="absolute -inset-4 rounded-3xl bg-gold opacity-[0.04] blur-2xl" />
@@ -87,7 +87,7 @@ export default function PreOrderSpotlight({ product }: { product: Product }) {
         </div>
 
         {/* ── right: content ── */}
-        <div className="order-1 lg:order-2 flex flex-col gap-7">
+        <div className="order-2 lg:order-2 flex flex-col gap-7">
 
           {/* pulsing live indicator */}
           <div className="flex items-center gap-2.5">
