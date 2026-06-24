@@ -1,5 +1,6 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
+import { DUMMY_PRODUCTS } from '@/lib/data/products'
 
 function db() {
   return createClient(
@@ -31,7 +32,28 @@ export async function getProducts(): Promise<ProductRow[]> {
     .select('*')
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
-  return (data ?? []) as ProductRow[]
+
+  // Auto-seed from DUMMY_PRODUCTS on first load if the table is empty
+  if ((data ?? []).length === 0) {
+    const seed = DUMMY_PRODUCTS.map(p => ({
+      id: p.id,
+      type: p.type,
+      name: p.name,
+      slug: p.slug,
+      price: p.price,
+      images: p.images,
+      stock: p.stock,
+      status: p.status,
+      description: p.description ?? null,
+      tags: p.tags ?? [],
+      material: p.material ?? null,
+      brand: p.brand ?? null,
+    }))
+    const { data: seeded } = await db().from('products').insert(seed).select()
+    return (seeded ?? []) as ProductRow[]
+  }
+
+  return data as ProductRow[]
 }
 
 export async function upsertProduct(row: Omit<ProductRow, 'created_at'>): Promise<void> {
