@@ -3,19 +3,104 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle2, Package, ArrowRight, Copy } from 'lucide-react'
+import { CheckCircle2, Package, ArrowRight, Copy, Check } from 'lucide-react'
 import { formatVND } from '@/lib/utils/format'
 import type { CartItem } from '@/lib/types'
+
+const BANK_ID = process.env.NEXT_PUBLIC_BANK_ID ?? ''
+const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT ?? ''
+const BANK_ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME ?? ''
 
 interface LastOrder {
   orderId: string
   items: CartItem[]
+  amount?: number
+  paymentMethod?: string
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  function copy() {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <button onClick={copy} aria-label="Copy" className="text-muted hover:text-gold transition-colors shrink-0">
+      {copied ? <Check size={13} className="text-success" /> : <Copy size={13} />}
+    </button>
+  )
+}
+
+function VietQRSection({ orderId, amount }: { orderId: string; amount: number }) {
+  const addInfo = encodeURIComponent(orderId)
+  const accountName = encodeURIComponent(BANK_ACCOUNT_NAME)
+  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${BANK_ACCOUNT}-compact2.jpg?amount=${amount}&addInfo=${addInfo}&accountName=${accountName}`
+
+  return (
+    <div className="w-full bg-surface border border-gold/25 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
+        <p className="text-[11px] text-gold uppercase tracking-widest font-bold mb-0.5">Thanh toán ngay</p>
+        <p className="text-xs text-muted">Quét mã QR bằng app ngân hàng bất kỳ</p>
+      </div>
+
+      {/* QR Code */}
+      <div className="flex justify-center px-5 pb-4">
+        <div className="rounded-xl overflow-hidden border border-border bg-white p-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrUrl}
+            alt="VietQR thanh toán"
+            width={220}
+            height={220}
+            className="block"
+          />
+        </div>
+      </div>
+
+      {/* Bank details */}
+      <div className="border-t border-border mx-5 pt-4 pb-5 flex flex-col gap-2.5 text-sm">
+        <div className="flex justify-between items-center">
+          <span className="text-muted text-xs">Ngân hàng</span>
+          <span className="font-semibold text-primary text-xs">{BANK_ID}</span>
+        </div>
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-muted text-xs shrink-0">Số tài khoản</span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono font-bold text-primary text-sm">{BANK_ACCOUNT}</span>
+            <CopyButton text={BANK_ACCOUNT} />
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-muted text-xs shrink-0">Chủ tài khoản</span>
+          <span className="font-medium text-primary text-xs text-right">{BANK_ACCOUNT_NAME}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-muted text-xs shrink-0">Số tiền</span>
+          <span className="font-extrabold text-gold">{formatVND(amount)}</span>
+        </div>
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-muted text-xs shrink-0">Nội dung CK</span>
+          <div className="flex items-center gap-1.5">
+            <span className="font-mono font-bold text-primary text-sm">{orderId}</span>
+            <CopyButton text={orderId} />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gold/5 border-t border-gold/15 px-5 py-3">
+        <p className="text-[11px] text-muted text-center leading-relaxed">
+          Đơn hàng được xử lý sau khi xác nhận chuyển khoản · thường trong 1–2 giờ
+        </p>
+      </div>
+    </div>
+  )
 }
 
 function SuccessContent() {
   const params = useSearchParams()
   const orderId = params.get('order') ?? '—'
-  const [copied, setCopied] = useState(false)
   const [order, setOrder] = useState<LastOrder | null>(null)
 
   useEffect(() => {
@@ -25,16 +110,12 @@ function SuccessContent() {
     }
   }, [])
 
-  function copyId() {
-    navigator.clipboard.writeText(orderId)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const total = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
+  const subtotal = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
+  const total = order?.amount ?? subtotal
+  const isVietQR = !order?.paymentMethod || order.paymentMethod === 'vietqr'
 
   return (
-    <div className="max-w-lg mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center gap-6">
+    <div className="max-w-lg mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center gap-5">
 
       {/* Icon */}
       <div className="w-20 h-20 rounded-full bg-success flex items-center justify-center">
@@ -50,22 +131,23 @@ function SuccessContent() {
           Cảm ơn bạn đã đặt hàng!
         </h1>
         <p className="text-sm text-muted mt-2">
-          Chi tiết đơn hàng đã được gửi đến email của bạn.
+          {isVietQR
+            ? 'Vui lòng chuyển khoản để xác nhận đơn hàng.'
+            : 'Chi tiết đơn hàng đã được gửi đến email của bạn.'}
         </p>
       </div>
+
+      {/* VietQR payment block — shown first so user sees it immediately */}
+      {isVietQR && total > 0 && (
+        <VietQRSection orderId={orderId} amount={total} />
+      )}
 
       {/* Order ID */}
       <div className="w-full bg-surface border border-border rounded-xl px-5 py-4">
         <p className="text-[11px] text-muted uppercase tracking-widest font-bold mb-2">Mã đơn hàng</p>
         <div className="flex items-center justify-center gap-2">
           <span className="font-mono font-bold text-primary text-lg tracking-wider">{orderId}</span>
-          <button
-            onClick={copyId}
-            className="text-muted hover:text-gold transition-colors"
-            aria-label="Copy order ID"
-          >
-            {copied ? <CheckCircle2 size={14} className="text-gold" /> : <Copy size={14} />}
-          </button>
+          <CopyButton text={orderId} />
         </div>
       </div>
 
@@ -79,13 +161,8 @@ function SuccessContent() {
             {order.items.map(item => (
               <div key={item.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                 <div className="relative w-12 h-12 rounded-sm overflow-hidden bg-[#0F1729] shrink-0">
-                  <Image
-                    src={item.image_url || '/products/p1.jpg'}
-                    alt={item.product_name}
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                  />
+                  <Image src={item.image_url || '/products/p1.jpg'} alt={item.product_name}
+                    fill className="object-cover" sizes="48px" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-primary line-clamp-2 leading-snug">
@@ -106,7 +183,7 @@ function SuccessContent() {
         </div>
       )}
 
-      {/* Support via Facebook */}
+      {/* Support */}
       <div className="w-full bg-surface border border-border rounded-xl px-5 py-4 text-left">
         <p className="text-[11px] text-muted uppercase tracking-widest font-bold mb-3">Hỗ trợ</p>
         <div className="flex items-center gap-3">
@@ -117,12 +194,8 @@ function SuccessContent() {
             <p className="text-sm text-primary font-medium">Liên hệ qua Facebook</p>
             <p className="text-[11px] text-muted">Phản hồi trong vòng 1–2 giờ trong giờ hành chính</p>
           </div>
-          <a
-            href="https://www.facebook.com/figbox.gr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 h-8 px-3 rounded-lg bg-[#1877F2] text-white text-xs font-semibold flex items-center hover:bg-[#1877F2]/90 transition-colors"
-          >
+          <a href="https://www.facebook.com/figbox.gr" target="_blank" rel="noopener noreferrer"
+            className="shrink-0 h-8 px-3 rounded-lg bg-[#1877F2] text-white text-xs font-semibold flex items-center hover:bg-[#1877F2]/90 transition-colors">
             Nhắn tin
           </a>
         </div>
@@ -130,16 +203,12 @@ function SuccessContent() {
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 w-full">
-        <Link
-          href="/orders"
-          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg border border-border bg-surface/70 px-5 py-3.5 text-base font-bold text-primary transition-all duration-200 hover:border-gold/40 hover:bg-surface hover:text-gold active:scale-[0.98]"
-        >
+        <Link href="/orders"
+          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg border border-border bg-surface/70 px-5 py-3.5 text-base font-bold text-primary transition-all duration-200 hover:border-gold/40 hover:bg-surface hover:text-gold active:scale-[0.98]">
           <Package size={18} /> Đơn hàng của tôi
         </Link>
-        <Link
-          href="/shop"
-          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg bg-gold px-5 py-3.5 text-base font-extrabold text-[#07070C] shadow-[0_14px_32px_rgba(245,158,11,0.18)] transition-all duration-200 hover:bg-gold-mid active:scale-[0.98]"
-        >
+        <Link href="/shop"
+          className="flex-1 inline-flex min-h-[54px] items-center justify-center gap-2.5 rounded-lg bg-gold px-5 py-3.5 text-base font-extrabold text-[#07070C] shadow-[0_14px_32px_rgba(245,158,11,0.18)] transition-all duration-200 hover:bg-gold-mid active:scale-[0.98]">
           Tiếp tục mua sắm <ArrowRight size={18} />
         </Link>
       </div>

@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const paymentMethodRef = useRef<'transfer' | 'payos'>('transfer')
+  const paymentMethodRef = useRef<'transfer' | 'payos' | 'vietqr'>('vietqr')
   const formRef = useRef<HTMLFormElement>(null)
 
   // Address system toggle
@@ -233,35 +233,13 @@ export default function CheckoutPage() {
       return
     }
 
-    sessionStorage.setItem('lastOrder', JSON.stringify({ orderId: result.orderId, items }))
+    sessionStorage.setItem('lastOrder', JSON.stringify({
+      orderId: result.orderId,
+      items,
+      amount: subtotal + shippingFee,
+      paymentMethod: method,
+    }))
     clearCart()
-
-    if (method === 'payos') {
-      const res = await fetch('/api/payos/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: result.orderId,
-          amount: subtotal + shippingFee,
-          description: `FigBox ${result.orderId}`.slice(0, 25),
-          items: items.map(i => ({
-            name: i.product_name.slice(0, 50),
-            quantity: i.quantity,
-            price: i.unit_price,
-          })),
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok || !json.checkoutUrl) {
-        setLoading(false)
-        setError(json.error ?? 'Không thể kết nối PayOS, vui lòng thử chuyển khoản.')
-        return
-      }
-      window.location.href = json.checkoutUrl
-      // keep loading=true while redirecting
-      return
-    }
-
     router.push(`/checkout/success?order=${result.orderId}`)
   }
 
@@ -539,34 +517,14 @@ export default function CheckoutPage() {
                 <p className="text-xs text-error mb-3 bg-error/10 rounded-lg px-3 py-2">{error}</p>
               )}
 
-              {/* Payment method buttons */}
-              <div className="flex flex-col gap-2.5">
-                {/* PayOS */}
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => { paymentMethodRef.current = 'payos'; formRef.current?.requestSubmit() }}
-                  className="w-full h-12 rounded-lg bg-[#0066FF] text-white font-bold text-sm flex items-center justify-center gap-2.5 hover:bg-[#0052CC] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {loading && paymentMethodRef.current === 'payos'
-                    ? 'Đang xử lý…'
-                    : <><PayOSLogo /> Thanh toán qua PayOS</>
-                  }
-                </button>
-
-                {/* Bank transfer */}
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => { paymentMethodRef.current = 'transfer'; formRef.current?.requestSubmit() }}
-                  className="w-full h-11 rounded-lg bg-gold text-[#07070C] font-semibold text-sm flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {loading && paymentMethodRef.current === 'transfer'
-                    ? 'Đang xử lý…'
-                    : <>Chuyển khoản ngân hàng <ArrowRight size={14} /></>
-                  }
-                </button>
-              </div>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => { paymentMethodRef.current = 'vietqr'; formRef.current?.requestSubmit() }}
+                className="w-full h-12 rounded-lg bg-gold text-[#07070C] font-bold text-sm flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Đang xử lý…' : <>Đặt hàng & Thanh toán <ArrowRight size={15} /></>}
+              </button>
 
               <p className="text-[10px] text-faint text-center mt-3 leading-relaxed">
                 Bằng cách đặt hàng, bạn đồng ý với điều khoản dịch vụ của chúng tôi.
@@ -576,16 +534,6 @@ export default function CheckoutPage() {
         </div>
       </form>
     </div>
-  )
-}
-
-function PayOSLogo() {
-  return (
-    <svg width="52" height="16" viewBox="0 0 52 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <text x="0" y="13" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="14" fill="white" letterSpacing="-0.5">Pay</text>
-      <rect x="30" y="1" width="22" height="14" rx="3" fill="white" />
-      <text x="31" y="12" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="11" fill="#0066FF" letterSpacing="-0.3">OS</text>
-    </svg>
   )
 }
 

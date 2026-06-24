@@ -34,7 +34,7 @@ export async function placeOrder(
   couponCode?: string,
   discount = 0,
   shippingFee = 0,
-  paymentMethod: 'transfer' | 'payos' = 'transfer',
+  paymentMethod: 'transfer' | 'payos' | 'vietqr' = 'transfer',
 ): Promise<PlaceOrderResult> {
   if (!items.length) return { success: false, error: 'No items' }
 
