@@ -59,7 +59,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
   }
 
   return (
-    <div className={`group flex flex-col rounded-xl overflow-hidden transition-all duration-200 ease-out ${
+    <div className={`group flex flex-col h-full rounded-xl overflow-hidden transition-all duration-200 ease-out ${
       dark
         ? 'bg-surface border border-border hover:border-gold/25 hover:shadow-[0_8px_40px_rgba(0,0,0,0.55)] hover:-translate-y-1'
         : 'bg-white border border-[#EBE3D8] shadow-sm hover:shadow-xl hover:-translate-y-1'

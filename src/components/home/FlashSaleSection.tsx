@@ -50,21 +50,26 @@ export default function FlashSaleSection() {
         </div>
       </div>
 
-      {/* Carousel — swipe ngang, 1 card + 30% card tiếp */}
-      <div className="relative pb-8">
-        <div
-          className="max-w-7xl mx-auto flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-5 sm:pl-6"
-        >
+      {/* Mobile/tablet: carousel swipe */}
+      <div className="relative pb-8 lg:hidden">
+        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-5 sm:pl-6">
           {products.map(p => (
-            <div
-              key={p.id}
-              className="snap-start shrink-0 w-[75%] sm:w-[44%] lg:w-[30%]"
-            >
+            <div key={p.id} className="snap-start shrink-0 w-[75%] sm:w-[44%]">
               <ProductCard product={p} variant="light" />
             </div>
           ))}
-          {/* Trailing spacer — đảm bảo card cuối scroll vào đủ */}
           <div className="shrink-0 w-4 sm:w-6" aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* Desktop: 3-col grid, equal-height cards */}
+      <div className="hidden lg:block relative max-w-7xl mx-auto px-6 pb-10">
+        <div className="grid grid-cols-3 gap-5 items-stretch">
+          {products.slice(0, 3).map(p => (
+            <div key={p.id} className="flex flex-col">
+              <ProductCard product={p} variant="light" />
+            </div>
+          ))}
         </div>
       </div>
     </section>
