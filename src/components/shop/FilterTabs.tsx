@@ -107,7 +107,7 @@ export default function FilterTabs() {
               className={`h-10 px-4 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-2 whitespace-nowrap shrink-0 ${
                 isActive
                   ? 'bg-white/10 text-primary border border-gold/30'
-                  : 'text-faint hover:text-muted'
+                  : 'text-primary/85 hover:text-primary'
               }`}
             >
               <BrandLogo brand={b.value} size={28} active={isActive} />
