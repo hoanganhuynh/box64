@@ -34,6 +34,7 @@ export async function placeOrder(
   couponCode?: string,
   discount = 0,
   shippingFee = 0,
+  paymentMethod: 'transfer' | 'payos' = 'transfer',
 ): Promise<PlaceOrderResult> {
   if (!items.length) return { success: false, error: 'No items' }
 
@@ -82,7 +83,7 @@ export async function placeOrder(
     },
     subtotal,
     total,
-    payment_method: 'transfer',
+    payment_method: paymentMethod,
     coupon_code: couponCode || null,
     discount,
     note: shipping.note || null,
