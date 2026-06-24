@@ -27,6 +27,7 @@ interface SearchBoxProps {
   inputClassName?: string
   dropdownClassName?: string
   autoFocus?: boolean
+  containerClassName?: string
 }
 
 export default function SearchBox({
@@ -34,6 +35,7 @@ export default function SearchBox({
   inputClassName,
   dropdownClassName,
   autoFocus,
+  containerClassName,
 }: SearchBoxProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Product[]>([])
@@ -83,7 +85,7 @@ export default function SearchBox({
   }
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className={`relative${containerClassName ? ` ${containerClassName}` : ''}`}>
       {/* Input pill */}
       <div
         className={`flex items-center gap-1.5 bg-white/[0.07] border border-white/[0.08] rounded-sm px-2.5 h-8 focus-within:border-gold/50 focus-within:bg-white/[0.10] transition-all ${inputClassName ?? 'w-[180px]'}`}

@@ -228,6 +228,7 @@ export default function Header() {
         <div className="md:hidden border-t border-white/[0.05] bg-header px-4 py-3">
           <SearchBox
             onNavigate={() => setSearchOpen(false)}
+            containerClassName="w-full"
             inputClassName="w-full"
             dropdownClassName="w-full left-0 right-0"
             autoFocus
