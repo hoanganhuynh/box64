@@ -13,6 +13,18 @@ interface GeoItem { code: number; name: string }
 interface DvhcvnWard { code: string; name: string }
 interface DvhcvnProvince { code: string; name: string; wards: DvhcvnWard[] }
 
+const PRIORITY_PROVINCES = ['Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Cần Thơ']
+function sortProvinces<T extends { name: string }>(list: T[]): T[] {
+  return [...list].sort((a, b) => {
+    const ai = PRIORITY_PROVINCES.findIndex(k => a.name.includes(k))
+    const bi = PRIORITY_PROVINCES.findIndex(k => b.name.includes(k))
+    if (ai !== -1 && bi !== -1) return ai - bi
+    if (ai !== -1) return -1
+    if (bi !== -1) return 1
+    return 0
+  })
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart } = useCartStore()
@@ -339,7 +351,7 @@ export default function CheckoutPage() {
                         <option value="">
                           {loadingDvhcvn ? 'Đang tải...' : '-- Chọn tỉnh / thành phố --'}
                         </option>
-                        {dvhcvnProvinces.map(p => (
+                        {sortProvinces(dvhcvnProvinces).map(p => (
                           <option key={p.code} value={p.code}>{p.name}</option>
                         ))}
                       </select>
@@ -377,7 +389,7 @@ export default function CheckoutPage() {
                         <option value={0}>
                           {loadingProvinces ? 'Đang tải danh sách tỉnh...' : '-- Chọn tỉnh / thành phố --'}
                         </option>
-                        {apiProvinces.map(p => (
+                        {sortProvinces(apiProvinces).map(p => (
                           <option key={p.code} value={p.code}>{p.name}</option>
                         ))}
                       </select>
