@@ -52,7 +52,7 @@ export default function FlashSaleSection() {
 
       {/* Mobile/tablet: carousel swipe */}
       <div className="relative pb-8 lg:hidden">
-        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-5 sm:pl-6">
+        <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-5 sm:pl-6 [scroll-padding-left:1.25rem] sm:[scroll-padding-left:1.5rem]">
           {products.map(p => (
             <div key={p.id} className="snap-start shrink-0 w-[75%] sm:w-[44%]">
               <ProductCard product={p} variant="light" />
