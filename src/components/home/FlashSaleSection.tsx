@@ -53,7 +53,7 @@ export default function FlashSaleSection() {
       {/* Carousel — swipe ngang, 1 card + 30% card tiếp */}
       <div className="relative pb-8">
         <div
-          className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-4 sm:pl-6"
+          className="max-w-7xl mx-auto flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-4 sm:pl-6"
         >
           {products.map(p => (
             <div
