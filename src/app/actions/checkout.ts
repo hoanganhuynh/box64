@@ -33,11 +33,12 @@ export async function placeOrder(
   subtotal: number,
   couponCode?: string,
   discount = 0,
+  shippingFee = 0,
 ): Promise<PlaceOrderResult> {
   if (!items.length) return { success: false, error: 'No items' }
 
   const orderId = generateOrderId()
-  const total = subtotal - discount
+  const total = subtotal + shippingFee - discount
 
   const cookieStore = await cookies()
   const supabase = createServerClient(

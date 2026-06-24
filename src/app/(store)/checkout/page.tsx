@@ -191,6 +191,7 @@ export default function CheckoutPage() {
 
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
   const totalItems = items.reduce((s, i) => s + i.quantity, 0)
+  const shippingFee = subtotal >= 500_000 ? 0 : 11_000
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -215,6 +216,9 @@ export default function CheckoutPage() {
       },
       items,
       subtotal,
+      undefined,
+      0,
+      shippingFee,
     )
     setLoading(false)
 
@@ -486,12 +490,15 @@ export default function CheckoutPage() {
                   <span className="text-primary font-medium">{formatVND(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Phí vận chuyển</span>
-                  <span className="text-muted text-xs italic">Tính khi giao hàng</span>
+                  <span className="text-muted">Phí vận chuyển <span className="text-faint text-xs">· SPX</span></span>
+                  {shippingFee === 0
+                    ? <span className="text-success text-xs font-semibold">Miễn phí</span>
+                    : <span className="text-primary">{formatVND(shippingFee)}</span>
+                  }
                 </div>
                 <div className="flex justify-between border-t border-border pt-2 mt-1">
                   <span className="font-bold text-primary">Tổng cộng</span>
-                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal)}</span>
+                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal + shippingFee)}</span>
                 </div>
               </div>
 

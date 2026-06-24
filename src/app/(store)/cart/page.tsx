@@ -37,6 +37,7 @@ export default function CartPage() {
   const selectedItems = items.filter(i => selected.has(i.id))
   const subtotal = selectedItems.reduce((s, i) => s + i.unit_price * i.quantity, 0)
   const selectedCount = selectedItems.reduce((s, i) => s + i.quantity, 0)
+  const shippingFee = subtotal >= FREESHIP_THRESHOLD ? 0 : SHIPPING_FEE
 
   if (count === 0) {
     return (
@@ -192,12 +193,15 @@ export default function CartPage() {
                 <span className="font-semibold text-primary">{formatVND(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted">Shipping</span>
-                <span className="text-muted text-xs italic">Calculated at checkout</span>
+                <span className="text-muted">Shipping <span className="text-faint text-xs">· SPX</span></span>
+                {shippingFee === 0
+                  ? <span className="text-success text-xs font-semibold">Free</span>
+                  : <span className="text-primary">{formatVND(shippingFee)}</span>
+                }
               </div>
               <div className="border-t border-border pt-3 flex justify-between">
                 <span className="font-semibold text-primary">Total</span>
-                <span className="font-extrabold text-primary text-base">{formatVND(subtotal)}</span>
+                <span className="font-extrabold text-primary text-base">{formatVND(subtotal + shippingFee)}</span>
               </div>
             </div>
 
@@ -301,6 +305,7 @@ function Checkbox({ checked, indeterminate = false, onChange }: {
 }
 
 const FREESHIP_THRESHOLD = 500000
+const SHIPPING_FEE = 11000
 
 function FreeshipBanner({ subtotal }: { subtotal: number }) {
   const remaining = FREESHIP_THRESHOLD - subtotal
