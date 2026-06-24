@@ -53,14 +53,15 @@ export default function FlashSaleSection() {
       {/* Carousel — swipe ngang, 1 card + 30% card tiếp */}
       <div className="relative pb-8">
         <div
-          className="max-w-7xl mx-auto flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-4 sm:pl-6"
+          className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch]"
+          style={{ paddingLeft: 'max(1.25rem, calc((100vw - 80rem) / 2 + 1.5rem))' }}
         >
           {products.map(p => (
             <div
               key={p.id}
               className="snap-start shrink-0 w-[75%] sm:w-[44%] lg:w-[30%]"
             >
-              <ProductCard product={p} variant="light" showFlashProgress />
+              <ProductCard product={p} variant="light" />
             </div>
           ))}
           {/* Trailing spacer — đảm bảo card cuối scroll vào đủ */}
