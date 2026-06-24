@@ -283,7 +283,7 @@ export default function CheckoutPage() {
 
               {/* Saved address card */}
               {savedAddress && !addressApplied && (
-                <div className="flex items-start gap-3 bg-gold/5 border border-gold/20 rounded-xl p-4 mb-4">
+                <div className="flex items-start gap-3 bg-gold/5 border border-white/10 rounded-xl p-4 mb-4">
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold text-gold uppercase tracking-wider mb-1">Địa chỉ đã lưu</p>
                     <p className="text-sm font-medium text-primary">{savedAddress.name} · {savedAddress.phone}</p>
