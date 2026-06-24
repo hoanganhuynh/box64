@@ -1,36 +1,26 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SignOut, User } from '@phosphor-icons/react'
-import { createSupabaseClient } from '@/lib/supabase/client'
 import { useClickOutside } from '../hooks/useClickOutside'
 
-export function ProfileMenu() {
+export function ProfileMenu({ email }: { email: string }) {
   const [open, setOpen] = useState(false)
-  const [email, setEmail] = useState<string | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   useClickOutside(ref, () => setOpen(false))
 
-  useEffect(() => {
-    const supabase = createSupabaseClient()
-    supabase.auth.getUser().then(({ data }) => {
-      setEmail(data.user?.email ?? null)
-    })
-  }, [])
-
   async function handleSignOut() {
     setOpen(false)
-    const supabase = createSupabaseClient()
-    await supabase.auth.signOut()
+    await fetch('/admin/api/logout', { method: 'POST' })
     router.push('/admin/login')
     router.refresh()
   }
 
-  const initials = email ? email.slice(0, 2).toUpperCase() : 'AD'
+  const initials = email.slice(0, 2).toUpperCase()
 
   return (
     <div ref={ref} className="relative">
@@ -56,7 +46,7 @@ export function ProfileMenu() {
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground">Admin</p>
-                <p className="truncate text-xs text-muted">{email ?? '...'}</p>
+                <p className="truncate text-xs text-muted">{email}</p>
               </div>
             </div>
 

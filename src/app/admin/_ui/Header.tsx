@@ -7,7 +7,7 @@ import { CommandPalette } from './CommandPalette'
 import { ProfileMenu } from './ProfileMenu'
 import { useSidebar } from './SidebarContext'
 
-export function Header({ className }: { className?: string }) {
+export function Header({ className, adminEmail }: { className?: string; adminEmail: string }) {
   const { mobileOpen, setMobileOpen, commandOpen, setCommandOpen } = useSidebar()
 
   return (
@@ -36,7 +36,7 @@ export function Header({ className }: { className?: string }) {
         </button>
 
         <NotificationsDropdown />
-        <ProfileMenu />
+        <ProfileMenu email={adminEmail} />
       </div>
 
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />

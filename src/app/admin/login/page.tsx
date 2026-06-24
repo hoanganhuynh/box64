@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createSupabaseClient } from '@/lib/supabase/client'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { FigBoxLogo } from '../_ui/FigBoxLogo'
 
@@ -19,11 +18,15 @@ export default function AdminLoginPage() {
     setError('')
     setLoading(true)
 
-    const supabase = createSupabaseClient()
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    const res = await fetch('/admin/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
 
-    if (authError) {
-      setError('Email hoặc mật khẩu không đúng.')
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      setError(json.error ?? 'Email hoặc mật khẩu không đúng.')
       setLoading(false)
       return
     }
