@@ -1,7 +1,7 @@
 'use client'
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2 } from 'lucide-react'
 import {
   getProducts, upsertProduct, deleteProduct,
   type ProductRow,
@@ -98,6 +98,9 @@ function ProductModal({
     id: initial.id || `fb-${nanoid()}`,
   })
   const [imagesText, setImagesText] = useState(initial.images.join('\n'))
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
   function set(field: keyof typeof form, value: unknown) {
     setForm(f => ({ ...f, [field]: value }))
@@ -106,6 +109,31 @@ function ProductModal({
   function handleNameChange(v: string) {
     set('name', v)
     if (isNew) set('slug', slugify(v))
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+    setUploading(true)
+    setUploadError('')
+    const urls: string[] = []
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError(`"${file.name}" quá lớn (tối đa 5 MB)`)
+        continue
+      }
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) { setUploadError(json.error ?? 'Upload thất bại'); continue }
+      urls.push(json.url)
+    }
+    if (urls.length) {
+      setImagesText(prev => [...prev.split('\n').filter(Boolean), ...urls].join('\n'))
+    }
+    setUploading(false)
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -186,9 +214,23 @@ function ProductModal({
             </Field>
           </div>
 
-          <Field label="Hình ảnh (mỗi URL 1 dòng)">
+          <Field label="Hình ảnh">
+            <label className={[
+              'flex flex-col items-center justify-center gap-2 w-full h-24 rounded-lg border border-dashed cursor-pointer transition-colors select-none',
+              uploading
+                ? 'border-[#6366f1]/40 bg-[#6366f1]/5 cursor-not-allowed'
+                : 'border-[#2A2A38] hover:border-[#6366f1]/50 hover:bg-[#6366f1]/5',
+            ].join(' ')}>
+              <input ref={fileRef} type="file" accept="image/*" multiple disabled={uploading}
+                onChange={handleFileChange} className="sr-only" />
+              {uploading
+                ? <><Loader2 size={18} className="text-[#6366f1] animate-spin" /><span className="text-xs text-[#7A7A90]">Đang tải lên…</span></>
+                : <><Upload size={18} className="text-[#484858]" /><span className="text-xs text-[#7A7A90]">Chọn ảnh <span className="text-[#484858]">· auto WebP · tối đa 5 MB</span></span></>
+              }
+            </label>
+            {uploadError && <p className="text-[11px] text-red-400 mt-1.5">{uploadError}</p>}
             <textarea rows={3} value={imagesText} onChange={e => setImagesText(e.target.value)}
-              placeholder="/products/p1.jpg&#10;/products/p1b.jpg" className={TEXTAREA} />
+              placeholder="hoặc dán URL thủ công (mỗi dòng 1 URL)&#10;/products/p1.jpg" className={`${TEXTAREA} mt-2`} />
           </Field>
 
           <Field label="Mô tả">
