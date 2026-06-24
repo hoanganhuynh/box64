@@ -47,7 +47,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
 
           {/* ── brand column ── */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center text-center md:items-start md:text-left">
             <Link href="/" className="inline-flex items-center mb-4">
               <Image src="/logo.svg" alt="figbox.store" width={44} height={48} />
             </Link>
