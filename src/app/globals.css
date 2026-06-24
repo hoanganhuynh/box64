@@ -83,6 +83,8 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+/* scrollbar-none utility — webkit override (plugin not installed) */
+.scrollbar-none::-webkit-scrollbar { display: none; }
 
 /* ── Admin UI v2 design tokens (Vault template — dark only) ─────────── */
 .admin-root {
