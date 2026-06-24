@@ -288,7 +288,17 @@ const availabilityMap: Record<string, string> = {
                 View all →
               </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+            {/* Mobile/tablet: 1.3-card snap carousel */}
+            <div className="lg:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] -mx-4 sm:-mx-6 pl-4 sm:pl-6 [scroll-padding-left:1rem] sm:[scroll-padding-left:1.5rem]">
+              {related.map(p => (
+                <div key={p.id} className="snap-start shrink-0 w-[76%] sm:w-[44%]">
+                  <ProductCard product={p} />
+                </div>
+              ))}
+              <div className="shrink-0 w-4 sm:w-6" aria-hidden="true" />
+            </div>
+            {/* Desktop: 4-col grid */}
+            <div className="hidden lg:grid grid-cols-4 gap-5">
               {related.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
