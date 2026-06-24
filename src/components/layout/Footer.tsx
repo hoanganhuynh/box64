@@ -52,7 +52,7 @@ export default function Footer() {
               <Image src="/logo.svg" alt="figbox.store" width={44} height={48} />
             </Link>
 
-            <p className="text-white/40 text-sm leading-relaxed max-w-[220px]">
+            <p className="text-white/40 text-sm leading-relaxed md:max-w-[220px]">
               Premium custom packaging for 1:64 diecast collectors. Designed with care, printed professionally.
             </p>
           </div>
