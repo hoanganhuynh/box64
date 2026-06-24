@@ -15,6 +15,7 @@ const BANK_CONFIGURED = !!BANK_ACCOUNT && BANK_ACCOUNT !== '0123456789'
 interface LastOrder {
   orderId: string
   items: CartItem[]
+  shippingFee?: number
   amount?: number
   paymentMethod?: string
   customerName?: string
@@ -125,6 +126,7 @@ function SuccessContent() {
   }, [])
 
   const subtotal = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
+  const shippingFee = order?.shippingFee ?? 0
   const total = order?.amount ?? subtotal
   const isVietQR = !order?.paymentMethod || order.paymentMethod === 'vietqr'
 
@@ -190,9 +192,21 @@ function SuccessContent() {
               </div>
             ))}
           </div>
-          <div className="border-t border-border mt-3 pt-3 flex justify-between items-center">
-            <span className="text-sm font-bold text-primary">Tổng cộng</span>
-            <span className="text-base font-extrabold text-gold">{formatVND(total)}</span>
+          <div className="border-t border-border mt-3 pt-3 flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted">Tạm tính</span>
+              <span className="text-xs text-primary">{formatVND(subtotal)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted">Phí vận chuyển</span>
+              {shippingFee === 0
+                ? <span className="text-xs text-success font-medium">Miễn phí</span>
+                : <span className="text-xs text-primary">{formatVND(shippingFee)}</span>}
+            </div>
+            <div className="flex justify-between items-center border-t border-border pt-2 mt-1">
+              <span className="text-sm font-bold text-primary">Tổng cộng</span>
+              <span className="text-base font-extrabold text-gold">{formatVND(total)}</span>
+            </div>
           </div>
         </div>
       )}

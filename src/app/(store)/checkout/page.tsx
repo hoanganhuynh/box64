@@ -236,6 +236,7 @@ export default function CheckoutPage() {
     sessionStorage.setItem('lastOrder', JSON.stringify({
       orderId: result.orderId,
       items,
+      shippingFee,
       amount: subtotal + shippingFee,
       paymentMethod: method,
       customerName: form.name,
