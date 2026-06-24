@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
 import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2 } from 'lucide-react'
+import BrandLogo from '@/components/ui/BrandLogo'
 import {
   getProducts, upsertProduct, deleteProduct,
   type ProductRow,
@@ -197,12 +198,7 @@ function ProductModal({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Thương hiệu xe">
-              <div className="relative">
-                <select value={form.brand ?? ''} onChange={e => set('brand', e.target.value || null)} className={SELECT}>
-                  {BRAND_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-                <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#484858] pointer-events-none" />
-              </div>
+              <BrandSelect value={form.brand ?? null} onChange={v => set('brand', v)} />
             </Field>
             <Field label="Vật liệu">
               <div className="relative">
@@ -439,5 +435,79 @@ export default function ProductsPage() {
           onConfirm={handleDelete} deleting={deleting} />
       )}
     </div>
+  )
+}
+
+// ─── Brand Select ─────────────────────────────────────────────────────────────
+
+const BRAND_LOGO_SIZE = 20
+
+function BrandSelect({ value, onChange }: {
+  value: string | null
+  onChange: (v: string | null) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+
+  const selected = BRAND_OPTIONS.find(o => o.value === (value ?? '')) ?? BRAND_OPTIONS[0]
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full bg-[#0D0D14] border border-[#1E1E28] rounded-lg px-3 h-9 text-sm text-[#EEEEF4] flex items-center gap-2.5 focus:outline-none focus:border-[#6366f1] transition-colors hover:border-[#2A2A3C]"
+      >
+        <BrandLogoOrPlaceholder brand={value} size={BRAND_LOGO_SIZE} />
+        <span className="flex-1 text-left">{selected.label}</span>
+        <ChevronDown size={13} className={`text-[#484858] shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-[#0D0D14] border border-[#2A2A38] rounded-xl z-[200] overflow-hidden shadow-2xl shadow-black/60 py-1">
+          {BRAND_OPTIONS.map(o => {
+            const active = (value ?? '') === o.value
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => { onChange(o.value || null); setOpen(false) }}
+                className={`flex items-center gap-2.5 w-full px-3 py-2 text-sm transition-colors ${
+                  active
+                    ? 'bg-[#6366f1]/15 text-[#EEEEF4]'
+                    : 'text-[#BBBBC8] hover:bg-[#1A1A26] hover:text-[#EEEEF4]'
+                }`}
+              >
+                <BrandLogoOrPlaceholder brand={o.value || null} size={BRAND_LOGO_SIZE} />
+                <span className="flex-1 text-left">{o.label}</span>
+                {active && <span className="text-[#6366f1] text-xs">✓</span>}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function BrandLogoOrPlaceholder({ brand, size }: { brand: string | null; size: number }) {
+  if (!brand || brand === 'other') {
+    return <span className="shrink-0" style={{ width: size, height: size }} />
+  }
+  return (
+    <span className="shrink-0 flex items-center justify-center" style={{ width: size * 1.6, height: size }}>
+      <BrandLogo brand={brand as import('@/lib/types').CarBrand} size={size} variant="dark" />
+    </span>
   )
 }
