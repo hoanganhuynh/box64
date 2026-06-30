@@ -72,7 +72,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-lg space-y-8">
+    <div className="max-w-lg mx-auto px-4 sm:px-6 py-8 space-y-8">
       <div>
         <h1 className="text-xl font-bold text-[#EEEEF4]">Cài đặt</h1>
         <p className="text-sm text-[#484858] mt-1">Quản lý tài khoản quản trị</p>
