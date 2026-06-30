@@ -54,10 +54,10 @@ export default function CustomersClient({ customers }: { customers: CustomerRow[
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#1A1A22]">
-                  <th className="text-left px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Khách hàng</th>
-                  <th className="text-right px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Đơn hàng</th>
-                  <th className="text-right px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Đã chi</th>
-                  <th className="text-right px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Đơn gần nhất</th>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Khách hàng</th>
+                  <th className="text-right px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Đơn hàng</th>
+                  <th className="text-right px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Đã chi</th>
+                  <th className="text-right px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Đơn gần nhất</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1A1A22]">
@@ -66,13 +66,13 @@ export default function CustomersClient({ customers }: { customers: CustomerRow[
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-[#1E1E28] flex items-center justify-center shrink-0">
-                          <span className="text-xs font-bold text-[#F0A500]">
+                          <span className="text-sm font-bold text-[#F0A500]">
                             {c.name.trim().split(' ').pop()?.charAt(0).toUpperCase() ?? '?'}
                           </span>
                         </div>
                         <div>
                           <p className="font-medium text-[#EEEEF4]">{c.name}</p>
-                          <p className="text-xs text-[#484858] mt-0.5">{c.phone}</p>
+                          <p className="text-sm text-[#484858] mt-0.5">{c.phone}</p>
                         </div>
                       </div>
                     </td>
@@ -83,7 +83,7 @@ export default function CustomersClient({ customers }: { customers: CustomerRow[
                       <span className="text-[#F0A500] font-semibold tabular-nums">{vnd(c.spent)}</span>
                     </td>
                     <td className="px-6 py-4 text-right hidden lg:table-cell">
-                      <span className="text-xs text-[#484858]">{timeAgo(c.lastOrder)}</span>
+                      <span className="text-sm text-[#484858]">{timeAgo(c.lastOrder)}</span>
                     </td>
                   </tr>
                 ))}

@@ -58,8 +58,8 @@ function StatusSelect({ orderId, current }: { orderId: string; current: string }
                 onClick={() => select(opt.value)}
                 className={
                   value === opt.value
-                    ? 'w-full text-left px-4 py-2.5 text-xs font-semibold text-[#F0A500] bg-[#F0A500]/10 transition-colors'
-                    : 'w-full text-left px-4 py-2.5 text-xs font-medium text-[#7A7A90] hover:bg-white/[0.04] hover:text-[#EEEEF4] transition-colors'
+                    ? 'w-full text-left px-4 py-2.5 text-sm font-semibold text-[#F0A500] bg-[#F0A500]/10 transition-colors'
+                    : 'w-full text-left px-4 py-2.5 text-sm font-medium text-[#7A7A90] hover:bg-white/[0.04] hover:text-[#EEEEF4] transition-colors'
                 }
               >
                 {opt.label}
@@ -87,7 +87,7 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
         <thead>
           <tr className="border-b border-[#1A1A22]">
             {['Mã đơn', 'Khách hàng', 'Sản phẩm', 'Tổng tiền', 'Trạng thái', 'Thời gian', ''].map(h => (
-              <th key={h} className="text-left px-5 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide whitespace-nowrap">
+              <th key={h} className="text-left px-5 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -97,15 +97,15 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
           {orders.map(order => (
             <tr key={order.id} className="border-b border-[#16161E] hover:bg-white/[0.02] transition-colors group">
               <td className="px-5 py-4">
-                <span className="font-mono text-[11px] text-[#F0A500] font-semibold">{order.id}</span>
+                <span className="font-mono text-sm text-[#F0A500] font-semibold">{order.id}</span>
               </td>
               <td className="px-5 py-4">
-                <p className="font-semibold text-[#EEEEF4] text-xs leading-tight">{order.shipping?.name ?? '—'}</p>
-                <p className="text-[11px] text-[#484858] mt-0.5">{order.shipping?.phone ?? ''}</p>
+                <p className="font-semibold text-[#EEEEF4] text-sm leading-tight">{order.shipping?.name ?? '—'}</p>
+                <p className="text-sm text-[#484858] mt-0.5">{order.shipping?.phone ?? ''}</p>
               </td>
               <td className="px-5 py-4">
-                <p className="text-xs text-[#7A7A90]">{order.items?.length ?? 0} sản phẩm</p>
-                <p className="text-[11px] text-[#484858] mt-0.5 truncate max-w-[160px]">
+                <p className="text-sm text-[#7A7A90]">{order.items?.length ?? 0} sản phẩm</p>
+                <p className="text-sm text-[#484858] mt-0.5 truncate max-w-[160px]">
                   {order.items?.[0]?.product_name ?? ''}
                   {(order.items?.length ?? 0) > 1 ? ` +${order.items.length - 1}` : ''}
                 </p>
@@ -116,7 +116,7 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
               <td className="px-5 py-4">
                 <StatusSelect orderId={order.id} current={order.status} />
               </td>
-              <td className="px-5 py-4 text-[11px] text-[#484858] whitespace-nowrap">
+              <td className="px-5 py-4 text-sm text-[#484858] whitespace-nowrap">
                 {relativeDate(order.created_at)}
               </td>
               <td className="px-5 py-4">

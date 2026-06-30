@@ -36,18 +36,18 @@ async function OrdersContent({ status, page, search }: { status: string; page: n
           {page > 0 && (
             <Link
               href={`/admin/orders?status=${status}&page=${page - 1}&search=${search}`}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-sm font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
             >
               <ChevronLeft size={14} /> Trước
             </Link>
           )}
-          <span className="text-xs font-medium text-[#484858] px-3 tabular-nums">
+          <span className="text-sm font-medium text-[#484858] px-3 tabular-nums">
             {page + 1} / {totalPages}
           </span>
           {page < totalPages - 1 && (
             <Link
               href={`/admin/orders?status=${status}&page=${page + 1}&search=${search}`}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-sm font-medium text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
             >
               Tiếp <ChevronRight size={14} />
             </Link>
@@ -74,7 +74,7 @@ export default async function OrdersPage({
         <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Đơn hàng</h1>
         <a
           href="/admin/api/export"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-xs font-semibold text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#111118] border border-[#1E1E28] text-sm font-semibold text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors"
         >
           ↓ Xuất CSV
         </a>
@@ -88,7 +88,7 @@ export default async function OrdersPage({
             <Link
               key={tab.value}
               href={`/admin/orders?status=${tab.value}&page=0${search ? `&search=${search}` : ''}`}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${
                 status === tab.value
                   ? 'bg-[#F0A500] text-[#0A0A0F]'
                   : 'bg-[#111118] border border-[#1E1E28] text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38]'

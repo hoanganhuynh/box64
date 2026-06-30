@@ -79,7 +79,7 @@ function CategoryModal({ initial, isNew, onSave, onClose, saving }: ModalProps) 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Tên danh mục *</label>
+            <label className="block text-sm font-medium text-[#7A7A90] mb-1.5">Tên danh mục *</label>
             <input
               value={form.name} onChange={e => set('name', e.target.value)}
               required placeholder="Box Catalog"
@@ -89,18 +89,18 @@ function CategoryModal({ initial, isNew, onSave, onClose, saving }: ModalProps) 
 
           {/* Slug */}
           <div>
-            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Slug *</label>
+            <label className="block text-sm font-medium text-[#7A7A90] mb-1.5">Slug *</label>
             <input
               value={form.slug} onChange={e => handleSlugChange(e.target.value)}
               required placeholder="box_catalog"
               className="w-full h-9 px-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors font-mono"
             />
-            <p className="text-[10px] text-[#383848] mt-1">Dùng làm giá trị type của sản phẩm.</p>
+            <p className="text-sm text-[#383848] mt-1">Dùng làm giá trị type của sản phẩm.</p>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Mô tả</label>
+            <label className="block text-sm font-medium text-[#7A7A90] mb-1.5">Mô tả</label>
             <input
               value={form.description ?? ''} onChange={e => set('description', e.target.value)}
               placeholder="Mô tả ngắn về danh mục"
@@ -110,7 +110,7 @@ function CategoryModal({ initial, isNew, onSave, onClose, saving }: ModalProps) 
 
           {/* Color */}
           <div>
-            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Màu</label>
+            <label className="block text-sm font-medium text-[#7A7A90] mb-1.5">Màu</label>
             <div className="flex items-center gap-2 flex-wrap">
               {PRESET_COLORS.map(c => (
                 <button key={c} type="button" onClick={() => set('color', c)}
@@ -127,7 +127,7 @@ function CategoryModal({ initial, isNew, onSave, onClose, saving }: ModalProps) 
 
           {/* Sort order */}
           <div>
-            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Thứ tự</label>
+            <label className="block text-sm font-medium text-[#7A7A90] mb-1.5">Thứ tự</label>
             <input
               type="number" min={0}
               value={form.sort_order} onChange={e => set('sort_order', Number(e.target.value))}
@@ -255,7 +255,7 @@ export default function CategoriesPage() {
             </p>
             {!search && (
               <button onClick={openCreate}
-                className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-xs font-semibold hover:bg-[#5558e6] transition-colors">
+                className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors">
                 <Plus size={13} /> Thêm danh mục đầu tiên
               </button>
             )}
@@ -265,11 +265,11 @@ export default function CategoriesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#1A1A22]">
-                  <th className="text-left px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Danh mục</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Slug</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Mô tả</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Thứ tự</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Ngày tạo</th>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Danh mục</th>
+                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Slug</th>
+                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Mô tả</th>
+                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Thứ tự</th>
+                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Ngày tạo</th>
                   <th className="px-4 py-3 w-20" />
                 </tr>
               </thead>
@@ -287,22 +287,22 @@ export default function CategoriesPage() {
                         <div>
                           <p className="font-medium text-[#EEEEF4]">{c.name}</p>
                           {c.description && (
-                            <p className="text-[11px] text-[#484858] mt-0.5 line-clamp-1 md:hidden">{c.description}</p>
+                            <p className="text-sm text-[#484858] mt-0.5 line-clamp-1 md:hidden">{c.description}</p>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <span className="font-mono text-[11px] text-[#7A7A90] bg-[#1A1A22] px-1.5 py-0.5 rounded">{c.slug}</span>
+                      <span className="font-mono text-sm text-[#7A7A90] bg-[#1A1A22] px-1.5 py-0.5 rounded">{c.slug}</span>
                     </td>
                     <td className="px-4 py-4 hidden lg:table-cell">
-                      <span className="text-xs text-[#484858] line-clamp-1">{c.description ?? '—'}</span>
+                      <span className="text-sm text-[#484858] line-clamp-1">{c.description ?? '—'}</span>
                     </td>
                     <td className="px-4 py-4 text-right hidden md:table-cell">
-                      <span className="text-xs text-[#7A7A90] tabular-nums">{c.sort_order}</span>
+                      <span className="text-sm text-[#7A7A90] tabular-nums">{c.sort_order}</span>
                     </td>
                     <td className="px-4 py-4 text-right hidden lg:table-cell">
-                      <span className="text-[11px] text-[#383848]">{relDate(c.created_at)}</span>
+                      <span className="text-sm text-[#383848]">{relDate(c.created_at)}</span>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -8,6 +8,21 @@ import {
   type ProductRow,
 } from './actions'
 
+// ─── Tooltip ─────────────────────────────────────────────────────────────────
+
+function Tip({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="relative group/tip">
+      {children}
+      <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 z-10">
+        <span className="block opacity-0 group-hover/tip:opacity-100 transition-opacity delay-150 bg-[#1A1A22] border border-[#2A2A38] text-[#EEEEF4] text-sm font-medium whitespace-nowrap px-2 py-1 rounded-lg shadow-lg">
+          {label}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 // ─── constants ───────────────────────────────────────────────────────────────
 
 const TYPE_OPTIONS = [
@@ -79,7 +94,7 @@ const SELECT = 'w-full bg-[#0D0D14] border border-[#1E1E28] rounded-lg px-3 h-9 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold text-[#7A7A90] uppercase tracking-wide">{label}</span>
+      <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">{label}</span>
       {children}
     </label>
   )
@@ -228,7 +243,7 @@ function ProductModal({
 
           {/* ── SKU & Variant fields ─────────────────────────────── */}
           <div className="h-px bg-[#1A1A22]" />
-          <p className="text-[10px] font-bold text-[#484858] uppercase tracking-widest -mb-1">SKU & Phân loại</p>
+          <p className="text-sm font-bold text-[#484858] uppercase tracking-widest -mb-1">SKU & Phân loại</p>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Hãng SX diecast">
@@ -262,7 +277,7 @@ function ProductModal({
                   onChange={e => set('sku', e.target.value.toUpperCase() || null)}
                   className={INPUT + ' font-mono uppercase'} />
                 <button type="button" onClick={suggestSku}
-                  className="shrink-0 h-9 px-2.5 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-[10px] text-[#7A7A90] hover:text-[#EEEEF4] transition-colors whitespace-nowrap">
+                  className="shrink-0 h-9 px-2.5 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors whitespace-nowrap">
                   Gợi ý
                 </button>
               </div>
@@ -283,11 +298,11 @@ function ProductModal({
               <input ref={fileRef} type="file" accept="image/*" multiple disabled={uploading}
                 onChange={handleFileChange} className="sr-only" />
               {uploading
-                ? <><Loader2 size={18} className="text-[#6366f1] animate-spin" /><span className="text-xs text-[#7A7A90]">Đang tải lên…</span></>
-                : <><Upload size={18} className="text-[#484858]" /><span className="text-xs text-[#7A7A90]">Chọn ảnh <span className="text-[#484858]">· auto WebP · tối đa 5 MB</span></span></>
+                ? <><Loader2 size={18} className="text-[#6366f1] animate-spin" /><span className="text-sm text-[#7A7A90]">Đang tải lên…</span></>
+                : <><Upload size={18} className="text-[#484858]" /><span className="text-sm text-[#7A7A90]">Chọn ảnh <span className="text-[#484858]">· auto WebP · tối đa 5 MB</span></span></>
               }
             </label>
-            {uploadError && <p className="text-[11px] text-red-400 mt-1.5">{uploadError}</p>}
+            {uploadError && <p className="text-sm text-red-400 mt-1.5">{uploadError}</p>}
             <textarea rows={3} value={imagesText} onChange={e => setImagesText(e.target.value)}
               placeholder="hoặc dán URL thủ công (mỗi dòng 1 URL)&#10;/products/p1.jpg" className={`${TEXTAREA} mt-2`} />
           </Field>
@@ -327,10 +342,10 @@ function DeleteConfirm({ name, onCancel, onConfirm, deleting }: {
           </div>
           <div>
             <p className="font-semibold text-[#EEEEF4] text-sm">Xoá sản phẩm?</p>
-            <p className="text-xs text-[#484858] mt-0.5 line-clamp-1">{name}</p>
+            <p className="text-sm text-[#484858] mt-0.5 line-clamp-1">{name}</p>
           </div>
         </div>
-        <p className="text-xs text-[#7A7A90] mb-5">Thao tác này không thể hoàn tác.</p>
+        <p className="text-sm text-[#7A7A90] mb-5">Thao tác này không thể hoàn tác.</p>
         <div className="flex gap-3">
           <button onClick={onCancel}
             className="flex-1 h-9 rounded-lg text-sm font-medium text-[#7A7A90] border border-[#1E1E28] hover:text-[#EEEEF4] transition-colors">
@@ -437,10 +452,10 @@ function CsvImportModal({ onClose, onDone }: { onClose: () => void; onDone: () =
           <div className="flex items-center justify-between bg-[#0D0D14] border border-[#1E1E28] rounded-xl px-4 py-3">
             <div>
               <p className="text-sm font-medium text-[#EEEEF4]">File mẫu CSV</p>
-              <p className="text-xs text-[#484858] mt-0.5">17 cột — id, name, type, sku, giá, ảnh…</p>
+              <p className="text-sm text-[#484858] mt-0.5">17 cột — id, name, type, sku, giá, ảnh…</p>
             </div>
             <button onClick={downloadTemplate}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-xs text-[#7A7A90] hover:text-[#EEEEF4] transition-colors">
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors">
               <FileDown size={13} /> Tải mẫu
             </button>
           </div>
@@ -466,12 +481,12 @@ function CsvImportModal({ onClose, onDone }: { onClose: () => void; onDone: () =
           {rows.length > 0 && !result && (
             <div className="bg-[#0D0D14] border border-[#1E1E28] rounded-xl overflow-hidden">
               <div className="px-4 py-2.5 border-b border-[#1E1E28]">
-                <p className="text-xs text-[#7A7A90]">
+                <p className="text-sm text-[#7A7A90]">
                   <span className="font-semibold text-[#EEEEF4]">{rows.length}</span> sản phẩm — xem trước 3 dòng đầu
                 </p>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full text-xs">
+                <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[#1E1E28]">
                       {['name','sku','type','price','stock','status'].map(h => (
@@ -507,7 +522,7 @@ function CsvImportModal({ onClose, onDone }: { onClose: () => void; onDone: () =
           )}
 
           {err && (
-            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{err}</p>
+            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{err}</p>
           )}
         </div>
 
@@ -647,7 +662,7 @@ export default function ProductsPage() {
           <div className="py-20 text-center">
             <p className="text-sm text-[#484858] mb-3">Chưa có sản phẩm nào.</p>
             <button onClick={openCreate}
-              className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-xs font-semibold hover:bg-[#5558e6] transition-colors">
+              className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors">
               <Plus size={13} /> Thêm sản phẩm đầu tiên
             </button>
           </div>
@@ -656,14 +671,14 @@ export default function ProductsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#1A1A22]">
-                  <th className="text-left px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Loại</th>
-                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">SKU</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Giá</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Kho</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Trạng thái</th>
-                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Hiển thị</th>
-                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">Cập nhật</th>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</th>
+                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Loại</th>
+                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">SKU</th>
+                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Giá</th>
+                  <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Kho</th>
+                  <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Trạng thái</th>
+                  <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Hiển thị</th>
+                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">Cập nhật</th>
                   <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
@@ -679,20 +694,20 @@ export default function ProductsPage() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-[#EEEEF4] leading-snug line-clamp-1 max-w-[240px]">{p.name}</p>
-                          <p className="text-[11px] text-[#383848] mt-0.5 font-mono">{p.slug}</p>
+                          <p className="font-medium text-[#EEEEF4] leading-snug">{p.name}</p>
+                          <p className="text-sm text-[#484858] mt-0.5 font-mono">{p.slug}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <span className="text-xs text-[#7A7A90] bg-[#1A1A22] px-2 py-1 rounded-md">
+                      <span className="text-sm text-[#7A7A90] bg-[#1A1A22] px-2 py-1 rounded-md">
                         {TYPE_OPTIONS.find(o => o.value === p.type)?.label ?? p.type}
                       </span>
                     </td>
                     <td className="px-4 py-4 hidden xl:table-cell">
                       {p.sku
-                        ? <span className="font-mono text-[11px] text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">{p.sku}</span>
-                        : <span className="text-[#2A2A38] text-xs">—</span>
+                        ? <span className="font-mono text-sm text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">{p.sku}</span>
+                        : <span className="text-[#2A2A38] text-sm">—</span>
                       }
                     </td>
                     <td className="px-4 py-4 text-right font-semibold text-[#EEEEF4] tabular-nums whitespace-nowrap">
@@ -702,7 +717,7 @@ export default function ProductsPage() {
                       {p.stock}
                     </td>
                     <td className="px-4 py-4 text-center">
-                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_COLOR[p.status] ?? ''}`}>
+                      <span className={`text-sm font-semibold px-2.5 py-1 rounded-full ${STATUS_COLOR[p.status] ?? ''}`}>
                         {STATUS_LABEL[p.status] ?? p.status}
                       </span>
                     </td>
@@ -717,7 +732,7 @@ export default function ProductsPage() {
                     </td>
                     {/* Updated at */}
                     <td className="px-4 py-4 text-right hidden xl:table-cell">
-                      <span className="text-[11px] text-[#383848]">
+                      <span className="text-sm text-[#383848]">
                         {(p.updated_at ?? p.created_at)
                           ? new Date(p.updated_at ?? p.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: '2-digit' })
                           : '—'}
@@ -726,18 +741,24 @@ export default function ProductsPage() {
                     {/* Actions */}
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEdit(p)} title="Chỉnh sửa"
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
-                          <Pencil size={13} />
-                        </button>
-                        <button onClick={() => handleDuplicate(p)} title="Nhân bản"
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
-                          <Copy size={13} />
-                        </button>
-                        <button onClick={() => setDeleteTarget(p)} title="Xoá"
-                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                          <Trash2 size={13} />
-                        </button>
+                        <Tip label="Chỉnh sửa">
+                          <button onClick={() => openEdit(p)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+                            <Pencil size={13} />
+                          </button>
+                        </Tip>
+                        <Tip label="Nhân bản">
+                          <button onClick={() => handleDuplicate(p)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+                            <Copy size={13} />
+                          </button>
+                        </Tip>
+                        <Tip label="Xoá">
+                          <button onClick={() => setDeleteTarget(p)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                            <Trash2 size={13} />
+                          </button>
+                        </Tip>
                       </div>
                     </td>
                   </tr>
@@ -818,7 +839,7 @@ function BrandSelect({ value, onChange }: {
               >
                 <BrandLogoOrPlaceholder brand={o.value || null} size={BRAND_LOGO_SIZE} />
                 <span className="flex-1 text-left">{o.label}</span>
-                {active && <span className="text-[#6366f1] text-xs">✓</span>}
+                {active && <span className="text-[#6366f1] text-sm">✓</span>}
               </button>
             )
           })}

@@ -16,7 +16,7 @@ function InfoRow({ label, value, icon }: { label: string; value: string; icon?: 
     <div className="flex items-start gap-3 py-3 border-b border-[#16161E] last:border-0">
       {icon && <span className="text-[#484858] mt-0.5 shrink-0">{icon}</span>}
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-0.5">{label}</p>
+        <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-0.5">{label}</p>
         <p className="text-sm font-medium text-[#EEEEF4]">{value}</p>
       </div>
     </div>
@@ -51,7 +51,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="mb-6">
         <Link
           href="/admin/orders"
-          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#484858] hover:text-[#7A7A90] transition-colors mb-4 uppercase tracking-wide"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#484858] hover:text-[#7A7A90] transition-colors mb-4 uppercase tracking-wide"
         >
           <ArrowLeft size={13} /> Đơn hàng
         </Link>
@@ -60,7 +60,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <h1 className="font-mono font-bold text-[#EEEEF4] text-xl lg:text-2xl leading-none">
               {order.id}
             </h1>
-            <p className="text-[12px] text-[#484858] mt-1.5 capitalize">{createdAt}</p>
+            <p className="text-sm text-[#484858] mt-1.5 capitalize">{createdAt}</p>
           </div>
           <StatusBadge status={order.status} />
         </div>
@@ -71,7 +71,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="lg:col-span-2 flex flex-col gap-4">
           <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-[#1A1A22]">
-              <p className="text-xs font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</p>
+              <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</p>
             </div>
             <div className="divide-y divide-[#16161E]">
               {(order.items ?? []).map((item, i) => (
@@ -86,7 +86,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#EEEEF4] leading-tight">{item.product_name}</p>
-                    <p className="text-[11px] text-[#484858] mt-0.5">x{item.quantity}</p>
+                    <p className="text-sm text-[#484858] mt-0.5">x{item.quantity}</p>
                   </div>
                   <p className="text-sm font-bold text-[#EEEEF4] whitespace-nowrap tabular-nums">
                     {vnd(item.unit_price * item.quantity)}
@@ -118,7 +118,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-6 py-4">
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquare size={13} className="text-[#484858]" />
-                <p className="text-xs font-semibold text-[#484858] uppercase tracking-wide">Ghi chú</p>
+                <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">Ghi chú</p>
               </div>
               <p className="text-sm text-[#7A7A90] leading-relaxed">{order.note}</p>
             </div>
@@ -136,8 +136,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             return (
               <div key={i} className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden">
                 <div className="px-6 py-4 border-b border-[#1A1A22] flex items-center justify-between">
-                  <p className="text-xs font-semibold text-[#484858] uppercase tracking-wide">Thiết kế — {item.product_name}</p>
-                  <span className="text-[10px] font-semibold text-[#F0A500] bg-[#F0A500]/10 px-2 py-0.5 rounded-full">
+                  <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">Thiết kế — {item.product_name}</p>
+                  <span className="text-sm font-semibold text-[#F0A500] bg-[#F0A500]/10 px-2 py-0.5 rounded-full">
                     {d.box_size?.toUpperCase()} × {d.quantity}
                   </span>
                 </div>
@@ -152,12 +152,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   {/* Car name + colors */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-1">Tên xe</p>
+                      <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-1">Tên xe</p>
                       <p className="text-sm text-[#EEEEF4]">{d.car_name || '—'}</p>
-                      {d.specs_line && <p className="text-xs text-[#484858] mt-0.5">{d.specs_line}</p>}
+                      {d.specs_line && <p className="text-sm text-[#484858] mt-0.5">{d.specs_line}</p>}
                     </div>
                     <div>
-                      <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-2">Màu</p>
+                      <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-2">Màu</p>
                       <div className="flex items-center gap-2">
                         {[
                           { color: d.bg_color, label: 'BG' },
@@ -180,10 +180,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   {/* Specs */}
                   {specs.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-2">Thông số kỹ thuật</p>
+                      <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-2">Thông số kỹ thuật</p>
                       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
                         {specs.map(([k, v]) => (
-                          <div key={k} className="flex items-center gap-2 text-xs">
+                          <div key={k} className="flex items-center gap-2 text-sm">
                             <span className="text-[#383848] w-20 shrink-0">{k}</span>
                             <span className="text-[#EEEEF4] truncate">{v}</span>
                           </div>
@@ -195,8 +195,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   {/* Warning text */}
                   {d.warning_text && (
                     <div>
-                      <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-1">Warning text</p>
-                      <p className="text-xs text-[#7A7A90] font-mono">{d.warning_text}</p>
+                      <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-1">Warning text</p>
+                      <p className="text-sm text-[#7A7A90] font-mono">{d.warning_text}</p>
                     </div>
                   )}
                 </div>
@@ -208,7 +208,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         {/* Right — customer + status */}
         <div className="flex flex-col gap-4">
           <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-5 py-2">
-            <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide py-3 border-b border-[#1A1A22]">
+            <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide py-3 border-b border-[#1A1A22]">
               Khách hàng
             </p>
             <InfoRow label="Họ tên"     value={shipping.name ?? '—'}             icon={<User size={14} />} />
@@ -218,7 +218,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-5 py-4">
-            <p className="text-[10px] font-semibold text-[#484858] uppercase tracking-wide mb-3">
+            <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-3">
               Cập nhật trạng thái
             </p>
             <form className="flex flex-col gap-2">
@@ -229,7 +229,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     'use server'
                     await updateOrderStatus(id, opt.value)
                   }}
-                  className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold transition-colors border ${
+                  className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors border ${
                     order.status === opt.value
                       ? 'bg-[#F0A500]/10 border-[#F0A500]/25 text-[#F0A500]'
                       : 'bg-transparent border-[#1E1E28] text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38]'

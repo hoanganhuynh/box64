@@ -108,7 +108,7 @@ export function CommandPalette({ open, onClose }: Props) {
                       </span>
                       <div>
                         <p className="text-sm font-medium text-foreground">{item.label}</p>
-                        {item.sub && <p className="text-xs text-muted">{item.sub}</p>}
+                        {item.sub && <p className="text-sm text-muted">{item.sub}</p>}
                       </div>
                     </button>
                   )
@@ -116,7 +116,7 @@ export function CommandPalette({ open, onClose }: Props) {
               )}
             </div>
 
-            <div className="border-t border-border px-4 py-2.5 flex items-center gap-3 text-[11px] text-muted">
+            <div className="border-t border-border px-4 py-2.5 flex items-center gap-3 text-sm text-muted">
               <kbd className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono">↵</kbd>
               <span>Chọn</span>
               <kbd className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono">Esc</kbd>

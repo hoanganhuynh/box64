@@ -173,7 +173,7 @@ function SidebarContent({
           >
             <MagnifyingGlass size={20} weight="regular" className="shrink-0 text-muted" />
             <span className="flex-1 text-left text-muted">Tìm kiếm</span>
-            <kbd className="flex items-center gap-0.5 rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] font-medium text-muted">
+            <kbd className="flex items-center gap-0.5 rounded border border-border bg-surface px-1.5 py-0.5 text-sm font-medium text-muted">
               ⌘K
             </kbd>
           </button>
@@ -183,7 +183,7 @@ function SidebarContent({
       {/* Navigation */}
       <nav className={cn('flex-1 overflow-y-auto py-4', collapsed ? 'px-2' : 'px-3')}>
         {!collapsed && (
-          <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-widest text-muted">
+          <p className="mb-2 px-3 text-sm font-medium uppercase tracking-widest text-muted">
             Menu
           </p>
         )}

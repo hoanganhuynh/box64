@@ -50,7 +50,7 @@ function SidebarContent({ pathname, onNav }: { pathname: string; onNav?: () => v
       <div className="px-5 py-5 border-b border-dashed border-[#1E1E28]">
         <Link href="/admin/dashboard" onClick={onNav} className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-[#F0A500] flex items-center justify-center shrink-0">
-            <span className="text-[11px] font-black text-[#0A0A0F] tracking-tight">FB</span>
+            <span className="text-sm font-black text-[#0A0A0F] tracking-tight">FB</span>
           </div>
           <div>
             <p className="font-jakarta font-extrabold text-[#EEEEF4] text-sm leading-none">
@@ -63,7 +63,7 @@ function SidebarContent({ pathname, onNav }: { pathname: string; onNav?: () => v
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5 overflow-y-auto">
-        <p className="px-3 text-[10px] font-semibold text-[#2A2A38] uppercase tracking-widest mb-2">Menu</p>
+        <p className="px-3 text-sm font-semibold text-[#2A2A38] uppercase tracking-widest mb-2">Menu</p>
         {NAV.map(item => (
           <NavItem
             key={item.href}

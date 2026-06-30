@@ -81,12 +81,12 @@ export default function SettingsPage() {
       <div className="bg-[#0F0F18] border border-[#1E1E2E] rounded-xl p-6 space-y-5">
         <div>
           <h2 className="text-sm font-semibold text-[#EEEEF4]">Đổi mật khẩu</h2>
-          <p className="text-xs text-[#484858] mt-0.5">Mật khẩu mới phải có ít nhất 8 ký tự.</p>
+          <p className="text-sm text-[#484858] mt-0.5">Mật khẩu mới phải có ít nhất 8 ký tự.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="current" className="text-xs font-medium text-[#7A7A90]">
+            <label htmlFor="current" className="text-sm font-medium text-[#7A7A90]">
               Mật khẩu hiện tại
             </label>
             <PasswordInput
@@ -99,7 +99,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="next" className="text-xs font-medium text-[#7A7A90]">
+            <label htmlFor="next" className="text-sm font-medium text-[#7A7A90]">
               Mật khẩu mới
             </label>
             <PasswordInput
@@ -112,7 +112,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="confirm" className="text-xs font-medium text-[#7A7A90]">
+            <label htmlFor="confirm" className="text-sm font-medium text-[#7A7A90]">
               Xác nhận mật khẩu mới
             </label>
             <PasswordInput
@@ -125,12 +125,12 @@ export default function SettingsPage() {
           </div>
 
           {error && (
-            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
           {success && (
-            <p className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
               Đổi mật khẩu thành công!
             </p>
           )}

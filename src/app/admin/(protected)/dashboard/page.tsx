@@ -22,7 +22,7 @@ async function DashboardContent() {
     <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[11px] font-semibold text-[#484858] mb-1 capitalize">{today}</p>
+        <p className="text-sm font-semibold text-[#484858] mb-1 capitalize">{today}</p>
         <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Tổng quan</h1>
       </div>
 
@@ -63,10 +63,10 @@ async function DashboardContent() {
         <div className="lg:col-span-2 bg-[#111118] border border-[#1E1E28] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <p className="text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Doanh thu 30 ngày</p>
+              <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">Doanh thu 30 ngày</p>
               <p className="text-[#EEEEF4] font-bold text-lg mt-0.5">{vnd(stats.chartData.reduce((s, d) => s + d.revenue, 0))}</p>
             </div>
-            <span className="text-[11px] font-semibold text-[#F0A500] bg-[#F0A500]/10 px-3 py-1 rounded-full">
+            <span className="text-sm font-semibold text-[#F0A500] bg-[#F0A500]/10 px-3 py-1 rounded-full">
               {stats.chartData.reduce((s, d) => s + d.orders, 0)} đơn
             </span>
           </div>
@@ -74,17 +74,17 @@ async function DashboardContent() {
         </div>
 
         <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-6">
-          <p className="text-[11px] font-semibold text-[#484858] uppercase tracking-wide mb-5">Bán chạy</p>
+          <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-5">Bán chạy</p>
           {stats.topProducts.length === 0 ? (
             <p className="text-[#383848] text-sm text-center py-8">Chưa có dữ liệu</p>
           ) : (
             <div className="flex flex-col gap-4">
               {stats.topProducts.map((p, i) => (
                 <div key={p.name} className="flex items-start gap-3">
-                  <span className="text-xs font-bold text-[#2A2A38] w-5 shrink-0 mt-0.5 tabular-nums">{i + 1}</span>
+                  <span className="text-sm font-bold text-[#2A2A38] w-5 shrink-0 mt-0.5 tabular-nums">{i + 1}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#EEEEF4] leading-snug line-clamp-2">{p.name}</p>
-                    <p className="text-[11px] text-[#484858] mt-1">{p.qty} bán · {vnd(p.revenue)}</p>
+                    <p className="text-sm font-semibold text-[#EEEEF4] leading-snug line-clamp-2">{p.name}</p>
+                    <p className="text-sm text-[#484858] mt-1">{p.qty} bán · {vnd(p.revenue)}</p>
                   </div>
                 </div>
               ))}
@@ -97,7 +97,7 @@ async function DashboardContent() {
       <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A1A22]">
           <p className="text-sm font-semibold text-[#EEEEF4]">Đơn hàng gần đây</p>
-          <Link href="/admin/orders" className="text-[12px] font-semibold text-[#F0A500] hover:text-[#F0A500]/80 transition-colors">
+          <Link href="/admin/orders" className="text-sm font-semibold text-[#F0A500] hover:text-[#F0A500]/80 transition-colors">
             Xem tất cả →
           </Link>
         </div>

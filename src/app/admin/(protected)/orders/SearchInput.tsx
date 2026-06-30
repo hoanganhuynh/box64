@@ -26,7 +26,7 @@ export function SearchInput({ defaultValue }: { defaultValue?: string }) {
         value={value}
         onChange={e => setValue(e.target.value)}
         placeholder="Tên, SĐT, mã đơn..."
-        className="w-full h-9 pl-8 pr-7 bg-[#111118] border border-[#1E1E28] rounded-xl text-xs text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#F0A500]/50 transition-colors"
+        className="w-full h-9 pl-8 pr-7 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#F0A500]/50 transition-colors"
       />
       {value && (
         <button

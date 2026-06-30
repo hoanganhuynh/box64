@@ -109,11 +109,11 @@ export default function PaymentSettingsPage() {
 
         {/* Bank info card */}
         <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-5">
-          <p className="text-xs font-bold text-muted uppercase tracking-widest">Thông tin ngân hàng</p>
+          <p className="text-sm font-bold text-muted uppercase tracking-widest">Thông tin ngân hàng</p>
 
           {/* Bank select */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted">Ngân hàng</label>
+            <label className="text-sm font-semibold text-muted">Ngân hàng</label>
             <select
               value={settings.bank_id}
               onChange={e => setSettings(s => ({ ...s, bank_id: e.target.value }))}
@@ -127,7 +127,7 @@ export default function PaymentSettingsPage() {
 
           {/* Account number */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted">Số tài khoản</label>
+            <label className="text-sm font-semibold text-muted">Số tài khoản</label>
             <input
               type="text"
               inputMode="numeric"
@@ -140,7 +140,7 @@ export default function PaymentSettingsPage() {
 
           {/* Account name */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted">Tên chủ tài khoản</label>
+            <label className="text-sm font-semibold text-muted">Tên chủ tài khoản</label>
             <input
               type="text"
               value={settings.account_name}
@@ -148,15 +148,15 @@ export default function PaymentSettingsPage() {
               placeholder="NGUYEN DINH AN"
               className="h-11 px-3 bg-surface border border-border rounded-xl text-sm text-foreground font-mono uppercase placeholder-muted/40 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 transition-all"
             />
-            <p className="text-[11px] text-muted">Viết in hoa, không dấu — đúng với tên trên tài khoản ngân hàng</p>
+            <p className="text-sm text-muted">Viết in hoa, không dấu — đúng với tên trên tài khoản ngân hàng</p>
           </div>
         </div>
 
         {/* QR card */}
         <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
           <div>
-            <p className="text-xs font-bold text-muted uppercase tracking-widest">Hình QR tĩnh</p>
-            <p className="text-[11px] text-muted mt-1">Nếu không upload, trang thanh toán sẽ tự tạo QR động từ thông tin bên trên</p>
+            <p className="text-sm font-bold text-muted uppercase tracking-widest">Hình QR tĩnh</p>
+            <p className="text-sm text-muted mt-1">Nếu không upload, trang thanh toán sẽ tự tạo QR động từ thông tin bên trên</p>
           </div>
 
           {settings.qr_image_url ? (
@@ -171,14 +171,14 @@ export default function PaymentSettingsPage() {
                 />
               </div>
               <div className="flex flex-col gap-2 pt-1">
-                <p className="text-xs font-medium text-foreground">QR đang dùng</p>
-                <p className="text-[11px] text-muted leading-relaxed">Ảnh này sẽ hiển thị cho khách trên trang đặt hàng thành công</p>
+                <p className="text-sm font-medium text-foreground">QR đang dùng</p>
+                <p className="text-sm text-muted leading-relaxed">Ảnh này sẽ hiển thị cho khách trên trang đặt hàng thành công</p>
                 <div className="flex gap-2 mt-1">
                   <button
                     type="button"
                     onClick={() => fileRef.current?.click()}
                     disabled={uploadingQr}
-                    className="h-8 px-3 rounded-lg bg-surface border border-border text-xs font-medium text-foreground hover:bg-surface/80 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                    className="h-8 px-3 rounded-lg bg-surface border border-border text-sm font-medium text-foreground hover:bg-surface/80 transition-colors flex items-center gap-1.5 disabled:opacity-50"
                   >
                     {uploadingQr ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
                     Thay QR
@@ -186,7 +186,7 @@ export default function PaymentSettingsPage() {
                   <button
                     type="button"
                     onClick={removeQr}
-                    className="h-8 px-3 rounded-lg bg-surface border border-border text-xs font-medium text-red-400 hover:bg-red-500/5 transition-colors flex items-center gap-1.5"
+                    className="h-8 px-3 rounded-lg bg-surface border border-border text-sm font-medium text-red-400 hover:bg-red-500/5 transition-colors flex items-center gap-1.5"
                   >
                     <X size={12} /> Xoá
                   </button>
@@ -203,8 +203,8 @@ export default function PaymentSettingsPage() {
               {uploadingQr
                 ? <Loader2 size={20} className="animate-spin" />
                 : <Upload size={20} />}
-              <span className="text-xs font-medium">{uploadingQr ? 'Đang upload…' : 'Upload hình QR'}</span>
-              <span className="text-[11px]">PNG, JPG · tối đa 5 MB</span>
+              <span className="text-sm font-medium">{uploadingQr ? 'Đang upload…' : 'Upload hình QR'}</span>
+              <span className="text-sm">PNG, JPG · tối đa 5 MB</span>
             </button>
           )}
 
@@ -220,8 +220,8 @@ export default function PaymentSettingsPage() {
         {/* VietQR preview */}
         {settings.account_number && !settings.qr_image_url && (
           <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-3">
-            <p className="text-xs font-bold text-muted uppercase tracking-widest">Xem trước QR động</p>
-            <p className="text-[11px] text-muted">QR được tạo tự động từ thông tin bên trên (không có sẵn số tiền)</p>
+            <p className="text-sm font-bold text-muted uppercase tracking-widest">Xem trước QR động</p>
+            <p className="text-sm text-muted">QR được tạo tự động từ thông tin bên trên (không có sẵn số tiền)</p>
             <div className="flex justify-center">
               <div className="rounded-xl overflow-hidden border border-border bg-white p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

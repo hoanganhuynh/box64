@@ -34,7 +34,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'border border-border bg-transparent text-foreground hover:bg-surface': variant === 'outline',
           },
           {
-            'h-8 px-3 text-xs gap-1.5': size === 'sm',
+            'h-8 px-3 text-sm gap-1.5': size === 'sm',
             'h-11 px-4 text-sm gap-2': size === 'md',
             'h-12 px-6 text-base gap-2.5': size === 'lg',
           },

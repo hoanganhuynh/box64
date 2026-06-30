@@ -41,12 +41,12 @@ export function ProfileMenu({ email }: { email: string }) {
             className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-black/5"
           >
             <div className="flex items-center gap-3 px-4 py-4 border-b border-border">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600/10 text-xs font-semibold text-indigo-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600/10 text-sm font-semibold text-indigo-600">
                 {initials}
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground">Admin</p>
-                <p className="truncate text-xs text-muted">{email}</p>
+                <p className="truncate text-sm text-muted">{email}</p>
               </div>
             </div>
 

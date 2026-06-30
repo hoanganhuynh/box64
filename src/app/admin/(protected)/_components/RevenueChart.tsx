@@ -18,11 +18,11 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-[#16161E] border border-[#1E1E28] rounded-xl px-4 py-3 shadow-xl">
-      <p className="text-[11px] text-[#484858] mb-1">{label}</p>
+      <p className="text-sm text-[#484858] mb-1">{label}</p>
       <p className="text-sm font-bold text-[#F0A500]">
         {new Intl.NumberFormat('vi-VN').format(payload[0].value)} ₫
       </p>
-      <p className="text-[11px] text-[#484858] mt-0.5">{payload[1]?.value ?? 0} đơn</p>
+      <p className="text-sm text-[#484858] mt-0.5">{payload[1]?.value ?? 0} đơn</p>
     </div>
   )
 }

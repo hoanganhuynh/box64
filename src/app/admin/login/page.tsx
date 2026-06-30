@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
         <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-8 py-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-xs font-semibold text-[#7A7A90]">
+              <label htmlFor="email" className="text-sm font-semibold text-[#7A7A90]">
                 Email
               </label>
               <input
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-xs font-semibold text-[#7A7A90]">
+              <label htmlFor="password" className="text-sm font-semibold text-[#7A7A90]">
                 Mật khẩu
               </label>
               <div className="relative">
@@ -105,7 +105,7 @@ export default function AdminLoginPage() {
             </div>
 
             {error && (
-              <p role="alert" className="text-[12px] font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+              <p role="alert" className="text-sm font-medium text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
                 {error}
               </p>
             )}
@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center mt-6">
-          <a href="/" className="text-xs text-[#383848] hover:text-[#484858] transition-colors">
+          <a href="/" className="text-sm text-[#383848] hover:text-[#484858] transition-colors">
             ← Về trang chủ
           </a>
         </p>

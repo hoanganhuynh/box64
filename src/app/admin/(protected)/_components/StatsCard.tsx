@@ -16,8 +16,8 @@ export function StatsCard({ label, value, sub, accent, icon, iconBg = 'bg-white/
         </div>
       </div>
       <p className={`font-bold text-2xl leading-none tracking-tight ${accent ? 'text-[#F0A500]' : 'text-[#EEEEF4]'}`}>{value}</p>
-      <p className="text-[12px] font-semibold text-[#7A7A90] mt-1">{label}</p>
-      {sub && <p className="text-[11px] text-[#404055] mt-2 leading-relaxed">{sub}</p>}
+      <p className="text-sm font-semibold text-[#7A7A90] mt-1">{label}</p>
+      {sub && <p className="text-sm text-[#404055] mt-2 leading-relaxed">{sub}</p>}
     </div>
   )
 }
