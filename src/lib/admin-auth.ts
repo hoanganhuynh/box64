@@ -7,6 +7,10 @@ function secret() {
   return process.env.ADMIN_SESSION_SECRET ?? 'dev-secret-please-set-in-env'
 }
 
+export function hashPassword(password: string): string {
+  return crypto.createHmac('sha256', secret()).update(password).digest('hex')
+}
+
 export function createToken(email: string): string {
   const payload = Buffer.from(email).toString('base64url')
   const sig = crypto.createHmac('sha256', secret()).update(payload).digest('base64url')

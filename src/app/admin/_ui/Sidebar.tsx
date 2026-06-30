@@ -11,6 +11,7 @@ import {
   Package,
   GridFour,
   CreditCard,
+  GearSix,
   SignOut,
   X,
   ArrowLineLeft,
@@ -37,6 +38,7 @@ const mainNav: NavItem[] = [
   { label: 'Sản phẩm',   href: '/admin/products',    icon: Package },
   { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
   { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
+  { label: 'Cài đặt',   href: '/admin/settings',    icon: GearSix },
 ]
 
 function NavLink({

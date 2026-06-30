@@ -1,17 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createToken, COOKIE_NAME, MAX_AGE } from '@/lib/admin-auth'
+import { createClient } from '@supabase/supabase-js'
+import { createToken, hashPassword, COOKIE_NAME, MAX_AGE } from '@/lib/admin-auth'
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? '')
   .split(',').map(e => e.trim()).filter(Boolean)
 
+function db() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } },
+  )
+}
+
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json() as { email: string; password: string }
 
-  const adminPassword = process.env.ADMIN_PASSWORD
-  const invalid = !ADMIN_EMAILS.includes(email) || !adminPassword || password !== adminPassword
+  if (!ADMIN_EMAILS.includes(email)) {
+    await new Promise(r => setTimeout(r, 300))
+    return NextResponse.json({ error: 'Email hoặc mật khẩu không đúng.' }, { status: 401 })
+  }
 
-  if (invalid) {
-    // Constant-time-ish response to avoid timing attacks
+  // Check DB password first, fall back to env var
+  let passwordOk = false
+  const { data } = await db().from('admin_settings').select('password_hash').eq('id', 1).single()
+  if (data?.password_hash) {
+    passwordOk = hashPassword(password) === data.password_hash
+  } else {
+    // Fallback: plain-text env var (initial setup before password is ever changed)
+    passwordOk = !!process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD
+  }
+
+  if (!passwordOk) {
     await new Promise(r => setTimeout(r, 300))
     return NextResponse.json({ error: 'Email hoặc mật khẩu không đúng.' }, { status: 401 })
   }
