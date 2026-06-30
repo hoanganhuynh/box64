@@ -230,8 +230,12 @@ function ProductModal({
           </Field>
 
           <Field label="Slug (URL)">
-            <input value={form.slug} onChange={e => set('slug', e.target.value)}
-              placeholder="lb-works-gtr-r35-nismo" className={INPUT} />
+            {isNew ? (
+              <input value={form.slug} onChange={e => set('slug', e.target.value)}
+                placeholder="lb-works-gtr-r35-nismo" className={INPUT} />
+            ) : (
+              <div className={INPUT + ' text-[#484858] cursor-not-allowed select-none'}>{form.slug}</div>
+            )}
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
@@ -309,23 +313,47 @@ function ProductModal({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Mã SKU">
-              <div className="flex gap-1.5">
-                <input value={form.sku ?? ''} placeholder="MGT-POR-911GTR-PK"
-                  onChange={e => set('sku', e.target.value.toUpperCase() || null)}
-                  className={INPUT + ' font-mono uppercase'} />
-                <button type="button" onClick={suggestSku}
-                  className="shrink-0 h-9 px-2.5 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors whitespace-nowrap">
-                  Gợi ý
-                </button>
-              </div>
+              {isNew ? (
+                <div className="flex gap-1.5">
+                  <input value={form.sku ?? ''} placeholder="MGT-POR-911GTR-PK"
+                    onChange={e => set('sku', e.target.value.toUpperCase() || null)}
+                    className={INPUT + ' font-mono uppercase'} />
+                  <button type="button" onClick={suggestSku}
+                    className="shrink-0 h-9 px-2.5 rounded-lg bg-[#1A1A22] border border-[#2A2A38] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors whitespace-nowrap">
+                    Gợi ý
+                  </button>
+                </div>
+              ) : (
+                <div className={INPUT + ' font-mono text-[#6366f1] cursor-not-allowed select-none'}>{form.sku ?? '—'}</div>
+              )}
             </Field>
             <Field label="Color group">
-              <input value={form.color_group ?? ''} placeholder="mini-gt-porsche-911-gt3r"
-                onChange={e => set('color_group', e.target.value || null)} className={INPUT} />
+              <div className={INPUT + ' text-[#484858] cursor-not-allowed select-none font-mono text-[13px]'}>{form.color_group ?? '—'}</div>
             </Field>
           </div>
 
           <Field label="Hình ảnh">
+            {/* Preview existing images */}
+            {(() => {
+              const urls = imagesText.split('\n').map(s => s.trim()).filter(Boolean)
+              return urls.length > 0 ? (
+                <div className="flex gap-2 flex-wrap mb-2">
+                  {urls.map((url, i) => (
+                    <div key={i} className="relative group/img">
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#1A1A22] border border-[#2A2A38]">
+                        <img src={url} alt={`Ảnh ${i + 1}`}
+                          className="w-full h-full object-cover" />
+                      </div>
+                      <button type="button"
+                        onClick={() => setImagesText(imagesText.split('\n').map(s => s.trim()).filter((s, j) => j !== i).join('\n'))}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                        <X size={10} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            })()}
             <label className={[
               'flex flex-col items-center justify-center gap-2 w-full h-24 rounded-lg border border-dashed cursor-pointer transition-colors select-none',
               uploading
