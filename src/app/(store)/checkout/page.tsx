@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
 
   // Address system toggle
   const [addressType, setAddressType] = useState<'new' | 'old'>('new')
@@ -221,7 +222,7 @@ export default function CheckoutPage() {
       undefined,
       0,
       shippingFee,
-      'payos',
+      'transfer',
     )
 
     if (!result.success) {
@@ -230,47 +231,16 @@ export default function CheckoutPage() {
       return
     }
 
-    const total = subtotal + shippingFee
-    const orderId = result.orderId!
-
-    // Store before redirect so success page can read it when PayOS returns
     sessionStorage.setItem('lastOrder', JSON.stringify({
-      orderId,
+      orderId: result.orderId,
       items,
       shippingFee,
-      amount: total,
-      paymentMethod: 'payos',
+      amount: subtotal + shippingFee,
+      paymentMethod: 'transfer',
       customerName: form.name,
     }))
     clearCart()
-
-    // Create PayOS payment link → redirect to PayOS QR page
-    try {
-      const res = await fetch('/api/payos/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId,
-          amount: total,
-          description: form.name
-            .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D')
-            .toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().split(' ').slice(-1)[0]
-            + ' ' + orderId.slice(-6),
-          items: items.map(i => ({
-            name: i.product_name.slice(0, 50),
-            quantity: i.quantity,
-            price: i.unit_price,
-          })),
-        }),
-      })
-      const json = await res.json() as { checkoutUrl?: string; error?: string }
-      if (!res.ok || !json.checkoutUrl) throw new Error(json.error ?? 'PayOS error')
-      window.location.href = json.checkoutUrl
-    } catch (e: unknown) {
-      // PayOS failed — fall back to success page (manual transfer)
-      setLoading(false)
-      router.push(`/checkout/success?order=${orderId}`)
-    }
+    router.push(`/checkout/success?order=${result.orderId}`)
   }
 
   // Wait for mount + auth check (redirect to login happens in the effect).
@@ -295,7 +265,7 @@ export default function CheckoutPage() {
         <h1 className="font-jakarta font-extrabold text-primary text-2xl sm:text-3xl">Checkout</h1>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
           {/* ── Left: Shipping form (3/5) ── */}
@@ -552,7 +522,7 @@ export default function CheckoutPage() {
                 disabled={loading}
                 className="w-full h-12 rounded-lg bg-gold text-[#07070C] font-bold text-sm flex items-center justify-center gap-2 hover:bg-gold/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? 'Đang xử lý…' : <>Đặt hàng & Thanh toán QR <ArrowRight size={15} /></>}
+                {loading ? 'Đang xử lý…' : <>Đặt hàng & Thanh toán <ArrowRight size={15} /></>}
               </button>
 
               <p className="text-[10px] text-faint text-center mt-3 leading-relaxed">
