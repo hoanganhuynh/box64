@@ -25,6 +25,7 @@ export interface ProductRow {
   images: string[]
   stock: number
   status: string
+  published: boolean
   description: string | null
   tags: string[]
   material: string | null
@@ -79,6 +80,14 @@ export async function deleteProduct(id: string): Promise<void> {
   const { error } = await db()
     .from('products')
     .delete()
+    .eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function setPublished(id: string, published: boolean): Promise<void> {
+  const { error } = await db()
+    .from('products')
+    .update({ published })
     .eq('id', id)
   if (error) throw new Error(error.message)
 }

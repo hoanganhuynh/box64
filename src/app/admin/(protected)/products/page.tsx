@@ -1,10 +1,10 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, FileDown, FileUp, CheckCircle2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, FileDown, FileUp, CheckCircle2, Copy, Search } from 'lucide-react'
 import BrandLogo from '@/components/ui/BrandLogo'
 import {
-  getProducts, upsertProduct, deleteProduct,
+  getProducts, upsertProduct, deleteProduct, setPublished,
   type ProductRow,
 } from './actions'
 
@@ -64,7 +64,7 @@ function nanoid(len = 6) { return Math.random().toString(36).slice(2, 2 + len) }
 
 const BLANK: Omit<ProductRow, 'created_at'> = {
   id: '', type: 'box_custom', name: '', slug: '', price: 89000,
-  images: [], stock: 999, status: 'active',
+  images: [], stock: 999, status: 'active', published: true,
   description: null, tags: [], material: null, brand: null,
   sku: null, manufacturer: null, car_make: null, car_model: null,
   color: null, color_group: null,
@@ -542,6 +542,7 @@ export default function ProductsPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
+  const [search, setSearch] = useState('')
 
   async function load() {
     setLoading(true); setError('')
@@ -578,10 +579,36 @@ export default function ProductsPage() {
     finally { setDeleting(false) }
   }
 
+  async function handleDuplicate(p: ProductRow) {
+    const newId = `fb-${nanoid()}`
+    const { created_at: _, ...rest } = p
+    void _
+    await upsertProduct({
+      ...rest,
+      id: newId,
+      name: `${p.name} Copy`,
+      slug: `${p.slug}-copy`,
+      published: false,
+    })
+    startTransition(load)
+  }
+
+  async function handleTogglePublished(p: ProductRow) {
+    setProducts(prev => prev.map(x => x.id === p.id ? { ...x, published: !x.published } : x))
+    await setPublished(p.id, !p.published)
+  }
+
+  const filtered = search.trim()
+    ? products.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.sku ?? '').toLowerCase().includes(search.toLowerCase())
+      )
+    : products
+
   return (
     <div className="p-6 lg:p-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="shrink-0">
           <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Sản phẩm</h1>
           <p className="text-sm text-[#484858] mt-1">{products.length} sản phẩm</p>
         </div>
@@ -595,6 +622,16 @@ export default function ProductsPage() {
             <Plus size={15} /> Thêm sản phẩm
           </button>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4 relative">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484858] pointer-events-none" />
+        <input
+          value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Tìm theo tên hoặc SKU…"
+          className="w-full sm:w-80 h-9 pl-9 pr-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors"
+        />
       </div>
 
       {error && (
@@ -624,11 +661,12 @@ export default function ProductsPage() {
                   <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Giá</th>
                   <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Kho</th>
                   <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Trạng thái</th>
-                  <th className="px-4 py-3 w-20" />
+                  <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Hiển thị</th>
+                  <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1A1A22]">
-                {products.map(p => (
+                {filtered.map(p => (
                   <tr key={p.id} className="hover:bg-[#16161E] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -660,13 +698,27 @@ export default function ProductsPage() {
                         {STATUS_LABEL[p.status] ?? p.status}
                       </span>
                     </td>
+                    {/* Published toggle */}
+                    <td className="px-4 py-4 text-center">
+                      <button
+                        onClick={() => handleTogglePublished(p)}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${p.published ? 'bg-emerald-500' : 'bg-[#2A2A38]'}`}
+                      >
+                        <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${p.published ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      </button>
+                    </td>
+                    {/* Actions */}
                     <td className="px-4 py-4">
-                      <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEdit(p)}
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openEdit(p)} title="Chỉnh sửa"
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
                           <Pencil size={13} />
                         </button>
-                        <button onClick={() => setDeleteTarget(p)}
+                        <button onClick={() => handleDuplicate(p)} title="Nhân bản"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+                          <Copy size={13} />
+                        </button>
+                        <button onClick={() => setDeleteTarget(p)} title="Xoá"
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-red-400 hover:bg-red-500/10 transition-colors">
                           <Trash2 size={13} />
                         </button>
