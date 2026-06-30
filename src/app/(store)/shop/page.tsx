@@ -1,11 +1,13 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { DUMMY_PRODUCTS } from '@/lib/data/products'
+import { getAllProducts } from '@/lib/storefront/products'
 import ProductGrid from '@/components/shop/ProductGrid'
 import FilterTabs from '@/components/shop/FilterTabs'
 import SaleBanner from '@/components/shop/SaleBanner'
 import SortSelect from '@/components/shop/SortSelect'
 import type { Product } from '@/lib/types'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Shop — figbox.store | Custom 1:64 MiniGT Diecast Boxes',
@@ -63,11 +65,12 @@ interface PageProps {
 
 export default async function ShopPage({ searchParams }: PageProps) {
   const { type = '', brand = '', sort = '' } = await searchParams
-  const filtered = filterProducts(DUMMY_PRODUCTS, type, brand)
+  const allProducts = await getAllProducts()
+  const filtered = filterProducts(allProducts, type, brand)
   const products = sortProducts(filtered, sort)
 
-  const hasFlashSale = DUMMY_PRODUCTS.some(p =>
-    p.promotion?.type === 'flash_sale' && new Date(p.promotion.ends_at) > new Date()
+  const hasFlashSale = allProducts.some(p =>
+    p.promotion?.type === 'flash_sale' && new Date(p.promotion.ends_at!) > new Date()
   )
 
   const heading = TAB_LABELS[type] ?? 'Shop'

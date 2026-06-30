@@ -2,11 +2,15 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast, InfoCircle } from 'iconsax-react'
-import { getProductBySlug, getDiscountedPrice, getRelatedProducts, getColorVariants, DUMMY_PRODUCTS } from '@/lib/data/products'
+import { getDiscountedPrice } from '@/lib/data/products'
+import {
+  getProductBySlug,
+  getAllProducts,
+  getRelatedProducts,
+  getColorVariants,
+} from '@/lib/storefront/products'
 
-export function generateStaticParams() {
-  return DUMMY_PRODUCTS.map(p => ({ slug: p.slug }))
-}
+export const dynamic = 'force-dynamic'
 import { formatVND } from '@/lib/utils/format'
 import { getProductReviews } from '@/lib/data/reviews'
 import { JsonLd } from '@/components/ui/JsonLd'
@@ -27,7 +31,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  const product = await getProductBySlug(slug)
   if (!product) return {}
   const desc = product.description ?? `Custom MiniGT box for ${product.name}. 350gsm matte print, laser-cut, hand-folded. Nationwide delivery.`
   return {
@@ -46,18 +50,18 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  const [product, allProducts] = await Promise.all([getProductBySlug(slug), getAllProducts()])
   if (!product) notFound()
 
   const promo = product.promotion
-  const isActive = promo && new Date(promo.ends_at) > new Date()
+  const isActive = promo && new Date(promo.ends_at!) > new Date()
   const salePrice = getDiscountedPrice(product)
   const isPreOrder = product.status === 'pre_order'
   const isOutOfStock = product.stock === 0 && !isPreOrder
 
-  const related = getRelatedProducts(product, 4)
+  const related = getRelatedProducts(product, allProducts, 4)
   const reviews = getProductReviews(product.slug)
-  const colorVariants = getColorVariants(product)
+  const colorVariants = getColorVariants(product, allProducts)
 const availabilityMap: Record<string, string> = {
     active: 'https://schema.org/InStock',
     pre_order: 'https://schema.org/PreOrder',

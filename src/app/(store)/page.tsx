@@ -4,10 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight2 } from 'iconsax-react'
 import SampleRequestForm from '@/components/layout/SampleRequestForm'
-import {
-  BESTSELLERS, NEW_ARRIVALS,
-  getPreOrderProducts,
-} from '@/lib/data/products'
+import { getAllProducts } from '@/lib/storefront/products'
+
+export const dynamic = 'force-dynamic'
 import ProductCard from '@/components/shop/ProductCard'
 import FlashSaleSection from '@/components/home/FlashSaleSection'
 import ReviewsStrip from '@/components/home/ReviewsStrip'
@@ -31,9 +30,11 @@ export const metadata: Metadata = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function HomePage() {
-  const preOrders = getPreOrderProducts()
-  const preOrderItem = preOrders[0]
+export default async function HomePage() {
+  const allProducts = await getAllProducts()
+  const bestsellers = allProducts.filter(p => p.tags?.includes('bestseller'))
+  const newArrivals = allProducts.filter(p => p.tags?.includes('new'))
+  const preOrderItem = allProducts.find(p => p.status === 'pre_order')
 
   return (
     <>
@@ -129,7 +130,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-            {BESTSELLERS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} variant="light" />)}
+            {bestsellers.slice(0, 4).map(p => <ProductCard key={p.id} product={p} variant="light" />)}
           </div>
         </div>
       </section>
@@ -174,7 +175,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-            {NEW_ARRIVALS.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
+            {newArrivals.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>
       </section>
