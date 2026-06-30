@@ -1,126 +1,367 @@
 'use client'
-import { useState } from 'react'
-import { Search } from 'lucide-react'
-import { DUMMY_PRODUCTS } from '@/lib/data/products'
-import type { ProductType } from '@/lib/types'
+import { useState, useEffect, useTransition, useRef } from 'react'
+import { Plus, Search, Pencil, Trash2, X } from 'lucide-react'
+import { nanoid } from 'nanoid'
+import {
+  getCategories, upsertCategory, deleteCategory,
+  type CategoryRow,
+} from './actions'
 
-const CATEGORIES: { type: ProductType; label: string; desc: string; color: string }[] = [
-  { type: 'box_catalog', label: 'Box Catalog',   desc: 'Template MiniGT có sẵn',    color: '#6366f1' },
-  { type: 'box_custom',  label: 'Box Custom',    desc: 'Thiết kế theo yêu cầu',     color: '#F0A500' },
-  { type: 'water_decal', label: 'Water Decal',   desc: 'Decal dán nước trang trí',  color: '#22c55e' },
-  { type: 'accessory_3d',label: 'Phụ kiện 3D',  desc: 'Phụ kiện in 3D cho xe',     color: '#e54c10' },
+const PRESET_COLORS = [
+  '#6366f1', '#F0A500', '#22c55e', '#e54c10',
+  '#3b82f6', '#ec4899', '#8b5cf6', '#14b8a6',
 ]
 
-function vnd(n: number) {
-  return new Intl.NumberFormat('vi-VN').format(n) + ' ₫'
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
+}
+
+function relDate(iso: string) {
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)
+  if (d === 0) return 'Hôm nay'
+  if (d === 1) return 'Hôm qua'
+  if (d < 30) return `${d} ngày trước`
+  return `${Math.floor(d / 30)} tháng trước`
+}
+
+const BLANK: Omit<CategoryRow, 'created_at'> = {
+  id: '',
+  slug: '',
+  name: '',
+  description: '',
+  color: '#6366f1',
+  sort_order: 0,
+}
+
+interface ModalProps {
+  initial: Omit<CategoryRow, 'created_at'>
+  isNew: boolean
+  onSave: (row: Omit<CategoryRow, 'created_at'>) => void
+  onClose: () => void
+  saving: boolean
+}
+
+function CategoryModal({ initial, isNew, onSave, onClose, saving }: ModalProps) {
+  const [form, setForm] = useState(initial)
+  const [autoSlug, setAutoSlug] = useState(isNew)
+
+  function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
+    setForm(f => ({ ...f, [k]: v }))
+    if (k === 'name' && autoSlug) {
+      setForm(f => ({ ...f, name: v as string, slug: slugify(v as string) }))
+    }
+  }
+
+  function handleSlugChange(v: string) {
+    setAutoSlug(false)
+    setForm(f => ({ ...f, slug: v }))
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.name.trim() || !form.slug.trim()) return
+    onSave(form)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-[#0D0D14] border border-[#1E1E28] rounded-2xl shadow-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A1A22]">
+          <h2 className="font-semibold text-[#EEEEF4] text-base">
+            {isNew ? 'Thêm danh mục' : 'Chỉnh sửa danh mục'}
+          </h2>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+            <X size={14} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Name */}
+          <div>
+            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Tên danh mục *</label>
+            <input
+              value={form.name} onChange={e => set('name', e.target.value)}
+              required placeholder="Box Catalog"
+              className="w-full h-9 px-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors"
+            />
+          </div>
+
+          {/* Slug */}
+          <div>
+            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Slug *</label>
+            <input
+              value={form.slug} onChange={e => handleSlugChange(e.target.value)}
+              required placeholder="box_catalog"
+              className="w-full h-9 px-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors font-mono"
+            />
+            <p className="text-[10px] text-[#383848] mt-1">Dùng làm giá trị type của sản phẩm.</p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Mô tả</label>
+            <input
+              value={form.description ?? ''} onChange={e => set('description', e.target.value)}
+              placeholder="Mô tả ngắn về danh mục"
+              className="w-full h-9 px-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors"
+            />
+          </div>
+
+          {/* Color */}
+          <div>
+            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Màu</label>
+            <div className="flex items-center gap-2 flex-wrap">
+              {PRESET_COLORS.map(c => (
+                <button key={c} type="button" onClick={() => set('color', c)}
+                  className={`w-6 h-6 rounded-full transition-all ${form.color === c ? 'ring-2 ring-offset-2 ring-offset-[#0D0D14] ring-white scale-110' : 'opacity-70 hover:opacity-100'}`}
+                  style={{ background: c }}
+                />
+              ))}
+              <input type="color" value={form.color}
+                onChange={e => set('color', e.target.value)}
+                className="w-6 h-6 rounded-full cursor-pointer border-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full"
+              />
+            </div>
+          </div>
+
+          {/* Sort order */}
+          <div>
+            <label className="block text-xs font-medium text-[#7A7A90] mb-1.5">Thứ tự</label>
+            <input
+              type="number" min={0}
+              value={form.sort_order} onChange={e => set('sort_order', Number(e.target.value))}
+              className="w-24 h-9 px-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] focus:outline-none focus:border-[#6366f1]/60 transition-colors"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <button type="button" onClick={onClose}
+              className="h-9 px-4 rounded-xl border border-[#1E1E28] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors">
+              Huỷ
+            </button>
+            <button type="submit" disabled={saving}
+              className="h-9 px-5 rounded-xl bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] disabled:opacity-50 transition-colors">
+              {saving ? 'Đang lưu…' : 'Lưu'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 export default function CategoriesPage() {
+  const [categories, setCategories] = useState<CategoryRow[]>([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [modal, setModal] = useState<'create' | 'edit' | null>(null)
+  const [editing, setEditing] = useState<Omit<CategoryRow, 'created_at'>>(BLANK)
+  const [saving, setSaving] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<CategoryRow | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [, startTransition] = useTransition()
 
-  const byType = Object.fromEntries(
-    CATEGORIES.map(c => {
-      const all = DUMMY_PRODUCTS.filter(p => p.type === c.type)
-      const filtered = search.trim()
-        ? all.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
-        : all
-      return [c.type, { all, filtered }]
-    })
-  )
+  async function load() {
+    try {
+      setCategories(await getCategories())
+    } catch {
+      // table not created yet — show empty
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  function openCreate() {
+    setEditing({ ...BLANK, id: nanoid() })
+    setModal('create')
+  }
+
+  function openEdit(c: CategoryRow) {
+    const { created_at: _, ...rest } = c
+    void _
+    setEditing(rest)
+    setModal('edit')
+  }
+
+  async function handleSave(row: Omit<CategoryRow, 'created_at'>) {
+    setSaving(true)
+    try {
+      await upsertCategory(row)
+      setModal(null)
+      startTransition(load)
+    } catch (e: unknown) {
+      alert((e as Error).message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
+    try {
+      await deleteCategory(deleteTarget.id)
+      setDeleteTarget(null)
+      startTransition(load)
+    } catch (e: unknown) {
+      alert((e as Error).message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const filtered = search.trim()
+    ? categories.filter(c =>
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.slug.toLowerCase().includes(search.toLowerCase())
+      )
+    : categories
 
   return (
     <div className="p-6 lg:p-8">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
+      {/* Header */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="shrink-0">
           <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Danh mục</h1>
-          <p className="text-sm text-[#484858] mt-1">{CATEGORIES.length} danh mục sản phẩm</p>
+          <p className="text-sm text-[#484858] mt-1">{categories.length} danh mục</p>
         </div>
+        <button onClick={openCreate}
+          className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors">
+          <Plus size={15} /> Thêm danh mục
+        </button>
       </div>
 
       {/* Search */}
-      <div className="mb-6 relative">
+      <div className="mb-4 relative">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484858] pointer-events-none" />
         <input
           value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Tìm sản phẩm trong danh mục…"
+          placeholder="Tìm danh mục…"
           className="w-full sm:w-80 h-9 pl-9 pr-3 bg-[#111118] border border-[#1E1E28] rounded-xl text-sm text-[#EEEEF4] placeholder-[#383848] focus:outline-none focus:border-[#6366f1]/60 transition-colors"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        {CATEGORIES.map(cat => {
-          const { all, filtered } = byType[cat.type]
-          const totalStock = all.reduce((s, p) => s + p.stock, 0)
-          const avgPrice = all.length > 0
-            ? Math.round(all.reduce((s, p) => s + p.price, 0) / all.length)
-            : 0
-
-          return (
-            <div key={cat.type} className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: cat.color + '18' }}>
-                  <span className="text-lg font-black" style={{ color: cat.color }}>
-                    {cat.label.charAt(0)}
-                  </span>
-                </div>
-                <span className="text-2xl font-black text-[#EEEEF4] tabular-nums">{all.length}</span>
-              </div>
-              <h3 className="font-semibold text-[#EEEEF4] text-base">{cat.label}</h3>
-              <p className="text-xs text-[#484858] mt-1 mb-4">{cat.desc}</p>
-              {all.length > 0 ? (
-                <div className="flex items-center gap-4 pt-4 border-t border-[#1A1A22]">
-                  <div>
-                    <p className="text-[10px] text-[#383848] uppercase tracking-wide">Giá TB</p>
-                    <p className="text-sm font-semibold text-[#EEEEF4] tabular-nums mt-0.5">{vnd(avgPrice)}</p>
-                  </div>
-                  <div className="h-8 w-px bg-[#1A1A22]" />
-                  <div>
-                    <p className="text-[10px] text-[#383848] uppercase tracking-wide">Tồn kho</p>
-                    <p className="text-sm font-semibold text-[#EEEEF4] tabular-nums mt-0.5">
-                      {totalStock >= 999 * all.length ? '∞' : totalStock}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="pt-4 border-t border-[#1A1A22]">
-                  <span className="text-xs text-[#2A2A38]">Chưa có sản phẩm</span>
-                </div>
-              )}
-            </div>
-          )
-        })}
+      {/* Table */}
+      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden">
+        {loading ? (
+          <div className="py-20 text-center text-sm text-[#484858]">Đang tải…</div>
+        ) : filtered.length === 0 ? (
+          <div className="py-20 text-center">
+            <p className="text-sm text-[#484858] mb-3">
+              {search ? 'Không tìm thấy kết quả.' : 'Chưa có danh mục nào.'}
+            </p>
+            {!search && (
+              <button onClick={openCreate}
+                className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-xs font-semibold hover:bg-[#5558e6] transition-colors">
+                <Plus size={13} /> Thêm danh mục đầu tiên
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#1A1A22]">
+                  <th className="text-left px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Danh mục</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Slug</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Mô tả</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Thứ tự</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Ngày tạo</th>
+                  <th className="px-4 py-3 w-20" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1A1A22]">
+                {filtered.map(c => (
+                  <tr key={c.id} className="hover:bg-[#16161E] transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ background: c.color + '20' }}>
+                          <span className="text-sm font-black" style={{ color: c.color }}>
+                            {c.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#EEEEF4]">{c.name}</p>
+                          {c.description && (
+                            <p className="text-[11px] text-[#484858] mt-0.5 line-clamp-1 md:hidden">{c.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 hidden md:table-cell">
+                      <span className="font-mono text-[11px] text-[#7A7A90] bg-[#1A1A22] px-1.5 py-0.5 rounded">{c.slug}</span>
+                    </td>
+                    <td className="px-4 py-4 hidden lg:table-cell">
+                      <span className="text-xs text-[#484858] line-clamp-1">{c.description ?? '—'}</span>
+                    </td>
+                    <td className="px-4 py-4 text-right hidden md:table-cell">
+                      <span className="text-xs text-[#7A7A90] tabular-nums">{c.sort_order}</span>
+                    </td>
+                    <td className="px-4 py-4 text-right hidden lg:table-cell">
+                      <span className="text-[11px] text-[#383848]">{relDate(c.created_at)}</span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openEdit(c)} title="Chỉnh sửa"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+                          <Pencil size={13} />
+                        </button>
+                        <button onClick={() => setDeleteTarget(c)} title="Xoá"
+                          className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {CATEGORIES.filter(c => byType[c.type].filtered.length > 0).map(cat => {
-        const { filtered } = byType[cat.type]
-        return (
-          <div key={cat.type} className="bg-[#111118] border border-[#1E1E28] rounded-2xl overflow-hidden mb-4">
-            <div className="px-6 py-4 border-b border-[#1A1A22] flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
-              <p className="text-sm font-semibold text-[#EEEEF4]">{cat.label}</p>
-              <span className="text-xs text-[#484858]">— {filtered.length} sản phẩm</span>
+      {/* Create / Edit modal */}
+      {modal && (
+        <CategoryModal
+          initial={editing}
+          isNew={modal === 'create'}
+          onSave={handleSave}
+          onClose={() => setModal(null)}
+          saving={saving}
+        />
+      )}
+
+      {/* Delete confirm */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteTarget(null)} />
+          <div className="relative w-full max-w-sm bg-[#0D0D14] border border-[#1E1E28] rounded-2xl shadow-2xl p-6 space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center mx-auto">
+              <Trash2 size={18} className="text-red-400" />
             </div>
-            <div className="divide-y divide-[#1A1A22]">
-              {filtered.map(p => (
-                <div key={p.id} className="px-6 py-3 flex items-center gap-3 hover:bg-[#16161E] transition-colors">
-                  <p className="flex-1 text-sm text-[#EEEEF4] line-clamp-1">{p.name}</p>
-                  <span className="text-xs font-semibold text-[#7A7A90] tabular-nums shrink-0">
-                    {new Intl.NumberFormat('vi-VN').format(p.price)} ₫
-                  </span>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
-                    p.status === 'active' ? 'text-emerald-400 bg-emerald-500/10' :
-                    p.status === 'pre_order' ? 'text-blue-400 bg-blue-500/10' :
-                    'text-red-400 bg-red-500/10'
-                  }`}>
-                    {p.status === 'active' ? 'Đang bán' : p.status === 'pre_order' ? 'Pre-order' : 'Hết hàng'}
-                  </span>
-                </div>
-              ))}
+            <div className="text-center">
+              <p className="font-semibold text-[#EEEEF4]">Xoá danh mục?</p>
+              <p className="text-sm text-[#484858] mt-1">
+                <span className="text-[#EEEEF4]">{deleteTarget.name}</span> sẽ bị xoá vĩnh viễn.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setDeleteTarget(null)}
+                className="flex-1 h-9 rounded-xl border border-[#1E1E28] text-sm text-[#7A7A90] hover:text-[#EEEEF4] transition-colors">
+                Huỷ
+              </button>
+              <button onClick={handleDelete} disabled={deleting}
+                className="flex-1 h-9 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 disabled:opacity-50 transition-colors">
+                {deleting ? 'Đang xoá…' : 'Xoá'}
+              </button>
             </div>
           </div>
-        )
-      })}
+        </div>
+      )}
     </div>
   )
 }

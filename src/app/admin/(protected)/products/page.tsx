@@ -614,7 +614,7 @@ export default function ProductsPage() {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setImportOpen(true)}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-xl border border-[#1E1E28] bg-[#111118] text-[#7A7A90] text-sm font-medium hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors">
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-xl border border-[#2A2A38] bg-[#111118] text-[#EEEEF4] text-sm font-semibold hover:bg-[#1A1A22] hover:border-[#3A3A4A] transition-colors">
             <FileUp size={15} /> Import CSV
           </button>
           <button onClick={openCreate}
@@ -658,10 +658,12 @@ export default function ProductsPage() {
                 <tr className="border-b border-[#1A1A22]">
                   <th className="text-left px-6 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</th>
                   <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Loại</th>
+                  <th className="text-left px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">SKU</th>
                   <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Giá</th>
                   <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Kho</th>
                   <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Trạng thái</th>
                   <th className="text-center px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide">Hiển thị</th>
+                  <th className="text-right px-4 py-3 text-[11px] font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">Cập nhật</th>
                   <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
@@ -687,6 +689,12 @@ export default function ProductsPage() {
                         {TYPE_OPTIONS.find(o => o.value === p.type)?.label ?? p.type}
                       </span>
                     </td>
+                    <td className="px-4 py-4 hidden xl:table-cell">
+                      {p.sku
+                        ? <span className="font-mono text-[11px] text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">{p.sku}</span>
+                        : <span className="text-[#2A2A38] text-xs">—</span>
+                      }
+                    </td>
                     <td className="px-4 py-4 text-right font-semibold text-[#EEEEF4] tabular-nums whitespace-nowrap">
                       {vnd(p.price)}
                     </td>
@@ -706,6 +714,14 @@ export default function ProductsPage() {
                       >
                         <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${p.published ? 'translate-x-4' : 'translate-x-0.5'}`} />
                       </button>
+                    </td>
+                    {/* Updated at */}
+                    <td className="px-4 py-4 text-right hidden xl:table-cell">
+                      <span className="text-[11px] text-[#383848]">
+                        {(p.updated_at ?? p.created_at)
+                          ? new Date(p.updated_at ?? p.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: '2-digit' })
+                          : '—'}
+                      </span>
                     </td>
                     {/* Actions */}
                     <td className="px-4 py-4">

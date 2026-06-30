@@ -31,6 +31,7 @@ export interface ProductRow {
   material: string | null
   brand: string | null
   created_at: string
+  updated_at?: string | null
 }
 
 export async function getProducts(): Promise<ProductRow[]> {
