@@ -8,6 +8,36 @@ import {
   type ProductRow,
 } from './actions'
 
+// ─── SortTh ──────────────────────────────────────────────────────────────────
+
+type SortDir = 'asc' | 'desc'
+function SortTh({
+  label, field, sort, onSort, className = '',
+}: {
+  label: string
+  field: string
+  sort: { field: string; dir: SortDir }
+  onSort: (f: string) => void
+  className?: string
+}) {
+  const active = sort.field === field
+  return (
+    <th
+      onClick={() => onSort(field)}
+      className={`select-none cursor-pointer py-3 px-4 text-sm font-semibold uppercase tracking-wide transition-colors ${
+        active ? 'text-[#EEEEF4]' : 'text-[#484858] hover:text-[#7A7A90]'
+      } ${className}`}
+    >
+      <span className="inline-flex items-center gap-1">
+        {label}
+        <span className={`text-[10px] ${active ? 'opacity-100' : 'opacity-30'}`}>
+          {active && sort.dir === 'desc' ? '▼' : '▲'}
+        </span>
+      </span>
+    </th>
+  )
+}
+
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 
 function Tip({ label, children }: { label: string; children: React.ReactNode }) {
@@ -62,6 +92,12 @@ const STATUS_COLOR: Record<string, string> = {
 }
 const STATUS_LABEL: Record<string, string> = {
   active: 'Đang bán', pre_order: 'Pre-order', out_of_stock: 'Hết hàng',
+}
+const TYPE_COLOR: Record<string, { text: string; bg: string }> = {
+  box_custom:   { text: '#F0A500', bg: '#F0A500' },
+  box_catalog:  { text: '#6366f1', bg: '#6366f1' },
+  water_decal:  { text: '#22c55e', bg: '#22c55e' },
+  accessory_3d: { text: '#e54c10', bg: '#e54c10' },
 }
 
 function vnd(n: number) { return new Intl.NumberFormat('vi-VN').format(n) + ' ₫' }
@@ -558,6 +594,13 @@ export default function ProductsPage() {
   const [deleting, setDeleting] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<{ field: string; dir: SortDir }>({ field: 'created_at', dir: 'desc' })
+
+  function toggleSort(field: string) {
+    setSort(s => s.field === field
+      ? { field, dir: s.dir === 'asc' ? 'desc' : 'asc' }
+      : { field, dir: 'asc' })
+  }
 
   async function load() {
     setLoading(true); setError('')
@@ -613,12 +656,24 @@ export default function ProductsPage() {
     await setPublished(p.id, !p.published)
   }
 
-  const filtered = search.trim()
-    ? products.filter(p =>
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        (p.sku ?? '').toLowerCase().includes(search.toLowerCase())
-      )
-    : products
+  const filtered = (() => {
+    const base = search.trim()
+      ? products.filter(p =>
+          p.name.toLowerCase().includes(search.toLowerCase()) ||
+          (p.sku ?? '').toLowerCase().includes(search.toLowerCase())
+        )
+      : [...products]
+    const { field, dir } = sort
+    base.sort((a, b) => {
+      const av = (a as unknown as Record<string, unknown>)[field]
+      const bv = (b as unknown as Record<string, unknown>)[field]
+      const cmp =
+        typeof av === 'number' && typeof bv === 'number' ? av - bv
+        : String(av ?? '').localeCompare(String(bv ?? ''), 'vi')
+      return dir === 'asc' ? cmp : -cmp
+    })
+    return base
+  })()
 
   return (
     <div className="p-6 lg:p-8">
@@ -671,14 +726,14 @@ export default function ProductsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#1A1A22]">
-                  <th className="text-left px-6 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Sản phẩm</th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden md:table-cell">Loại</th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">SKU</th>
-                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Giá</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden lg:table-cell">Kho</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Trạng thái</th>
+                  <SortTh label="Sản phẩm" field="name" sort={sort} onSort={toggleSort} className="text-left px-6" />
+                  <SortTh label="Loại" field="type" sort={sort} onSort={toggleSort} className="text-left hidden md:table-cell" />
+                  <SortTh label="SKU" field="sku" sort={sort} onSort={toggleSort} className="text-left hidden xl:table-cell" />
+                  <SortTh label="Giá" field="price" sort={sort} onSort={toggleSort} className="text-right" />
+                  <SortTh label="Kho" field="stock" sort={sort} onSort={toggleSort} className="text-center hidden lg:table-cell" />
+                  <SortTh label="Trạng thái" field="status" sort={sort} onSort={toggleSort} className="text-center" />
                   <th className="text-center px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide">Hiển thị</th>
-                  <th className="text-right px-4 py-3 text-sm font-semibold text-[#484858] uppercase tracking-wide hidden xl:table-cell">Cập nhật</th>
+                  <SortTh label="Cập nhật" field="updated_at" sort={sort} onSort={toggleSort} className="text-right hidden xl:table-cell" />
                   <th className="px-4 py-3 w-24" />
                 </tr>
               </thead>
@@ -700,9 +755,15 @@ export default function ProductsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-4 hidden md:table-cell">
-                      <span className="text-sm text-[#7A7A90] bg-[#1A1A22] px-2 py-1 rounded-md">
-                        {TYPE_OPTIONS.find(o => o.value === p.type)?.label ?? p.type}
-                      </span>
+                      {(() => {
+                        const c = TYPE_COLOR[p.type]
+                        return (
+                          <span className="text-sm font-medium px-2.5 py-1 rounded-lg"
+                            style={c ? { color: c.text, background: c.bg + '18' } : { color: '#7A7A90', background: '#1A1A2218' }}>
+                            {TYPE_OPTIONS.find(o => o.value === p.type)?.label ?? p.type}
+                          </span>
+                        )
+                      })()}
                     </td>
                     <td className="px-4 py-4 hidden xl:table-cell">
                       {p.sku
