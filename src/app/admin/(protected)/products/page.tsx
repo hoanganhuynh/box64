@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, FileDown, FileUp, CheckCircle2, Copy, Search } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, Eye, FileDown, FileUp, CheckCircle2, Copy, Search } from 'lucide-react'
 import BrandLogo from '@/components/ui/BrandLogo'
 import {
   getProducts, upsertProduct, deleteProduct, setPublished,
@@ -908,6 +908,12 @@ export default function ProductsPage() {
                     {/* Actions */}
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Tip label="Xem trên web">
+                          <a href={`/shop/${p.slug}`} target="_blank" rel="noopener noreferrer"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
+                            <Eye size={13} />
+                          </a>
+                        </Tip>
                         <Tip label="Chỉnh sửa">
                           <button onClick={() => openEdit(p)}
                             className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-[#1A1A22] transition-colors">
