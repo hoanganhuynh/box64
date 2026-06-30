@@ -88,14 +88,14 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 // ─── Add/Edit Modal ───────────────────────────────────────────────────────────
 
 function ProductModal({
-  initial, onClose, onSave, saving,
+  initial, onClose, onSave, saving, isNew,
 }: {
   initial: Omit<ProductRow, 'created_at'>
   onClose: () => void
   onSave: (row: Omit<ProductRow, 'created_at'>) => void
   saving: boolean
+  isNew: boolean
 }) {
-  const isNew = !initial.id
   const [form, setForm] = useState<Omit<ProductRow, 'created_at'>>({
     ...initial,
     id: initial.id || `fb-${nanoid()}`,
@@ -304,7 +304,7 @@ function ProductModal({
             </button>
             <button type="submit" disabled={saving}
               className="h-9 px-5 rounded-lg text-sm font-semibold bg-[#6366f1] text-white hover:bg-[#5558e6] disabled:opacity-50 transition-colors">
-              {saving ? 'Đang lưu…' : isNew ? 'Thêm sản phẩm' : 'Lưu thay đổi'}
+              {saving ? 'Đang lưu…' : isNew ? 'Lưu' : 'Lưu'}
             </button>
           </div>
         </form>
@@ -681,7 +681,7 @@ export default function ProductsPage() {
       </div>
 
       {(modal === 'create' || modal === 'edit') && (
-        <ProductModal initial={editing} onClose={() => setModal(null)} onSave={handleSave} saving={saving} />
+        <ProductModal initial={editing} onClose={() => setModal(null)} onSave={handleSave} saving={saving} isNew={modal === 'create'} />
       )}
       {deleteTarget && (
         <DeleteConfirm name={deleteTarget.name} onCancel={() => setDeleteTarget(null)}
