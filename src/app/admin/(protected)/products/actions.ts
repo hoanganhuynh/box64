@@ -92,3 +92,25 @@ export async function setPublished(id: string, published: boolean): Promise<void
     .eq('id', id)
   if (error) throw new Error(error.message)
 }
+
+// ─── Bulk actions ─────────────────────────────────────────────────────────────
+
+export async function bulkDelete(ids: string[]): Promise<void> {
+  const { error } = await db().from('products').delete().in('id', ids)
+  if (error) throw new Error(error.message)
+}
+
+export async function bulkSetPublished(ids: string[], published: boolean): Promise<void> {
+  const { error } = await db().from('products').update({ published }).in('id', ids)
+  if (error) throw new Error(error.message)
+}
+
+export async function bulkSetStatus(ids: string[], status: string): Promise<void> {
+  const { error } = await db().from('products').update({ status }).in('id', ids)
+  if (error) throw new Error(error.message)
+}
+
+export async function bulkSetType(ids: string[], type: string): Promise<void> {
+  const { error } = await db().from('products').update({ type }).in('id', ids)
+  if (error) throw new Error(error.message)
+}

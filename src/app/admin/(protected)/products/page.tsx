@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, F
 import BrandLogo from '@/components/ui/BrandLogo'
 import {
   getProducts, upsertProduct, deleteProduct, setPublished,
+  bulkDelete, bulkSetPublished, bulkSetStatus, bulkSetType,
   type ProductRow,
 } from './actions'
 
@@ -595,6 +596,9 @@ export default function ProductsPage() {
   const [importOpen, setImportOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<{ field: string; dir: SortDir }>({ field: 'created_at', dir: 'desc' })
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bulkWorking, setBulkWorking] = useState(false)
+  const [bulkOpen, setBulkOpen] = useState<'status' | 'type' | null>(null)
 
   function toggleSort(field: string) {
     setSort(s => s.field === field
@@ -675,6 +679,48 @@ export default function ProductsPage() {
     return base
   })()
 
+  // ── Bulk helpers ──────────────────────────────────────────────────────────
+  const ids = Array.from(selected)
+  const allSelected = filtered.length > 0 && selected.size === filtered.length
+  const someSelected = selected.size > 0 && !allSelected
+
+  function toggleRow(id: string) {
+    setSelected(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(filtered.map(p => p.id)))
+  }
+  function clearSelection() { setSelected(new Set()); setBulkOpen(null) }
+
+  async function handleBulkDelete() {
+    if (!confirm(`Xoá ${ids.length} sản phẩm? Không thể hoàn tác.`)) return
+    setBulkWorking(true)
+    try { await bulkDelete(ids); clearSelection(); startTransition(load) }
+    catch (e: unknown) { alert((e as Error).message) }
+    finally { setBulkWorking(false) }
+  }
+  async function handleBulkPublish(pub: boolean) {
+    setBulkWorking(true)
+    setProducts(prev => prev.map(x => selected.has(x.id) ? { ...x, published: pub } : x))
+    try { await bulkSetPublished(ids, pub); clearSelection() }
+    catch (e: unknown) { alert((e as Error).message) }
+    finally { setBulkWorking(false) }
+  }
+  async function handleBulkStatus(status: string) {
+    setBulkWorking(true)
+    setProducts(prev => prev.map(x => selected.has(x.id) ? { ...x, status } : x))
+    try { await bulkSetStatus(ids, status); clearSelection() }
+    catch (e: unknown) { alert((e as Error).message) }
+    finally { setBulkWorking(false) }
+  }
+  async function handleBulkType(type: string) {
+    setBulkWorking(true)
+    setProducts(prev => prev.map(x => selected.has(x.id) ? { ...x, type } : x))
+    try { await bulkSetType(ids, type); clearSelection() }
+    catch (e: unknown) { alert((e as Error).message) }
+    finally { setBulkWorking(false) }
+  }
+
   return (
     <div className="p-6 lg:p-8">
       <div className="mb-6 flex items-center justify-between gap-4">
@@ -725,7 +771,25 @@ export default function ProductsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#1A1A22]">
-                  <SortTh label="Sản phẩm" field="name" sort={sort} onSort={toggleSort} className="text-left px-6" />
+                  {/* Select-all checkbox */}
+                  <th className="pl-4 pr-2 py-3 w-10">
+                    <button onClick={toggleAll}
+                      className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
+                        allSelected ? 'bg-[#6366f1] border-[#6366f1]'
+                        : someSelected ? 'bg-[#6366f1]/40 border-[#6366f1]/60'
+                        : 'border-[#2A2A38] hover:border-[#6366f1]/60'
+                      }`}>
+                      {(allSelected || someSelected) && (
+                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                          {allSelected
+                            ? <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            : <path d="M1.5 4h5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                          }
+                        </svg>
+                      )}
+                    </button>
+                  </th>
+                  <SortTh label="Sản phẩm" field="name" sort={sort} onSort={toggleSort} className="text-left px-2" />
                   <SortTh label="Loại" field="type" sort={sort} onSort={toggleSort} className="text-left hidden md:table-cell" />
                   <SortTh label="SKU" field="sku" sort={sort} onSort={toggleSort} className="text-left hidden xl:table-cell" />
                   <SortTh label="Giá" field="price" sort={sort} onSort={toggleSort} className="text-right" />
@@ -737,9 +801,24 @@ export default function ProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1A1A22]">
-                {filtered.map(p => (
-                  <tr key={p.id} className="hover:bg-[#16161E] transition-colors group">
-                    <td className="px-6 py-4">
+                {filtered.map(p => {
+                  const isSelected = selected.has(p.id)
+                  return (
+                  <tr key={p.id} className={`transition-colors group ${isSelected ? 'bg-[#6366f1]/8' : 'hover:bg-[#16161E]'}`}>
+                    {/* Row checkbox */}
+                    <td className="pl-4 pr-2 py-4">
+                      <button onClick={() => toggleRow(p.id)}
+                        className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
+                          isSelected ? 'bg-[#6366f1] border-[#6366f1]' : 'border-[#2A2A38] hover:border-[#6366f1]/60'
+                        }`}>
+                        {isSelected && (
+                          <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                            <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-2 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#1A1A22] shrink-0">
                           {p.images[0] && (
@@ -822,7 +901,7 @@ export default function ProductsPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
@@ -841,6 +920,87 @@ export default function ProductsPage() {
           onClose={() => setImportOpen(false)}
           onDone={() => { startTransition(load) }}
         />
+      )}
+
+      {/* ── Bulk action bar ───────────────────────────────────────────────── */}
+      {selected.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-3 bg-[#16161E] border border-[#2A2A38] rounded-2xl shadow-2xl shadow-black/60">
+          <span className="text-sm font-semibold text-[#EEEEF4] pr-2 border-r border-[#2A2A38]">
+            {selected.size} đã chọn
+          </span>
+
+          {/* Publish */}
+          <Tip label="Hiển thị">
+            <button onClick={() => handleBulkPublish(true)} disabled={bulkWorking}
+              className="h-8 px-3 rounded-xl text-sm font-medium text-emerald-400 hover:bg-emerald-500/10 disabled:opacity-40 transition-colors whitespace-nowrap">
+              Hiển thị
+            </button>
+          </Tip>
+          <Tip label="Ẩn">
+            <button onClick={() => handleBulkPublish(false)} disabled={bulkWorking}
+              className="h-8 px-3 rounded-xl text-sm font-medium text-[#7A7A90] hover:bg-white/5 disabled:opacity-40 transition-colors whitespace-nowrap">
+              Ẩn
+            </button>
+          </Tip>
+
+          {/* Status dropdown */}
+          <div className="relative">
+            <button onClick={() => setBulkOpen(bulkOpen === 'status' ? null : 'status')} disabled={bulkWorking}
+              className="h-8 px-3 rounded-xl text-sm font-medium text-blue-400 hover:bg-blue-500/10 disabled:opacity-40 transition-colors inline-flex items-center gap-1 whitespace-nowrap">
+              Trạng thái <ChevronDown size={12} className={`transition-transform ${bulkOpen === 'status' ? 'rotate-180' : ''}`} />
+            </button>
+            {bulkOpen === 'status' && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setBulkOpen(null)} />
+                <div className="absolute bottom-full mb-2 left-0 z-20 bg-[#16161E] border border-[#2A2A38] rounded-xl overflow-hidden shadow-2xl min-w-[148px]">
+                  {STATUS_OPTIONS.map(o => (
+                    <button key={o.value} onClick={() => handleBulkStatus(o.value)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#7A7A90] hover:bg-white/[0.04] hover:text-[#EEEEF4] transition-colors">
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Type dropdown */}
+          <div className="relative">
+            <button onClick={() => setBulkOpen(bulkOpen === 'type' ? null : 'type')} disabled={bulkWorking}
+              className="h-8 px-3 rounded-xl text-sm font-medium text-[#F0A500] hover:bg-[#F0A500]/10 disabled:opacity-40 transition-colors inline-flex items-center gap-1 whitespace-nowrap">
+              Loại <ChevronDown size={12} className={`transition-transform ${bulkOpen === 'type' ? 'rotate-180' : ''}`} />
+            </button>
+            {bulkOpen === 'type' && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setBulkOpen(null)} />
+                <div className="absolute bottom-full mb-2 left-0 z-20 bg-[#16161E] border border-[#2A2A38] rounded-xl overflow-hidden shadow-2xl min-w-[148px]">
+                  {TYPE_OPTIONS.map(o => (
+                    <button key={o.value} onClick={() => handleBulkType(o.value)}
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#7A7A90] hover:bg-white/[0.04] hover:text-[#EEEEF4] transition-colors">
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="w-px h-5 bg-[#2A2A38] mx-1" />
+
+          {/* Delete */}
+          <Tip label="Xoá đã chọn">
+            <button onClick={handleBulkDelete} disabled={bulkWorking}
+              className="h-8 px-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-40 transition-colors">
+              Xoá
+            </button>
+          </Tip>
+
+          {/* Deselect */}
+          <button onClick={clearSelection}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-[#EEEEF4] hover:bg-white/5 transition-colors ml-1">
+            <X size={14} />
+          </button>
+        </div>
       )}
     </div>
   )
