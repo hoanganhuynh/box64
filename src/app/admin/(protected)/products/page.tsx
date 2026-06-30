@@ -679,8 +679,7 @@ export default function ProductsPage() {
     <div className="p-6 lg:p-8">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="shrink-0">
-          <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Sản phẩm</h1>
-          <p className="text-sm text-[#484858] mt-1">{products.length} sản phẩm</p>
+          <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Sản phẩm <span className="text-[#484858] font-normal">({products.length})</span></h1>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setImportOpen(true)}

@@ -29,6 +29,9 @@ export default function CustomersClient({ customers }: { customers: CustomerRow[
 
   return (
     <>
+      <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl mb-6">
+        Khách hàng <span className="text-[#484858] font-normal">({customers.length})</span>
+      </h1>
       <div className="mb-4 relative">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#484858] pointer-events-none" />
         <input

@@ -225,8 +225,7 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="shrink-0">
-          <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Danh mục</h1>
-          <p className="text-sm text-[#484858] mt-1">{categories.length} danh mục</p>
+          <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl">Danh mục <span className="text-[#484858] font-normal">({categories.length})</span></h1>
         </div>
         <button onClick={openCreate}
           className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors">
