@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "@payos/node": "^2.0.5",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
@@ -28,6 +27,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.79.0",
     "recharts": "^3.8.1",
+    "sepay-pg-node": "^1.0.0",
     "sharp": "^0.35.2",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",

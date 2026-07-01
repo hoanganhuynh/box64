@@ -27,7 +27,7 @@ function sortProvinces<T extends { name: string }>(list: T[]): T[] {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, clearCart } = useCartStore()
+  const { items } = useCartStore()
   const [mounted, setMounted] = useState(false)
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
@@ -65,6 +65,11 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true)
+
+    // Returning from SePay's hosted checkout after a cancel or error
+    const sp = new URLSearchParams(window.location.search)
+    if (sp.get('cancelled')) setError('Bạn đã huỷ thanh toán. Vui lòng đặt hàng lại khi sẵn sàng.')
+    else if (sp.get('error')) setError('Thanh toán thất bại. Vui lòng thử lại hoặc chọn ngân hàng khác.')
 
     // Load both address systems in parallel
     fetch('https://provinces.open-api.vn/api/p/')
@@ -222,7 +227,7 @@ export default function CheckoutPage() {
       undefined,
       0,
       shippingFee,
-      'vietqr',
+      'sepay',
     )
 
     if (!result.success) {
@@ -231,16 +236,27 @@ export default function CheckoutPage() {
       return
     }
 
+    const total = subtotal + shippingFee
     sessionStorage.setItem('lastOrder', JSON.stringify({
       orderId: result.orderId,
       items,
       shippingFee,
-      amount: subtotal + shippingFee,
-      paymentMethod: 'vietqr',
+      amount: total,
+      paymentMethod: 'sepay',
       customerName: form.name,
     }))
-    clearCart()
-    router.push(`/checkout/success?order=${result.orderId}`)
+    // Cart is cleared on the success page instead — if the customer cancels
+    // or hits an error at SePay's checkout, they land back here with their
+    // cart intact instead of having to re-add everything.
+
+    // Redirect to SePay's hosted VietQR checkout — SePay confirms payment
+    // via IPN webhook automatically, no manual admin step needed.
+    const params = new URLSearchParams({
+      order: result.orderId!,
+      amount: String(total),
+      name: form.name,
+    })
+    window.location.href = `/api/sepay/checkout?${params.toString()}`
   }
 
   // Wait for mount + auth check (redirect to login happens in the effect).

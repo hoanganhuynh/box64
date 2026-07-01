@@ -1,17 +1,12 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { CheckCircle2, Package, ArrowRight, Copy, Check } from 'lucide-react'
+import { CheckCircle2, Package, ArrowRight, Copy, Check, Loader2 } from 'lucide-react'
 import { formatVND } from '@/lib/utils/format'
+import { useCartStore } from '@/lib/store/cart'
 import type { CartItem } from '@/lib/types'
-
-interface BankSettings {
-  bank_id: string
-  account_number: string
-  account_name: string
-}
 
 interface LastOrder {
   orderId: string
@@ -20,18 +15,6 @@ interface LastOrder {
   amount?: number
   paymentMethod?: string
   customerName?: string
-}
-
-function toTransferDesc(customerName: string | undefined, orderId: string): string {
-  const name = (customerName ?? '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D')
-    .toUpperCase()
-    .replace(/[^A-Z0-9 ]/g, '')
-    .trim()
-    .replace(/\s+/g, ' ')
-  return name ? `${name} ${orderId}` : orderId
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -48,76 +31,68 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function VietQRSection({
-  orderId, amount, customerName, settings,
-}: {
-  orderId: string
-  amount: number
-  customerName?: string
-  settings: BankSettings | null
-}) {
-  const bankId = settings?.bank_id ?? ''
-  const account = settings?.account_number ?? ''
-  const accountName = settings?.account_name ?? ''
+type PaymentStatus = 'checking' | 'paid' | 'pending'
 
-  const transferDesc = toTransferDesc(customerName, orderId)
-  const qrUrl = `https://img.vietqr.io/image/${bankId}-${account}-compact2.jpg?amount=${amount}&addInfo=${encodeURIComponent(transferDesc)}&accountName=${encodeURIComponent(accountName)}`
+// SePay already showed the VietQR and captured the payment on its own
+// hosted checkout page before redirecting here — we just poll our own
+// order record (updated by SePay's IPN webhook) to confirm and reflect it.
+function PaymentStatusCard({ orderId }: { orderId: string }) {
+  const [status, setStatus] = useState<PaymentStatus>('checking')
+  const attemptsRef = useRef(0)
+
+  useEffect(() => {
+    let cancelled = false
+    async function poll() {
+      attemptsRef.current += 1
+      try {
+        const res = await fetch(`/api/orders/${orderId}/status`)
+        if (res.ok) {
+          const data = await res.json() as { payment_status: string }
+          if (data.payment_status === 'paid') {
+            if (!cancelled) setStatus('paid')
+            return
+          }
+        }
+      } catch {}
+      if (attemptsRef.current >= 8) {
+        if (!cancelled) setStatus('pending')
+        return
+      }
+      if (!cancelled) setTimeout(poll, 2000)
+    }
+    poll()
+    return () => { cancelled = true }
+  }, [orderId])
 
   return (
-    <div className="w-full bg-surface border border-white/10 rounded-xl overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-3">
-        <p className="text-[11px] text-gold uppercase tracking-widest font-bold mb-0.5">Thanh toán ngay</p>
-        <p className="text-xs text-muted">Quét mã QR bằng app ngân hàng bất kỳ</p>
-      </div>
-
-      {/* QR Code — always dynamic VietQR (amount + content pre-filled) */}
-      <div className="flex justify-center px-5 pb-4">
-        <div className="rounded-xl overflow-hidden border border-white/10 bg-white p-2">
-          {account ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrUrl} alt="VietQR thanh toán" width={220} height={220} className="block" />
-          ) : (
-            <Image src="/QR-bank.png" alt="QR chuyển khoản" width={220} height={220} className="block" />
-          )}
-        </div>
-      </div>
-
-      {/* Bank details */}
-      <div className="border-t border-border mx-5 pt-4 pb-5 flex flex-col gap-2.5 text-sm">
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-xs">Ngân hàng</span>
-          <span className="font-semibold text-primary text-xs">{bankId}</span>
-        </div>
-        <div className="flex justify-between items-center gap-2">
-          <span className="text-muted text-xs shrink-0">Số tài khoản</span>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono font-bold text-primary text-sm">{account}</span>
-            <CopyButton text={account} />
+    <div className="w-full bg-surface border border-white/10 rounded-xl px-5 py-4 flex items-center gap-3">
+      {status === 'checking' && (
+        <>
+          <Loader2 size={18} className="text-gold animate-spin shrink-0" />
+          <div className="text-left">
+            <p className="text-sm font-semibold text-primary">Đang xác nhận thanh toán…</p>
+            <p className="text-[11px] text-muted mt-0.5">Thường mất vài giây sau khi chuyển khoản</p>
           </div>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-xs shrink-0">Chủ tài khoản</span>
-          <span className="font-medium text-primary text-xs text-right">{accountName}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-xs shrink-0">Số tiền</span>
-          <span className="font-extrabold text-gold">{formatVND(amount)}</span>
-        </div>
-        <div className="flex justify-between items-center gap-2">
-          <span className="text-muted text-xs shrink-0">Nội dung CK</span>
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono font-bold text-primary text-sm">{transferDesc}</span>
-            <CopyButton text={transferDesc} />
+        </>
+      )}
+      {status === 'paid' && (
+        <>
+          <CheckCircle2 size={18} className="text-success shrink-0" />
+          <div className="text-left">
+            <p className="text-sm font-semibold text-success">Đã xác nhận thanh toán</p>
+            <p className="text-[11px] text-muted mt-0.5">Đơn hàng của bạn đang được xử lý</p>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-gold/5 border-t border-white/10 px-5 py-3">
-        <p className="text-[11px] text-muted text-center leading-relaxed">
-          Đơn hàng được xử lý sau khi xác nhận chuyển khoản · thường trong 1–2 giờ
-        </p>
-      </div>
+        </>
+      )}
+      {status === 'pending' && (
+        <>
+          <Loader2 size={18} className="text-gold shrink-0" />
+          <div className="text-left">
+            <p className="text-sm font-semibold text-primary">Đang chờ xác nhận</p>
+            <p className="text-[11px] text-muted mt-0.5">Nếu bạn đã chuyển khoản, đơn sẽ tự cập nhật trong ít phút</p>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -126,20 +101,22 @@ function SuccessContent() {
   const params = useSearchParams()
   const orderId = params.get('order') ?? '—'
   const [order, setOrder] = useState<LastOrder | null>(null)
-  const [bankSettings, setBankSettings] = useState<BankSettings | null>(null)
+  const clearCart = useCartStore(s => s.clearCart)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('lastOrder')
     if (raw) {
       try { setOrder(JSON.parse(raw)) } catch {}
     }
-    fetch('/api/bank-settings').then(r => r.json()).then(setBankSettings).catch(() => {})
-  }, [])
+    // Reaching this page means SePay confirmed (or is confirming) the
+    // payment — safe to clear the cart here rather than before redirecting.
+    clearCart()
+  }, [clearCart])
 
   const subtotal = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
   const shippingFee = order?.shippingFee ?? 0
   const total = order?.amount ?? subtotal
-  const isVietQR = !order?.paymentMethod || order.paymentMethod === 'vietqr'
+  const isSepay = order?.paymentMethod === 'sepay'
 
   return (
     <div className="max-w-lg mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center gap-5">
@@ -158,21 +135,12 @@ function SuccessContent() {
           Cảm ơn bạn đã đặt hàng!
         </h1>
         <p className="text-sm text-muted mt-2">
-          {isVietQR
-            ? 'Vui lòng chuyển khoản để xác nhận đơn hàng.'
-            : 'Chi tiết đơn hàng đã được gửi đến email của bạn.'}
+          Chi tiết đơn hàng đã được gửi đến email của bạn.
         </p>
       </div>
 
-      {/* VietQR payment block */}
-      {isVietQR && total > 0 && (
-        <VietQRSection
-          orderId={orderId}
-          amount={total}
-          customerName={order?.customerName}
-          settings={bankSettings}
-        />
-      )}
+      {/* Payment status */}
+      {isSepay && orderId !== '—' && <PaymentStatusCard orderId={orderId} />}
 
       {/* Order ID */}
       <div className="w-full bg-surface border border-border rounded-xl px-5 py-4">
