@@ -9,7 +9,7 @@ export async function GET() {
   )
   const { data } = await db
     .from('bank_settings')
-    .select('bank_id, account_number, account_name, qr_image_url')
+    .select('bank_id, account_number, account_name')
     .eq('id', 1)
     .single()
 
@@ -18,7 +18,6 @@ export async function GET() {
       bank_id: process.env.NEXT_PUBLIC_BANK_ID ?? '',
       account_number: process.env.NEXT_PUBLIC_BANK_ACCOUNT ?? '',
       account_name: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME ?? '',
-      qr_image_url: null,
     },
   )
 }

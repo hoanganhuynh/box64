@@ -11,7 +11,6 @@ interface BankSettings {
   bank_id: string
   account_number: string
   account_name: string
-  qr_image_url: string | null
 }
 
 interface LastOrder {
@@ -60,7 +59,6 @@ function VietQRSection({
   const bankId = settings?.bank_id ?? ''
   const account = settings?.account_number ?? ''
   const accountName = settings?.account_name ?? ''
-  const qrImageUrl = settings?.qr_image_url
 
   const transferDesc = toTransferDesc(customerName, orderId)
   const qrUrl = `https://img.vietqr.io/image/${bankId}-${account}-compact2.jpg?amount=${amount}&addInfo=${encodeURIComponent(transferDesc)}&accountName=${encodeURIComponent(accountName)}`
@@ -73,12 +71,10 @@ function VietQRSection({
         <p className="text-xs text-muted">Quét mã QR bằng app ngân hàng bất kỳ</p>
       </div>
 
-      {/* QR Code */}
+      {/* QR Code — always dynamic VietQR (amount + content pre-filled) */}
       <div className="flex justify-center px-5 pb-4">
         <div className="rounded-xl overflow-hidden border border-white/10 bg-white p-2">
-          {qrImageUrl ? (
-            <Image src={qrImageUrl} alt="QR chuyển khoản" width={220} height={220} className="block" unoptimized />
-          ) : account ? (
+          {account ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={qrUrl} alt="VietQR thanh toán" width={220} height={220} className="block" />
           ) : (

@@ -1,7 +1,6 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-import { Upload, Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { getBankSettings, updateBankSettings, type BankSettings } from './actions'
 
 const VN_BANKS = [
@@ -30,13 +29,10 @@ export default function PaymentSettingsPage() {
     bank_id: 'MB',
     account_number: '',
     account_name: '',
-    qr_image_url: null,
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [uploadingQr, setUploadingQr] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     getBankSettings().then(s => {
@@ -56,27 +52,6 @@ export default function PaymentSettingsPage() {
     setSaving(false)
     if (error) showToast('error', error)
     else showToast('success', 'Đã lưu thành công!')
-  }
-
-  async function handleQrUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setUploadingQr(true)
-    const form = new FormData()
-    form.append('file', file)
-    const res = await fetch('/api/admin/upload-qr', { method: 'POST', body: form })
-    const json = await res.json()
-    setUploadingQr(false)
-    if (json.url) {
-      setSettings(s => ({ ...s, qr_image_url: json.url }))
-    } else {
-      showToast('error', json.error ?? 'Upload thất bại')
-    }
-    if (fileRef.current) fileRef.current.value = ''
-  }
-
-  function removeQr() {
-    setSettings(s => ({ ...s, qr_image_url: null }))
   }
 
   if (loading) {
@@ -102,7 +77,7 @@ export default function PaymentSettingsPage() {
 
       <div className="mb-6">
         <h1 className="text-xl font-bold text-foreground">Thanh toán</h1>
-        <p className="text-sm text-muted mt-1">Thông tin tài khoản nhận tiền và mã QR hiển thị cho khách</p>
+        <p className="text-sm text-muted mt-1">Thông tin tài khoản nhận tiền — QR động VietQR tự sinh cho mỗi đơn hàng</p>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -152,76 +127,11 @@ export default function PaymentSettingsPage() {
           </div>
         </div>
 
-        {/* QR card */}
-        <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
-          <div>
-            <p className="text-sm font-bold text-muted uppercase tracking-widest">Hình QR tĩnh</p>
-            <p className="text-sm text-muted mt-1">Nếu không upload, trang thanh toán sẽ tự tạo QR động từ thông tin bên trên</p>
-          </div>
-
-          {settings.qr_image_url ? (
-            <div className="flex items-start gap-4">
-              <div className="relative w-[110px] h-[110px] rounded-xl overflow-hidden border border-border bg-white shrink-0">
-                <Image
-                  src={settings.qr_image_url}
-                  alt="QR hiện tại"
-                  fill
-                  className="object-contain p-1.5"
-                  unoptimized
-                />
-              </div>
-              <div className="flex flex-col gap-2 pt-1">
-                <p className="text-sm font-medium text-foreground">QR đang dùng</p>
-                <p className="text-sm text-muted leading-relaxed">Ảnh này sẽ hiển thị cho khách trên trang đặt hàng thành công</p>
-                <div className="flex gap-2 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={uploadingQr}
-                    className="h-8 px-3 rounded-lg bg-surface border border-border text-sm font-medium text-foreground hover:bg-surface/80 transition-colors flex items-center gap-1.5 disabled:opacity-50"
-                  >
-                    {uploadingQr ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                    Thay QR
-                  </button>
-                  <button
-                    type="button"
-                    onClick={removeQr}
-                    className="h-8 px-3 rounded-lg bg-surface border border-border text-sm font-medium text-red-400 hover:bg-red-500/5 transition-colors flex items-center gap-1.5"
-                  >
-                    <X size={12} /> Xoá
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploadingQr}
-              className="flex flex-col items-center justify-center gap-2 h-32 w-full rounded-xl border-2 border-dashed border-border hover:border-indigo-500/40 text-muted hover:text-foreground transition-colors"
-            >
-              {uploadingQr
-                ? <Loader2 size={20} className="animate-spin" />
-                : <Upload size={20} />}
-              <span className="text-sm font-medium">{uploadingQr ? 'Đang upload…' : 'Upload hình QR'}</span>
-              <span className="text-sm">PNG, JPG · tối đa 5 MB</span>
-            </button>
-          )}
-
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleQrUpload}
-          />
-        </div>
-
         {/* VietQR preview */}
-        {settings.account_number && !settings.qr_image_url && (
+        {settings.account_number && (
           <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-3">
             <p className="text-sm font-bold text-muted uppercase tracking-widest">Xem trước QR động</p>
-            <p className="text-sm text-muted">QR được tạo tự động từ thông tin bên trên (không có sẵn số tiền)</p>
+            <p className="text-sm text-muted">Mỗi đơn hàng sẽ tự sinh QR riêng kèm đúng số tiền và nội dung chuyển khoản</p>
             <div className="flex justify-center">
               <div className="rounded-xl overflow-hidden border border-border bg-white p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
