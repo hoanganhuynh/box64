@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, MapPin, Phone, User, CreditCard, MessageSquare } from 'lucide-react'
 import { getOrder } from '@/lib/admin/queries'
 import { StatusBadge, STATUS_OPTIONS } from '../../_components/StatusBadge'
-import { updateOrderStatus } from '../../actions'
+import { updateOrderStatus, updatePaymentStatus } from '../../actions'
 
 function vnd(n: number) {
   return new Intl.NumberFormat('vi-VN').format(n) + ' ₫'
@@ -215,6 +215,39 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <InfoRow label="Điện thoại" value={shipping.phone ?? '—'}            icon={<Phone size={14} />} />
             <InfoRow label="Địa chỉ"   value={addressParts.join(', ') || '—'}   icon={<MapPin size={14} />} />
             <InfoRow label="Thanh toán" value={order.payment_method ?? '—'}      icon={<CreditCard size={14} />} />
+          </div>
+
+          {/* Payment status — VietQR chuyển khoản cần admin xác nhận thủ công */}
+          <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-5 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">
+                Trạng thái thanh toán
+              </p>
+              <span className={`text-sm font-semibold px-2.5 py-1 rounded-full ${
+                order.payment_status === 'paid'
+                  ? 'bg-emerald-500/10 text-emerald-400'
+                  : order.payment_status === 'cancelled'
+                  ? 'bg-red-500/10 text-red-400'
+                  : 'bg-[#F0A500]/10 text-[#F0A500]'
+              }`}>
+                {order.payment_status === 'paid' ? 'Đã thanh toán'
+                  : order.payment_status === 'cancelled' ? 'Đã huỷ'
+                  : 'Chờ chuyển khoản'}
+              </span>
+            </div>
+            {order.payment_status !== 'paid' && (
+              <form>
+                <button
+                  formAction={async () => {
+                    'use server'
+                    await updatePaymentStatus(id, 'paid')
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/15 transition-colors"
+                >
+                  ✓ Xác nhận đã nhận chuyển khoản
+                </button>
+              </form>
+            )}
           </div>
 
           <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl px-5 py-4">

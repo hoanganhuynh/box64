@@ -1,7 +1,7 @@
 'use server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { updateOrderStatus as dbUpdateStatus } from '@/lib/admin/queries'
+import { updateOrderStatus as dbUpdateStatus, updatePaymentStatus as dbUpdatePaymentStatus } from '@/lib/admin/queries'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 
 async function requireAdmin() {
@@ -16,4 +16,11 @@ export async function updateOrderStatus(orderId: string, status: string) {
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${orderId}`)
   revalidatePath('/admin/dashboard')
+}
+
+export async function updatePaymentStatus(orderId: string, paymentStatus: string) {
+  await requireAdmin()
+  await dbUpdatePaymentStatus(orderId, paymentStatus)
+  revalidatePath('/admin/orders')
+  revalidatePath(`/admin/orders/${orderId}`)
 }

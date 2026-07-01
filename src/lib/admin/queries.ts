@@ -20,6 +20,7 @@ export interface OrderRow {
   discount: number
   coupon_code: string | null
   payment_method: string
+  payment_status: string
   note: string | null
   created_at: string
 }
@@ -159,6 +160,12 @@ export async function getOrder(id: string) {
 export async function updateOrderStatus(id: string, status: string) {
   const db = getAdminClient()
   const { error } = await db.from('orders').update({ status }).eq('id', id)
+  if (error) throw error
+}
+
+export async function updatePaymentStatus(id: string, payment_status: string) {
+  const db = getAdminClient()
+  const { error } = await db.from('orders').update({ payment_status }).eq('id', id)
   if (error) throw error
 }
 

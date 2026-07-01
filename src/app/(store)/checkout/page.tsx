@@ -222,7 +222,7 @@ export default function CheckoutPage() {
       undefined,
       0,
       shippingFee,
-      'transfer',
+      'vietqr',
     )
 
     if (!result.success) {
@@ -236,7 +236,7 @@ export default function CheckoutPage() {
       items,
       shippingFee,
       amount: subtotal + shippingFee,
-      paymentMethod: 'transfer',
+      paymentMethod: 'vietqr',
       customerName: form.name,
     }))
     clearCart()
