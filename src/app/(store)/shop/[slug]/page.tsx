@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star1, Ruler, Layer, Brush2, Clock, TickCircle, Box, TruckFast, InfoCircle } from 'iconsax-react'
@@ -51,7 +51,18 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function ProductDetailPage({ params }: PageProps) {
   const { slug } = await params
   const [product, allProducts] = await Promise.all([getProductBySlug(slug), getAllProducts()])
-  if (!product) notFound()
+
+  if (!product) {
+    // Common mistyped-URL pattern: someone prepends "mini-gt-"/"minigt-" to a
+    // slug that doesn't have it. Redirect to the real product instead of a
+    // dead-end 404 when we can resolve it unambiguously.
+    const stripped = slug.replace(/^(mini-gt-|minigt-|mini-)/, '')
+    if (stripped !== slug) {
+      const fallback = allProducts.find(p => p.slug === stripped)
+      if (fallback) redirect(`/shop/${fallback.slug}`)
+    }
+    notFound()
+  }
 
   const promo = product.promotion
   const isActive = promo && new Date(promo.ends_at!) > new Date()
