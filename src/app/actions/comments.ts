@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { containsBannedWord } from '@/lib/moderation/profanity'
+import { moderateWithAI } from '@/lib/moderation/ai'
 
 function adminDb() {
   return createClient(
@@ -76,7 +77,7 @@ export async function postComment(productId: string, content: string): Promise<P
   const { data: wordsData } = await db.from('banned_words').select('word')
   const bannedWords = (wordsData ?? []).map(w => w.word as string)
 
-  if (containsBannedWord(trimmed, bannedWords)) {
+  const handleViolation = async () => {
     const nextCount = (moderation?.comment_violations ?? 0) + 1
     const justBanned = nextCount >= MAX_VIOLATIONS_BEFORE_BAN
     await db.from('user_moderation').upsert({
@@ -85,7 +86,16 @@ export async function postComment(productId: string, content: string): Promise<P
       comment_banned: justBanned,
       comment_banned_at: justBanned ? new Date().toISOString() : null,
     })
-    return { success: false, error: 'blocked', violations: nextCount, justBanned }
+    return { success: false as const, error: 'blocked' as const, violations: nextCount, justBanned }
+  }
+
+  if (containsBannedWord(trimmed, bannedWords)) {
+    return await handleViolation()
+  }
+
+  const aiResult = await moderateWithAI(trimmed)
+  if (aiResult.flagged) {
+    return await handleViolation()
   }
 
   const userName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? null

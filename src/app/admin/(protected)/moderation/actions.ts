@@ -97,22 +97,69 @@ export interface RecentCommentRow {
   content: string
   created_at: string
   user_name: string | null
+  user_id: string
+  product_name: string
+  product_slug: string
+  product_image: string | null
 }
 
 export async function getRecentComments(limit = 50): Promise<RecentCommentRow[]> {
   await requireAdmin()
   const { data, error } = await db()
     .from('product_comments')
-    .select('id, product_id, content, created_at, user_name')
+    .select('id, product_id, content, created_at, user_name, user_id, products(name, slug, images)')
     .order('created_at', { ascending: false })
     .limit(limit)
-  if (error) return []
-  return data as RecentCommentRow[]
+  if (error || !data) return []
+  return data.map((d: any) => ({
+    id: d.id,
+    product_id: d.product_id,
+    content: d.content,
+    created_at: d.created_at,
+    user_name: d.user_name,
+    user_id: d.user_id,
+    product_name: d.products?.name ?? 'Sản phẩm không rõ',
+    product_slug: d.products?.slug ?? '',
+    product_image: d.products?.images?.[0] ?? null,
+  }))
 }
 
 export async function deleteComment(id: string): Promise<void> {
   await requireAdmin()
   const { error } = await db().from('product_comments').delete().eq('id', id)
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/moderation')
+}
+
+export interface AiConfig {
+  system_prompt: string
+  total_tokens_used: number
+}
+
+export async function getAiConfig(): Promise<AiConfig | null> {
+  await requireAdmin()
+  const { data, error } = await db().from('ai_moderation_config').select('*').eq('id', true).maybeSingle()
+  if (error || !data) return null
+  return {
+    system_prompt: data.system_prompt,
+    total_tokens_used: Number(data.total_tokens_used)
+  }
+}
+
+export async function updateAiPrompt(prompt: string): Promise<void> {
+  await requireAdmin()
+  const { error } = await db().from('ai_moderation_config').update({ system_prompt: prompt }).eq('id', true)
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/moderation')
+}
+export async function banUserManually(userId: string): Promise<void> {
+  await requireAdmin()
+  const { error } = await db().from('user_moderation').upsert({
+    user_id: userId,
+    comment_banned: true,
+    comment_violations: 4,
+    comment_banned_at: new Date().toISOString()
+  })
   if (error) throw new Error(error.message)
   revalidatePath('/admin/moderation')
 }

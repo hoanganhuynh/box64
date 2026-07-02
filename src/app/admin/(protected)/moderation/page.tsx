@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import { Plus, Trash2, ShieldOff } from 'lucide-react'
 import {
   getBannedWords, addBannedWord, deleteBannedWord,
-  getBannedUsers, unbanUser,
+  getBannedUsers, unbanUser, banUserManually,
   getRecentComments, deleteComment,
-  type BannedWordRow, type BannedUserRow, type RecentCommentRow,
+  getAiConfig, updateAiPrompt,
+  type BannedWordRow, type BannedUserRow, type RecentCommentRow, type AiConfig,
 } from './actions'
 
 function timeAgo(iso: string) {
@@ -21,12 +22,19 @@ export default function ModerationPage() {
   const [words, setWords] = useState<BannedWordRow[]>([])
   const [bannedUsers, setBannedUsers] = useState<BannedUserRow[]>([])
   const [comments, setComments] = useState<RecentCommentRow[]>([])
+  const [aiConfig, setAiConfig] = useState<AiConfig | null>(null)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [savingPrompt, setSavingPrompt] = useState(false)
   const [newWord, setNewWord] = useState('')
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'comments' | 'ai' | 'words' | 'users'>('comments')
 
   function load() {
-    Promise.all([getBannedWords(), getBannedUsers(), getRecentComments()]).then(([w, u, c]) => {
-      setWords(w); setBannedUsers(u); setComments(c); setLoading(false)
+    Promise.all([getBannedWords(), getBannedUsers(), getRecentComments(), getAiConfig()]).then(([w, u, c, ai]) => {
+      setWords(w); setBannedUsers(u); setComments(c); 
+      setAiConfig(ai)
+      if (ai) setAiPrompt(ai.system_prompt)
+      setLoading(false)
     })
   }
 
@@ -57,6 +65,26 @@ export default function ModerationPage() {
     load()
   }
 
+  async function handleBanUser(userId: string) {
+    if (!confirm('Cấm người dùng này bình luận ngay lập tức?')) return
+    await banUserManually(userId)
+    load()
+  }
+
+  async function handleSavePrompt() {
+    if (!aiPrompt.trim()) return
+    setSavingPrompt(true)
+    try {
+      await updateAiPrompt(aiPrompt)
+      load()
+      alert('Đã cập nhật Rule AI thành công!')
+    } catch (e: any) {
+      alert('Lỗi: ' + e.message)
+    } finally {
+      setSavingPrompt(false)
+    }
+  }
+
   if (loading) {
     return <div className="p-6 lg:p-8 text-sm text-[#484858]">Đang tải...</div>
   }
@@ -65,9 +93,30 @@ export default function ModerationPage() {
     <div className="p-6 lg:p-8">
       <h1 className="font-jakarta font-extrabold text-[#EEEEF4] text-2xl lg:text-3xl mb-6">Kiểm duyệt</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        {/* Banned words */}
-        <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5">
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-[#1E1E28] pb-4">
+        {[
+          { id: 'comments', label: 'Bình luận gần đây' },
+          { id: 'ai', label: 'Cấu hình AI' },
+          { id: 'words', label: 'Từ khoá bị cấm' },
+          { id: 'users', label: 'Người dùng bị cấm' },
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              activeTab === tab.id
+                ? 'bg-[#6366f1] text-white'
+                : 'text-[#7A7A90] hover:text-[#EEEEF4] hover:bg-[#1A1A22]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'words' && (
+        <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5 mb-4">
           <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-3">
             Từ khoá bị cấm ({words.length})
           </p>
@@ -91,9 +140,10 @@ export default function ModerationPage() {
             {words.length === 0 && <p className="text-sm text-[#484858]">Chưa có từ khoá nào.</p>}
           </div>
         </div>
+      )}
 
-        {/* Banned users */}
-        <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5">
+      {activeTab === 'users' && (
+        <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5 mb-4">
           <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-3">
             Người dùng bị cấm bình luận ({bannedUsers.length})
           </p>
@@ -116,32 +166,104 @@ export default function ModerationPage() {
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Recent comments */}
-      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5">
-        <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide mb-3">
-          Bình luận gần đây ({comments.length})
-        </p>
+      {activeTab === 'ai' && (
+      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-5 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">
+            Cấu hình AI DeepSeek
+          </p>
+          <div className="text-sm text-[#484858]">
+            Tổng Token tiêu thụ: <span className="font-mono text-[#EEEEF4]">{aiConfig?.total_tokens_used?.toLocaleString() ?? 0}</span>
+          </div>
+        </div>
+        <textarea
+          value={aiPrompt}
+          onChange={e => setAiPrompt(e.target.value)}
+          className="w-full h-40 bg-[#0D0D14] border border-[#1E1E28] rounded-lg p-3 text-sm text-[#EEEEF4] focus:outline-none focus:border-[#6366f1] transition-colors mb-3 font-mono"
+          placeholder="Nhập System Prompt cho AI..."
+        />
+        <div className="flex justify-end">
+          <button
+            onClick={handleSavePrompt}
+            disabled={savingPrompt}
+            className="h-9 px-4 rounded-lg bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors disabled:opacity-50"
+          >
+            {savingPrompt ? 'Đang lưu...' : 'Lưu thay đổi'}
+          </button>
+        </div>
+        </div>
+      )}
+
+      {activeTab === 'comments' && (
+      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-0 overflow-hidden flex flex-col">
+        <div className="p-5 pb-4 border-b border-[#1E1E28]">
+          <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">
+            Bình luận gần đây ({comments.length})
+          </p>
+        </div>
         {comments.length === 0 ? (
-          <p className="text-sm text-[#484858]">Chưa có bình luận nào.</p>
+          <div className="p-5">
+            <p className="text-sm text-[#484858]">Chưa có bình luận nào.</p>
+          </div>
         ) : (
-          <div className="flex flex-col divide-y divide-[#1A1A22]">
-            {comments.map(c => (
-              <div key={c.id} className="flex items-start justify-between gap-3 py-3 first:pt-0">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-[#EEEEF4]">{c.user_name ?? 'Ẩn danh'} <span className="text-[#484858] font-normal">· {timeAgo(c.created_at)}</span></p>
-                  <p className="text-sm text-[#7A7A90] mt-0.5">{c.content}</p>
-                </div>
-                <button onClick={() => handleDeleteComment(c.id)}
-                  className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-[#484858] hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[800px]">
+              <thead>
+                <tr className="bg-[#0D0D14]/50 border-b border-[#1E1E28]">
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[35%]">Sản phẩm</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[20%]">Người dùng</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[35%]">Nội dung</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[10%] text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1A1A22]">
+                {comments.map(c => (
+                  <tr key={c.id} className="hover:bg-[#1A1A22]/50 transition-colors group/row">
+                    <td className="py-4 px-5 align-top">
+                      <a href={`/shop/${c.product_slug}`} target="_blank" className="flex items-start gap-3 group/link">
+                        <div className="w-12 h-12 rounded-lg bg-[#1A1A22] border border-[#1E1E28] overflow-hidden shrink-0">
+                          {c.product_image ? (
+                            <img src={c.product_image} alt="" className="w-full h-full object-cover group-hover/link:scale-105 transition-transform" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] text-[#484858]">No Img</div>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-[#EEEEF4] group-hover/link:text-[#6366f1] transition-colors line-clamp-2 mt-0.5">
+                          {c.product_name}
+                        </span>
+                      </a>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-sm font-semibold text-[#EEEEF4]">{c.user_name ?? 'Ẩn danh'}</p>
+                      <p className="text-xs text-[#7A7A90] mt-1">{timeAgo(c.created_at)}</p>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-sm text-[#EEEEF4] leading-relaxed break-words whitespace-pre-wrap">{c.content}</p>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <div className="flex items-center justify-end gap-1.5 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                        <button onClick={() => handleBanUser(c.user_id)}
+                          title="Cấm người dùng này"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7A7A90] hover:text-orange-400 hover:bg-orange-500/10 transition-colors">
+                          <ShieldOff size={15} />
+                        </button>
+                        <button onClick={() => handleDeleteComment(c.id)}
+                          title="Xoá bình luận"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7A7A90] hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
+      )}
     </div>
   )
 }
