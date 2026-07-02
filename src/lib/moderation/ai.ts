@@ -87,8 +87,12 @@ export async function moderateWithAI(content: string): Promise<AiModerationResul
 
     if (!raw) return { flagged: false }
 
-    const parsed = JSON.parse(raw) as { flagged?: boolean; reason?: string }
-    return { flagged: !!parsed.flagged, reason: parsed.reason }
+    // Strip markdown code blocks if present
+    const cleanRaw = raw.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim()
+
+    const parsed = JSON.parse(cleanRaw) as { flagged?: boolean; reason?: string; Flagged?: boolean }
+    const isFlagged = parsed.flagged === true || String(parsed.flagged).toLowerCase() === 'true' || parsed.Flagged === true
+    return { flagged: isFlagged, reason: parsed.reason }
   } catch (e) {
     console.error('DeepSeek moderation call failed:', e)
     return { flagged: false }
