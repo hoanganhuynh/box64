@@ -8,6 +8,27 @@ import {
   bulkDelete, bulkSetPublished, bulkSetStatus, bulkSetType,
   type ProductRow,
 } from './actions'
+import type { ProductVariant, ProductVariantKey } from '@/lib/types'
+
+// ─── Variants ────────────────────────────────────────────────────────────────
+
+const VARIANT_DEFS: { key: ProductVariantKey; label: string }[] = [
+  { key: 'custom_minigt',  label: 'Custom size MiniGT' },
+  { key: 'custom_poprace', label: 'Custom size Poprace' },
+  { key: 'zin_minigt',     label: 'MiniGT Zin (nguyên bản)' },
+]
+
+// Custom variants always outrank the zin/stock box for default selection —
+// zin is only ever default when it's the sole variant on the product.
+const VARIANT_DEFAULT_PRIORITY: ProductVariantKey[] = ['custom_minigt', 'custom_poprace', 'zin_minigt']
+
+function computeVariantDefaults(variants: ProductVariant[]): ProductVariant[] {
+  if (variants.length === 0) return variants
+  const defaultKey = variants.length === 1
+    ? variants[0].key
+    : VARIANT_DEFAULT_PRIORITY.find(k => variants.some(v => v.key === k)) ?? variants[0].key
+  return variants.map(v => ({ ...v, is_default: v.key === defaultKey }))
+}
 
 // ─── SortTh ──────────────────────────────────────────────────────────────────
 
@@ -116,6 +137,7 @@ function nanoid(len = 6) { return Math.random().toString(36).slice(2, 2 + len) }
 
 const BLANK: Omit<ProductRow, 'created_at'> = {
   id: '', type: 'box_custom', name: '', slug: '', price: 89000,
+  variants: [],
   images: [], stock: 999, status: 'active', published: true,
   description: null, tags: [], material: null, brand: null,
   sku: null, manufacturer: null, car_make: null, car_model: null,
@@ -151,6 +173,7 @@ function ProductModal({
   const [form, setForm] = useState<Omit<ProductRow, 'created_at'>>({
     ...initial,
     id: initial.id || `fb-${nanoid()}`,
+    variants: initial.variants ?? [],
   })
   const [imagesText, setImagesText] = useState(initial.images.join('\n'))
   const [uploading, setUploading] = useState(false)
@@ -178,6 +201,25 @@ function ProductModal({
     if (form.color) parts.push(s(form.color, 3))
     const suggestion = parts.filter(Boolean).join('-')
     if (suggestion) set('sku', suggestion)
+  }
+
+  function toggleVariant(key: ProductVariantKey, checked: boolean) {
+    setForm(f => {
+      let variants = f.variants
+      if (checked) {
+        if (!variants.find(v => v.key === key)) {
+          const def = VARIANT_DEFS.find(d => d.key === key)!
+          variants = [...variants, { key, label: def.label, price: f.price, is_default: false }]
+        }
+      } else {
+        variants = variants.filter(v => v.key !== key)
+      }
+      return { ...f, variants: computeVariantDefaults(variants) }
+    })
+  }
+
+  function updateVariantPrice(key: ProductVariantKey, price: number) {
+    setForm(f => ({ ...f, variants: f.variants.map(v => v.key === key ? { ...v, price } : v) }))
   }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -208,7 +250,9 @@ function ProductModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const images = imagesText.split('\n').map(s => s.trim()).filter(Boolean)
-    onSave({ ...form, images })
+    const variants = computeVariantDefaults(form.variants)
+    const defaultVariant = variants.find(v => v.is_default)
+    onSave({ ...form, images, variants, price: defaultVariant ? defaultVariant.price : form.price })
   }
 
   return (
@@ -258,14 +302,54 @@ function ProductModal({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Giá (VND) *">
-              <input required type="number" min={0} value={form.price}
-                onChange={e => set('price', parseInt(e.target.value) || 0)} className={INPUT} />
+            <Field label={form.variants.length > 0 ? 'Giá mặc định (tự tính)' : 'Giá (VND) *'}>
+              <input required type="number" min={0} value={form.price} disabled={form.variants.length > 0}
+                onChange={e => set('price', parseInt(e.target.value) || 0)}
+                className={INPUT + (form.variants.length > 0 ? ' opacity-50 cursor-not-allowed' : '')} />
             </Field>
             <Field label="Tồn kho *">
               <input required type="number" min={0} value={form.stock}
                 onChange={e => set('stock', parseInt(e.target.value) || 0)} className={INPUT} />
             </Field>
+          </div>
+
+          {/* ── Box variants ─────────────────────────────────────── */}
+          <div className="h-px bg-[#1A1A22]" />
+          <p className="text-sm font-bold text-[#484858] uppercase tracking-widest -mb-1">Biến thể (loại hộp)</p>
+          <p className="text-sm text-[#484858] -mt-2">
+            Chỉ chọn 1 loại → tự thành mặc định. Chọn nhiều loại → mặc định luôn là bản custom.
+          </p>
+          <div className="flex flex-col gap-2">
+            {VARIANT_DEFS.map(def => {
+              const v = form.variants.find(x => x.key === def.key)
+              const checked = !!v
+              return (
+                <div key={def.key} className="flex items-center gap-3">
+                  <button type="button" onClick={() => toggleVariant(def.key, !checked)}
+                    className={`w-4 h-4 rounded flex items-center justify-center border shrink-0 transition-colors ${
+                      checked ? 'bg-[#6366f1] border-[#6366f1]' : 'border-[#2A2A38] hover:border-[#6366f1]/60'
+                    }`}>
+                    {checked && (
+                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                        <path d="M1 4l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </button>
+                  <span className={`text-sm flex-1 ${checked ? 'text-[#EEEEF4]' : 'text-[#484858]'}`}>
+                    {def.label}
+                    {v?.is_default && (
+                      <span className="ml-2 text-sm font-semibold text-[#6366f1] bg-[#6366f1]/10 px-1.5 py-0.5 rounded">Mặc định</span>
+                    )}
+                  </span>
+                  {checked && (
+                    <input type="number" min={0} value={v!.price}
+                      onChange={e => updateVariantPrice(def.key, parseInt(e.target.value) || 0)}
+                      placeholder="Giá"
+                      className="w-32 bg-[#0D0D14] border border-[#1E1E28] rounded-lg px-3 h-8 text-sm text-[#EEEEF4] focus:outline-none focus:border-[#6366f1] transition-colors" />
+                  )}
+                </div>
+              )
+            })}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

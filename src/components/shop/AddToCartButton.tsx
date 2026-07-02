@@ -1,12 +1,12 @@
 'use client'
 import { useState } from 'react'
 import { ShoppingCart, Check } from 'lucide-react'
-import type { Product } from '@/lib/types'
+import type { Product, ProductVariant } from '@/lib/types'
 import { useCartStore } from '@/lib/store/cart'
 
-interface Props { product: Product }
+interface Props { product: Product; variant?: ProductVariant }
 
-export default function AddToCartButton({ product }: Props) {
+export default function AddToCartButton({ product, variant }: Props) {
   const addItem = useCartStore(s => s.addItem)
   const triggerFly = useCartStore(s => s.triggerFly)
   const [qty, setQty] = useState(1)
@@ -16,7 +16,7 @@ export default function AddToCartButton({ product }: Props) {
 
   const handleAdd = () => {
     if (isOutOfStock) return
-    addItem(product, qty)
+    addItem(product, qty, variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
 

@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
 import { DUMMY_PRODUCTS } from '@/lib/data/products'
+import type { ProductVariant } from '@/lib/types'
 
 function db() {
   return createClient(
@@ -22,6 +23,7 @@ export interface ProductRow {
   color: string | null
   color_group: string | null
   price: number
+  variants: ProductVariant[]
   images: string[]
   stock: number
   status: string

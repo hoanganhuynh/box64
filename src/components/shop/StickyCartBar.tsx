@@ -3,16 +3,17 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ShoppingCart, Check } from 'lucide-react'
-import type { Product } from '@/lib/types'
+import type { Product, ProductVariant } from '@/lib/types'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 
 interface Props {
   product: Product
   salePrice: number
+  variant?: ProductVariant
 }
 
-export default function StickyCartBar({ product, salePrice }: Props) {
+export default function StickyCartBar({ product, salePrice, variant }: Props) {
   const [visible, setVisible] = useState(false)
   const [added, setAdded] = useState(false)
   const addItem = useCartStore(s => s.addItem)
@@ -29,10 +30,11 @@ export default function StickyCartBar({ product, salePrice }: Props) {
   }, [])
 
   const isOutOfStock = product.stock === 0 && product.status !== 'pre_order'
+  const displayPrice = variant ? variant.price : salePrice
 
   const handleAdd = () => {
     if (isOutOfStock) return
-    addItem(product, 1)
+    addItem(product, 1, variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
@@ -61,7 +63,7 @@ export default function StickyCartBar({ product, salePrice }: Props) {
           {/* Name + price */}
           <div className="flex-1 min-w-0">
             <p className="text-white/50 text-[11px] truncate leading-none mb-1">{product.name}</p>
-            <p className="text-white font-bold text-base leading-none">{formatVND(salePrice)}</p>
+            <p className="text-white font-bold text-base leading-none">{formatVND(displayPrice)}</p>
           </div>
 
           {/* CTA */}

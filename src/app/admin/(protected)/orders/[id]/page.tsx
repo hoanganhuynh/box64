@@ -86,7 +86,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#EEEEF4] leading-tight">{item.product_name}</p>
-                    <p className="text-sm text-[#484858] mt-0.5">x{item.quantity}</p>
+                    <p className="text-sm text-[#484858] mt-0.5">
+                      x{item.quantity}
+                      {item.variant_label && <span className="ml-1.5 text-[#6366f1]">· {item.variant_label}</span>}
+                    </p>
                   </div>
                   <p className="text-sm font-bold text-[#EEEEF4] whitespace-nowrap tabular-nums">
                     {vnd(item.unit_price * item.quantity)}

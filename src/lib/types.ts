@@ -7,6 +7,19 @@ export type PromotionType = 'sale' | 'pre_order' | 'flash_sale'
 export type BoxSize = 'minigt' | 'poprace'
 export type LogoVariant = 'minigt' | 'poprace' | 'custom'
 
+// Box variant a product can be ordered as. A product with 0 or 1 entries has
+// no visible selector — the single entry (or the plain product.price) is used
+// as-is. With 2+ entries, the customer picks one; is_default marks which one
+// is preselected (custom variants always outrank the MiniGT zin/stock box).
+export type ProductVariantKey = 'custom_minigt' | 'custom_poprace' | 'zin_minigt'
+
+export interface ProductVariant {
+  key: ProductVariantKey
+  label: string
+  price: number
+  is_default: boolean
+}
+
 export interface Product {
   id: string
   type: ProductType
@@ -18,7 +31,8 @@ export interface Product {
   car_model?: string     // car model: 911-gt3-r, defender-110
   color?: string         // color/livery variant: pink, dust-sand
   color_group?: string   // links same-model variants: mini-gt-porsche-911-gt3r
-  price: number          // VND, integer
+  price: number          // VND, integer — mirrors the default variant's price
+  variants?: ProductVariant[]
   images: string[]
   stock: number
   status: ProductStatus
@@ -153,4 +167,6 @@ export interface CartItem {
   material?: 'box_only' | 'box_protect'
   brand?: CarBrand
   design?: DesignState   // present for box_custom items
+  variant_key?: ProductVariantKey
+  variant_label?: string
 }

@@ -63,6 +63,7 @@ export async function placeOrder(
     material: i.material,
     brand: i.brand,
     image_url: i.image_url,
+    variant_label: i.variant_label,
   }))
 
   const { error } = await supabase.from('orders').insert({

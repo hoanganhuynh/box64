@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Product } from '@/lib/types'
+import type { Product, ProductVariant } from '@/lib/types'
 
 function db() {
   return createClient(
@@ -21,6 +21,7 @@ type DbRow = {
   color: string | null
   color_group: string | null
   price: number
+  variants: ProductVariant[] | null
   images: string[]
   stock: number
   status: string
@@ -45,6 +46,7 @@ function toProduct(row: DbRow): Product {
     color: row.color ?? undefined,
     color_group: row.color_group ?? undefined,
     price: row.price,
+    variants: row.variants ?? [],
     images: row.images ?? [],
     stock: row.stock,
     status: row.status as Product['status'],

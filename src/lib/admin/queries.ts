@@ -13,7 +13,7 @@ export interface OrderRow {
   id: string
   user_id: string | null
   status: string
-  items: Array<{ product_name: string; quantity: number; unit_price: number; image_url?: string; design_data?: DesignState }>
+  items: Array<{ product_name: string; quantity: number; unit_price: number; image_url?: string; design_data?: DesignState; variant_label?: string }>
   shipping: { name: string; phone: string; line1: string; ward?: string; district: string; city: string }
   subtotal: number
   total: number

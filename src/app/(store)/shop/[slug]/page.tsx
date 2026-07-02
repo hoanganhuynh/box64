@@ -17,9 +17,8 @@ import { JsonLd } from '@/components/ui/JsonLd'
 import BrandLogo from '@/components/ui/BrandLogo'
 import CountdownBadge from '@/components/shop/CountdownBadge'
 import ProductCard from '@/components/shop/ProductCard'
-import AddToCartButton from '@/components/shop/AddToCartButton'
 import ImageGallery from '@/components/shop/ImageGallery'
-import StickyCartBar from '@/components/shop/StickyCartBar'
+import VariantPurchasePanel from '@/components/shop/VariantPurchasePanel'
 
 function prettifySlug(s: string) {
   return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -166,15 +165,13 @@ const availabilityMap: Record<string, string> = {
 
           {/* Right: info + actions */}
           <div className="flex flex-col gap-5">
-            {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className={`font-extrabold text-3xl ${isActive && promo!.discount_pct > 0 ? 'text-error' : 'text-primary'}`}>
-                {formatVND(salePrice)}
-              </span>
-              {isActive && promo!.discount_pct > 0 && (
-                <span className="text-faint line-through text-base">{formatVND(product.price)}</span>
-              )}
-            </div>
+            {/* Price + variant picker + add to cart */}
+            <VariantPurchasePanel
+              product={product}
+              salePrice={salePrice}
+              isActive={!!isActive}
+              discountPct={promo?.discount_pct ?? 0}
+            />
 
             {/* Status badges */}
             {isActive && promo!.discount_pct > 0 && (
@@ -253,12 +250,6 @@ const availabilityMap: Record<string, string> = {
                 After checkout, we&apos;ll email you instructions to upload your car photo. Our team designs and prints your personalised box.
               </div>
             )}
-
-            {/* Add to cart */}
-            <AddToCartButton product={product} />
-
-            {/* Sticky bar — sentinel sits right after ATC button so bar appears as soon as ATC scrolls off */}
-            <StickyCartBar product={product} salePrice={salePrice} />
 
             {/* Trust signals — inline, no bg */}
             <div className="flex items-center flex-wrap gap-x-0 gap-y-1">
