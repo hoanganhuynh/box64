@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart'
 import { useEffect, useRef, useState } from 'react'
-import { Bag2, ProfileCircle, HambergerMenu, CloseSquare, LogoutCurve, SearchNormal1 } from 'iconsax-react'
+import { Bag2, ProfileCircle, HambergerMenu, CloseSquare, LogoutCurve, SearchNormal1, Gift } from 'iconsax-react'
 import type { User } from '@supabase/supabase-js'
 import { createSupabaseClient } from '@/lib/supabase/client'
 import SearchBox from '@/components/shop/SearchBox'
@@ -85,6 +85,14 @@ function UserMenu({ user }: { user: User }) {
             >
               <Bag2 size={15} color="currentColor" />
               My Orders
+            </Link>
+            <Link
+              href="/referral"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <Gift size={15} color="currentColor" />
+              Mời bạn bè
             </Link>
             <button
               onClick={handleSignOut}
@@ -264,6 +272,10 @@ export default function Header() {
                 <Link href="/orders" onClick={() => setMenuOpen(false)}
                   className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
                   <Bag2 size={18} color="currentColor" /> My Orders
+                </Link>
+                <Link href="/referral" onClick={() => setMenuOpen(false)}
+                  className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
+                  <Gift size={18} color="currentColor" /> Mời bạn bè
                 </Link>
                 <button onClick={handleMobileSignOut}
                   className="py-4 px-3 text-base font-semibold text-error/80 hover:text-error hover:bg-error/5 rounded-sm transition-colors flex items-center gap-2.5 w-full text-left">

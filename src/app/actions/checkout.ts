@@ -2,6 +2,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { CartItem } from '@/lib/types'
+import { previewDiscount, commitRedemption } from './promotions'
 
 export interface ShippingInput {
   name: string
@@ -31,15 +32,13 @@ export async function placeOrder(
   shipping: ShippingInput,
   items: CartItem[],
   subtotal: number,
-  couponCode?: string,
-  discount = 0,
+  couponCode: string | undefined,
   shippingFee = 0,
   paymentMethod: 'transfer' | 'vietqr' | 'sepay' = 'transfer',
 ): Promise<PlaceOrderResult> {
   if (!items.length) return { success: false, error: 'No items' }
 
   const orderId = generateOrderId()
-  const total = subtotal + shippingFee - discount
 
   const cookieStore = await cookies()
   const supabase = createServerClient(
@@ -54,6 +53,18 @@ export async function placeOrder(
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Discount is never trusted from the client — re-validated here against
+  // the code's own rules (scope, expiry, per-user redemption) right before
+  // the order total is computed.
+  let discount = 0
+  let promoCodeId: string | null = null
+  if (couponCode && user) {
+    const preview = await previewDiscount(user.id, couponCode, items, subtotal)
+    discount = preview.discount
+    promoCodeId = preview.promoCodeId
+  }
+  const total = subtotal + shippingFee - discount
 
   const orderItems = items.map(i => ({
     product_id: i.product_id,
@@ -93,6 +104,10 @@ export async function placeOrder(
   if (error) {
     console.error('placeOrder error:', error)
     return { success: false, error: error.message }
+  }
+
+  if (promoCodeId && user) {
+    await commitRedemption(promoCodeId, user.id, orderId)
   }
 
   // Send order confirmation email. MUST be awaited — in a serverless runtime

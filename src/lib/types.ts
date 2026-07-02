@@ -166,6 +166,10 @@ export interface CartItem {
   image_url: string
   material?: 'box_only' | 'box_protect'
   brand?: CarBrand
+  car_make?: string
+  color?: string
+  manufacturer?: string
+  product_type?: ProductType
   design?: DesignState   // present for box_custom items
   variant_key?: ProductVariantKey
   variant_label?: string

@@ -53,6 +53,10 @@ export const useCartStore = create<CartStore>()(
             image_url: product.images[0] ?? '',
             material: product.material,
             brand: product.brand,
+            car_make: product.car_make,
+            color: product.color,
+            manufacturer: product.manufacturer,
+            product_type: product.type,
             variant_key: variant?.key,
             variant_label: variant?.label,
           }

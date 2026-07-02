@@ -3,10 +3,11 @@ import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, MapPin, Phone, User, FileText, Building2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MapPin, Phone, User, FileText, Building2, Tag } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 import { placeOrder } from '@/app/actions/checkout'
+import { getApplicableCodes, type ApplicableCode } from '@/app/actions/promotions'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 interface GeoItem { code: number; name: string }
@@ -33,6 +34,8 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
+  const [applicableCodes, setApplicableCodes] = useState<ApplicableCode[]>([])
+  const [selectedCode, setSelectedCode] = useState<string>('')
 
   // Address system toggle
   const [addressType, setAddressType] = useState<'new' | 'old'>('new')
@@ -198,6 +201,18 @@ export default function CheckoutPage() {
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
   const totalItems = items.reduce((s, i) => s + i.quantity, 0)
   const shippingFee = subtotal >= 500_000 ? 0 : 11_000
+  const selected = applicableCodes.find(c => c.code === selectedCode)
+  const discount = selected?.discount ?? 0
+
+  useEffect(() => {
+    if (!isAuthed || items.length === 0) { setApplicableCodes([]); return }
+    getApplicableCodes(items, subtotal).then(codes => {
+      setApplicableCodes(codes)
+      // Auto-apply the single best code; let the shopper choose among several.
+      setSelectedCode(prev => codes.some(c => c.code === prev) ? prev : (codes[0]?.code ?? ''))
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthed, items.length, subtotal])
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -224,8 +239,7 @@ export default function CheckoutPage() {
       },
       items,
       subtotal,
-      undefined,
-      0,
+      selectedCode || undefined,
       shippingFee,
       'sepay',
     )
@@ -236,7 +250,7 @@ export default function CheckoutPage() {
       return
     }
 
-    const total = subtotal + shippingFee
+    const total = subtotal + shippingFee - discount
     sessionStorage.setItem('lastOrder', JSON.stringify({
       orderId: result.orderId,
       items,
@@ -511,6 +525,28 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Promo code */}
+              {applicableCodes.length > 0 && (
+                <div className="border-t border-border pt-4 mb-1">
+                  <label className="flex items-center gap-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1.5">
+                    <Tag size={14} className="text-gold/60" /> Mã giảm giá
+                  </label>
+                  {applicableCodes.length === 1 ? (
+                    <div className="flex items-center justify-between bg-gold/5 border border-gold/25 rounded-lg px-3 py-2">
+                      <span className="font-mono text-xs font-bold text-gold">{applicableCodes[0].code}</span>
+                      <span className="text-xs text-gold">-{formatVND(applicableCodes[0].discount)}</span>
+                    </div>
+                  ) : (
+                    <select value={selectedCode} onChange={e => setSelectedCode(e.target.value)} className={INPUT}>
+                      <option value="">Không dùng mã</option>
+                      {applicableCodes.map(c => (
+                        <option key={c.code} value={c.code}>{c.label} · -{formatVND(c.discount)}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
               <div className="border-t border-border pt-4 flex flex-col gap-2 text-sm mb-5">
                 <div className="flex justify-between">
                   <span className="text-muted">Tạm tính</span>
@@ -523,9 +559,15 @@ export default function CheckoutPage() {
                     : <span className="text-primary">{formatVND(shippingFee)}</span>
                   }
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Giảm giá</span>
+                    <span className="text-success font-medium">-{formatVND(discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-border pt-2 mt-1">
                   <span className="font-bold text-primary">Tổng cộng</span>
-                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal + shippingFee)}</span>
+                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal + shippingFee - discount)}</span>
                 </div>
               </div>
 
