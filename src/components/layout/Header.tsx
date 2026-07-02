@@ -79,6 +79,14 @@ function UserMenu({ user }: { user: User }) {
           </div>
           <div className="py-1.5">
             <Link
+              href="/account"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <ProfileCircle size={15} color="currentColor" />
+              Hồ sơ
+            </Link>
+            <Link
               href="/orders"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
@@ -269,6 +277,10 @@ export default function Header() {
                     <p className="text-[11px] text-white/40 truncate">{user.email}</p>
                   </div>
                 </div>
+                <Link href="/account" onClick={() => setMenuOpen(false)}
+                  className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
+                  <ProfileCircle size={18} color="currentColor" /> Hồ sơ
+                </Link>
                 <Link href="/orders" onClick={() => setMenuOpen(false)}
                   className="py-4 px-3 text-base font-semibold text-white/75 hover:text-white hover:bg-white/5 rounded-sm transition-colors border-b border-white/[0.05] flex items-center gap-2.5">
                   <Bag2 size={18} color="currentColor" /> My Orders

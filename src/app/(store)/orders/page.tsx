@@ -11,7 +11,9 @@ import { StatusBadge, PaymentBadge } from '@/components/shop/OrderStatusBadges'
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
-  function copy() {
+  function copy(e: React.MouseEvent) {
+    e.stopPropagation()
+    e.preventDefault()
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -69,7 +71,11 @@ export default function OrdersPage() {
       ) : (
         <div className="flex flex-col gap-4">
           {orders.map(order => (
-            <div key={order.id} className="bg-surface border border-border rounded-xl overflow-hidden">
+            <Link
+              key={order.id}
+              href={`/orders/${order.id}`}
+              className="block bg-surface border border-border rounded-xl overflow-hidden hover:border-gold/30 transition-colors"
+            >
               {/* Header */}
               <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
@@ -118,7 +124,7 @@ export default function OrdersPage() {
                   <p className="font-extrabold text-gold text-base">{formatVND(order.total)}</p>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
