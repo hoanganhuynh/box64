@@ -41,20 +41,11 @@ export interface CommentRow {
 export async function getComments(productId: string): Promise<CommentRow[]> {
   const { data, error } = await adminDb()
     .from('product_comments')
-    .select('id, product_id, user_id, content, created_at, profiles(full_name, avatar_url)')
+    .select('id, product_id, user_id, content, created_at, user_name, user_avatar')
     .eq('product_id', productId)
     .order('created_at', { ascending: false })
   if (error) return []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data as any[]).map(c => ({
-    id: c.id,
-    product_id: c.product_id,
-    user_id: c.user_id,
-    content: c.content,
-    created_at: c.created_at,
-    user_name: c.profiles?.full_name ?? null,
-    user_avatar: c.profiles?.avatar_url ?? null,
-  }))
+  return data as CommentRow[]
 }
 
 export type PostCommentResult =
@@ -72,13 +63,13 @@ export async function postComment(productId: string, content: string): Promise<P
 
   const db = adminDb()
 
-  const { data: profile } = await db
-    .from('profiles')
+  const { data: moderation } = await db
+    .from('user_moderation')
     .select('comment_violations, comment_banned')
-    .eq('id', user.id)
-    .single()
+    .eq('user_id', user.id)
+    .maybeSingle()
 
-  if (profile?.comment_banned) {
+  if (moderation?.comment_banned) {
     return { success: false, error: 'banned' }
   }
 
@@ -86,22 +77,31 @@ export async function postComment(productId: string, content: string): Promise<P
   const bannedWords = (wordsData ?? []).map(w => w.word as string)
 
   if (containsBannedWord(trimmed, bannedWords)) {
-    const nextCount = (profile?.comment_violations ?? 0) + 1
+    const nextCount = (moderation?.comment_violations ?? 0) + 1
     const justBanned = nextCount >= MAX_VIOLATIONS_BEFORE_BAN
-    await db.from('profiles').update({
+    await db.from('user_moderation').upsert({
+      user_id: user.id,
       comment_violations: nextCount,
       comment_banned: justBanned,
       comment_banned_at: justBanned ? new Date().toISOString() : null,
-    }).eq('id', user.id)
+    })
     return { success: false, error: 'blocked', violations: nextCount, justBanned }
   }
+
+  const userName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? null
+  const userAvatar = (user.user_metadata?.avatar_url as string | undefined) ?? null
 
   const { error } = await db.from('product_comments').insert({
     product_id: productId,
     user_id: user.id,
     content: trimmed,
+    user_name: userName,
+    user_avatar: userAvatar,
   })
-  if (error) return { success: false, error: 'empty' }
+  if (error) {
+    console.error('postComment insert error:', error.message)
+    return { success: false, error: 'empty' }
+  }
 
   return { success: true }
 }

@@ -50,13 +50,13 @@ export async function getMyReferral(): Promise<MyReferral | null> {
   if (!user) return null
 
   const db = adminDb()
-  const { data: profile } = await db.from('profiles').select('referral_code').eq('id', user.id).single()
+  const { data: existingRow } = await db.from('user_referral').select('referral_code').eq('user_id', user.id).maybeSingle()
 
-  let referralCode = profile?.referral_code as string | null | undefined
+  let referralCode = existingRow?.referral_code as string | null | undefined
   if (!referralCode) {
     for (let attempt = 0; attempt < 5 && !referralCode; attempt++) {
       const candidate = randomCode()
-      const { error } = await db.from('profiles').update({ referral_code: candidate }).eq('id', user.id)
+      const { error } = await db.from('user_referral').upsert({ user_id: user.id, referral_code: candidate })
       if (!error) referralCode = candidate
     }
     if (!referralCode) return null

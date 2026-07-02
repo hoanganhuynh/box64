@@ -27,14 +27,14 @@ async function processReferral(refereeId: string, refereeCreatedAt: string, refC
 
   const db = adminDb()
 
-  const { data: referee } = await db.from('profiles').select('referred_by').eq('id', refereeId).single()
+  const { data: referee } = await db.from('user_referral').select('referred_by').eq('user_id', refereeId).maybeSingle()
   if (referee?.referred_by) return // already credited
 
-  const { data: referrer } = await db.from('profiles').select('id').eq('referral_code', refCode).single()
-  if (!referrer || referrer.id === refereeId) return // invalid or self-referral
+  const { data: referrer } = await db.from('user_referral').select('user_id').eq('referral_code', refCode).maybeSingle()
+  if (!referrer || referrer.user_id === refereeId) return // invalid or self-referral
 
-  await db.from('profiles').update({ referred_by: referrer.id }).eq('id', refereeId)
-  const { error: refError } = await db.from('referrals').insert({ referrer_id: referrer.id, referee_id: refereeId })
+  await db.from('user_referral').upsert({ user_id: refereeId, referred_by: referrer.user_id })
+  const { error: refError } = await db.from('referrals').insert({ referrer_id: referrer.user_id, referee_id: refereeId })
   if (refError) return // already has a referral row — don't double-issue vouchers
 
   await db.from('promo_codes').insert([
@@ -44,7 +44,7 @@ async function processReferral(refereeId: string, refereeCreatedAt: string, refC
       value: REFERRAL_VOUCHER_VALUE,
       scope: 'all',
       is_referral: true,
-      owner_id: referrer.id,
+      owner_id: referrer.user_id,
       active: true,
     },
     {

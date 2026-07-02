@@ -2,6 +2,9 @@
 -- color, manufacturer, type). Referral vouchers are promo_codes too
 -- (is_referral=true, owner_id set, never expire); everything else must have
 -- an expires_at.
+--
+-- No `profiles` table in this project — user identity lives on auth.users
+-- directly (see orders.user_id), so owner/user references point there.
 create table if not exists promo_codes (
   id uuid primary key default gen_random_uuid(),
   code text not null unique,
@@ -15,7 +18,7 @@ create table if not exists promo_codes (
   min_order_amount integer not null default 0,
   expires_at timestamptz,
   is_referral boolean not null default false,
-  owner_id uuid references profiles(id) on delete cascade,
+  owner_id uuid references auth.users(id) on delete cascade,
   active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -27,20 +30,23 @@ create index if not exists promo_codes_owner_id_idx on promo_codes (owner_id) wh
 create table if not exists promo_code_redemptions (
   id uuid primary key default gen_random_uuid(),
   promo_code_id uuid not null references promo_codes(id) on delete cascade,
-  user_id uuid not null references profiles(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
   order_id text references orders(id) on delete set null,
   created_at timestamptz not null default now(),
   unique (promo_code_id, user_id)
 );
 
 -- Referral program
-alter table profiles add column if not exists referral_code text unique;
-alter table profiles add column if not exists referred_by uuid references profiles(id);
+create table if not exists user_referral (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  referral_code text unique,
+  referred_by uuid references auth.users(id)
+);
 
 create table if not exists referrals (
   id uuid primary key default gen_random_uuid(),
-  referrer_id uuid not null references profiles(id) on delete cascade,
-  referee_id uuid not null references profiles(id) on delete cascade,
+  referrer_id uuid not null references auth.users(id) on delete cascade,
+  referee_id uuid not null references auth.users(id) on delete cascade,
   created_at timestamptz not null default now(),
   unique (referee_id)
 );
