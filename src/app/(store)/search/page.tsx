@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight2 } from 'iconsax-react'
-import { DUMMY_PRODUCTS, getDiscountedPrice } from '@/lib/data/products'
+import { getAllProducts } from '@/lib/storefront/products'
 import ProductCard from '@/components/shop/ProductCard'
+import SampleRequestForm from '@/components/layout/SampleRequestForm'
 import type { Product } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -19,12 +20,14 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
-function searchProducts(q: string): Product[] {
+function searchProducts(all: Product[], q: string): Product[] {
   if (!q.trim()) return []
   const lower = q.toLowerCase()
-  return DUMMY_PRODUCTS.filter(p =>
+  return all.filter(p =>
     p.name.toLowerCase().includes(lower) ||
     (p.brand ?? '').toLowerCase().includes(lower) ||
+    (p.car_make ?? '').toLowerCase().includes(lower) ||
+    (p.car_model ?? '').toLowerCase().includes(lower) ||
     (p.tags ?? []).some(t => t.toLowerCase().includes(lower)) ||
     (p.description ?? '').toLowerCase().includes(lower)
   )
@@ -32,10 +35,12 @@ function searchProducts(q: string): Product[] {
 
 export default async function SearchPage({ searchParams }: Props) {
   const { q = '' } = await searchParams
-  const results = searchProducts(q)
+  const allProducts = await getAllProducts()
+  const results = searchProducts(allProducts, q)
+  const hasNoResults = q.trim().length > 0 && results.length === 0
 
   const resultIds = new Set(results.map(p => p.id))
-  const suggestions = DUMMY_PRODUCTS
+  const suggestions = allProducts
     .filter(p => !resultIds.has(p.id) && p.status === 'active')
     .slice(0, 4)
 
@@ -56,7 +61,7 @@ export default async function SearchPage({ searchParams }: Props) {
               <p className="text-white/35 text-sm mt-2">
                 {results.length > 0
                   ? `${results.length} product${results.length !== 1 ? 's' : ''} found`
-                  : 'No products found'}
+                  : 'Mẫu này mình chưa có sẵn — nhưng có thể làm riêng cho bạn'}
               </p>
             </>
           ) : (
@@ -76,17 +81,35 @@ export default async function SearchPage({ searchParams }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {results.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
-        ) : q ? (
-          <div className="py-20 text-center border border-border rounded-xl">
-            <p className="font-display font-extrabold text-white/10 text-6xl mb-4">∅</p>
-            <p className="text-white/50 text-base font-semibold">No results for &ldquo;{q}&rdquo;</p>
-            <p className="text-white/25 text-sm mt-2 mb-7">Try another keyword or browse our shop</p>
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 h-10 px-6 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
-            >
-              Browse all boxes <ArrowRight2 size={14} color="currentColor" />
-            </Link>
+        ) : hasNoResults ? (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+            {/* Request form — smart fallback instead of a dead-end "no results" page */}
+            <div className="lg:col-span-2 border border-border rounded-xl p-5 sm:p-6 bg-surface/40 h-fit">
+              <p className="font-display font-extrabold text-white text-lg mb-1">Yêu cầu mẫu &ldquo;{q}&rdquo;</p>
+              <p className="text-white/40 text-sm mb-5">
+                Điền thông tin bên dưới, chúng tôi sẽ làm mẫu box riêng cho xe này và liên hệ báo giá.
+              </p>
+              <SampleRequestForm defaultCarModel={q} searchQuery={q} source="search" />
+            </div>
+
+            {/* Nearby suggestions */}
+            <div className="lg:col-span-3">
+              <p className="text-white/50 text-sm font-semibold mb-4">Trong khi chờ, đây là các mẫu tương tự:</p>
+              {suggestions.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+                  {suggestions.map(p => <ProductCard key={p.id} product={p} />)}
+                </div>
+              ) : (
+                <div className="py-10 text-center border border-border rounded-xl">
+                  <Link
+                    href="/shop"
+                    className="inline-flex items-center gap-2 h-10 px-6 rounded-sm bg-gold text-[#07070C] font-bold text-sm hover:bg-gold-mid transition-colors"
+                  >
+                    Browse all boxes <ArrowRight2 size={14} color="currentColor" />
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="py-16 text-center border border-border rounded-xl">
@@ -95,7 +118,7 @@ export default async function SearchPage({ searchParams }: Props) {
         )}
 
         {/* ── You may also like ── */}
-        {suggestions.length > 0 && (
+        {results.length > 0 && suggestions.length > 0 && (
           <section className="mt-16 pt-4">
             <div className="flex items-end justify-between mb-7">
               <div>

@@ -17,6 +17,8 @@ import {
   ArrowLineLeft,
   ArrowLineRight,
   MagnifyingGlass,
+  Envelope,
+  Wallet,
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/cn'
 import { Modal } from './Modal'
@@ -37,6 +39,8 @@ const mainNav: NavItem[] = [
   { label: 'Khách hàng', href: '/admin/customers',   icon: UsersThree },
   { label: 'Sản phẩm',   href: '/admin/products',    icon: Package },
   { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
+  { label: 'Yêu cầu mẫu', href: '/admin/requests',   icon: Envelope },
+  { label: 'Tài chính',  href: '/admin/finance',     icon: Wallet },
   { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
   { label: 'Cài đặt',   href: '/admin/settings',    icon: GearSix },
 ]
