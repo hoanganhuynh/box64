@@ -19,6 +19,7 @@ import {
   MagnifyingGlass,
   Envelope,
   Wallet,
+  ShieldCheck,
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/cn'
 import { Modal } from './Modal'
@@ -41,6 +42,7 @@ const mainNav: NavItem[] = [
   { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
   { label: 'Yêu cầu mẫu', href: '/admin/requests',   icon: Envelope },
   { label: 'Tài chính',  href: '/admin/finance',     icon: Wallet },
+  { label: 'Kiểm duyệt', href: '/admin/moderation',  icon: ShieldCheck },
   { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
   { label: 'Cài đặt',   href: '/admin/settings',    icon: GearSix },
 ]

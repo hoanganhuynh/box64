@@ -19,6 +19,7 @@ import CountdownBadge from '@/components/shop/CountdownBadge'
 import ProductCard from '@/components/shop/ProductCard'
 import ImageGallery from '@/components/shop/ImageGallery'
 import VariantPurchasePanel from '@/components/shop/VariantPurchasePanel'
+import ProductComments from '@/components/shop/ProductComments'
 
 function prettifySlug(s: string) {
   return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -303,6 +304,9 @@ const availabilityMap: Record<string, string> = {
             ))}
           </div>
         </section>
+
+        {/* Comments */}
+        <ProductComments productId={product.id} />
 
         {/* Related products */}
         {related.length > 0 && (
