@@ -26,6 +26,7 @@ export function NotificationsDropdown() {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<AdminNotification[]>([])
   const [unread, setUnread] = useState(0)
+  const [loaded, setLoaded] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
@@ -33,7 +34,7 @@ export function NotificationsDropdown() {
 
   const refetch = useCallback(() => {
     getNotifications()
-      .then(r => { setItems(r.items); setUnread(r.unread) })
+      .then(r => { setItems(r.items); setUnread(r.unread); setLoaded(true) })
       .catch(() => {})
   }, [])
 
@@ -108,7 +109,11 @@ export function NotificationsDropdown() {
               )}
             </div>
 
-            {items.length === 0 ? (
+            {!loaded ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-10">
+                <Bell size={24} weight="regular" className="text-muted animate-pulse" />
+              </div>
+            ) : items.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-2 py-10">
                 <Bell size={24} weight="regular" className="text-muted" />
                 <p className="text-sm text-muted">Không có thông báo mới</p>
