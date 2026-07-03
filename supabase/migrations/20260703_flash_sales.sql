@@ -19,10 +19,17 @@ create table if not exists flash_sale_items (
   sale_price integer not null check (sale_price > 0),
   quantity_limit integer check (quantity_limit > 0),
   sold_count integer not null default 0,
-  unique (flash_sale_id, product_id)
+  unique (flash_sale_id, product_id),
+  -- Backstop against any future write path (e.g. an admin tool) bypassing
+  -- claim_flash_sale_stock() and pushing sold_count past the limit directly.
+  check (quantity_limit is null or sold_count <= quantity_limit)
 );
 
 create index if not exists flash_sale_items_product_id_idx on flash_sale_items (product_id);
+create index if not exists flash_sale_items_flash_sale_id_idx on flash_sale_items (flash_sale_id);
+
+-- Speeds up the app-side "which sales are live right now" lookup.
+create index if not exists flash_sales_active_window_idx on flash_sales (active, starts_at, ends_at);
 
 alter table flash_sales enable row level security;
 alter table flash_sale_items enable row level security;
@@ -42,12 +49,16 @@ returns setof flash_sale_items language sql as $$
   returning *;
 $$;
 
--- Compensating release for when the order insert fails after a claim.
+-- Compensating release for when the order insert fails after a claim. NOT
+-- idempotent — callers must release at most once per successful claim, or
+-- sold_count will undercount. (No claim ledger exists yet to enforce this
+-- server-side; a future task should add one if double-release risk grows.)
 create or replace function release_flash_sale_stock(item_id uuid, qty integer)
 returns void language sql as $$
   update flash_sale_items
      set sold_count = greatest(sold_count - qty, 0)
-   where id = item_id;
+   where id = item_id
+     and qty > 0;
 $$;
 
 -- Only the server (service role) may mutate stock counters.
