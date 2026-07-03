@@ -38,9 +38,11 @@ export async function addBannedWord(word: string): Promise<void> {
   if (!w) return
   const { error } = await db().from('banned_words').insert({ word: w })
   if (error && !error.message.includes('duplicate')) throw new Error(error.message)
-  await logAdminAction({
-    action: 'create', entityType: 'moderation', entityLabel: `Từ cấm: ${w}`, after: { word: w },
-  })
+  if (!error) {
+    await logAdminAction({
+      action: 'create', entityType: 'moderation', entityLabel: `Từ cấm: ${w}`, after: { word: w },
+    })
+  }
   revalidatePath('/admin/moderation')
 }
 
