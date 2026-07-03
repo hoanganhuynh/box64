@@ -28,6 +28,12 @@ exception when others then
   null;
 end $$;
 
+-- Notification failures must never block the parent insert — this matters
+-- most for auth.users, which already has an unrelated handle_new_user()
+-- trigger (001_initial_schema.sql) creating the customer's profile row in
+-- the SAME transaction. Postgres fires same-event triggers alphabetically
+-- and any uncaught exception rolls back the whole statement, so a broken
+-- admin_notifications insert could otherwise break real OAuth signups.
 create or replace function notify_admin_new_order()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -38,6 +44,9 @@ begin
     '/admin/orders/' || new.id
   );
   perform admin_notif_signal('order');
+  return new;
+exception when others then
+  raise warning 'notify_admin_new_order failed: %', sqlerrm;
   return new;
 end $$;
 
@@ -57,6 +66,9 @@ begin
   );
   perform admin_notif_signal('comment');
   return new;
+exception when others then
+  raise warning 'notify_admin_new_comment failed: %', sqlerrm;
+  return new;
 end $$;
 
 drop trigger if exists trg_notify_admin_new_comment on product_comments;
@@ -67,6 +79,11 @@ create trigger trg_notify_admin_new_comment
 -- Trigger on auth.users catches Google OAuth signups. Requires the migration
 -- to run as postgres (supabase db push / SQL editor does). security definer so
 -- the auth-schema trigger can insert into public.admin_notifications.
+-- auth.users already has an unrelated handle_new_user() trigger
+-- (001_initial_schema.sql, fires first — 'h' < 't' alphabetically) that
+-- creates the customer's profile row in the same transaction: this trigger
+-- MUST swallow its own failures or a broken admin_notifications insert
+-- would roll back the entire signup, including that profile row.
 create or replace function public.notify_admin_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -77,6 +94,9 @@ begin
     '/admin/customers'
   );
   perform admin_notif_signal('user');
+  return new;
+exception when others then
+  raise warning 'notify_admin_new_user failed: %', sqlerrm;
   return new;
 end $$;
 
