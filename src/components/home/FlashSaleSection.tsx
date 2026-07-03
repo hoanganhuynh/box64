@@ -1,10 +1,14 @@
 import { Flash } from 'iconsax-react'
-import { getFlashSaleProducts } from '@/lib/data/products'
+import { getAllProducts } from '@/lib/storefront/products'
 import FlashCountdown from './FlashCountdown'
 import ProductCard from '@/components/shop/ProductCard'
 
-export default function FlashSaleSection() {
-  const products = getFlashSaleProducts()
+export default async function FlashSaleSection() {
+  const all = await getAllProducts()
+  const now = new Date()
+  const products = all.filter(p =>
+    p.promotion?.type === 'flash_sale' && new Date(p.promotion.ends_at) > now,
+  )
   if (products.length === 0) return null
 
   const endDate = products.reduce((min, p) => {
@@ -55,7 +59,7 @@ export default function FlashSaleSection() {
         <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none [-webkit-overflow-scrolling:touch] pl-5 sm:pl-6 [scroll-padding-left:1.25rem] sm:[scroll-padding-left:1.5rem]">
           {products.map(p => (
             <div key={p.id} className="snap-start shrink-0 w-[75%] sm:w-[44%]">
-              <ProductCard product={p} variant="light" />
+              <ProductCard product={p} variant="light" showFlashProgress />
             </div>
           ))}
           <div className="shrink-0 w-4 sm:w-6" aria-hidden="true" />
@@ -67,7 +71,7 @@ export default function FlashSaleSection() {
         <div className="grid grid-cols-3 gap-5 items-stretch">
           {products.slice(0, 3).map(p => (
             <div key={p.id} className="flex flex-col">
-              <ProductCard product={p} variant="light" />
+              <ProductCard product={p} variant="light" showFlashProgress />
             </div>
           ))}
         </div>

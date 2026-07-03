@@ -54,6 +54,9 @@ export interface Promotion {
   ends_at: string        // ISO timestamp
   product_ids: string[] | null   // null = sitewide
   priority: number
+  sale_price?: number        // exact VND flash price — overrides discount_pct math
+  quantity_limit?: number | null  // flash sale: per-item cap (null = unlimited)
+  sold_count?: number        // flash sale: units claimed so far
 }
 
 export interface Address {

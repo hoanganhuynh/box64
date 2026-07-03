@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Product, ProductVariant } from '@/lib/types'
+import type { Product, ProductVariant, Promotion } from '@/lib/types'
+import { getActiveFlashPrices } from './flash'
 
 function db() {
   return createClient(
@@ -58,6 +59,32 @@ function toProduct(row: DbRow): Product {
   }
 }
 
+// Attach live flash-sale prices as product.promotion so the existing
+// flash-sale UI (ProductCard, PriceDisplay, FlashSaleSection) lights up.
+async function attachFlashPromotions(products: Product[]): Promise<Product[]> {
+  if (products.length === 0) return products
+  const flash = await getActiveFlashPrices(products.map(p => p.id))
+  if (flash.size === 0) return products
+  return products.map(p => {
+    const fp = flash.get(p.id)
+    if (!fp || fp.sale_price >= p.price) return p
+    const promotion: Promotion = {
+      id: fp.id,
+      type: 'flash_sale',
+      label: 'FLASH SALE',
+      discount_pct: Math.round((1 - fp.sale_price / p.price) * 100),
+      starts_at: fp.starts_at,
+      ends_at: fp.ends_at,
+      product_ids: null,
+      priority: 10,
+      sale_price: fp.sale_price,
+      quantity_limit: fp.quantity_limit,
+      sold_count: fp.sold_count,
+    }
+    return { ...p, promotion }
+  })
+}
+
 export async function getAllProducts(): Promise<Product[]> {
   const { data, error } = await db()
     .from('products')
@@ -65,7 +92,8 @@ export async function getAllProducts(): Promise<Product[]> {
     .eq('published', true)
     .order('created_at', { ascending: false })
   if (error) throw new Error(error.message)
-  return (data as DbRow[]).map(toProduct)
+  const mapped = (data as DbRow[]).map(toProduct)
+  return attachFlashPromotions(mapped)
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
@@ -76,7 +104,9 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
     .eq('published', true)
     .single()
   if (error || !data) return undefined
-  return toProduct(data as DbRow)
+  const product = toProduct(data as DbRow)
+  const [withFlash] = await attachFlashPromotions([product])
+  return withFlash
 }
 
 export async function getAllSlugs(): Promise<string[]> {

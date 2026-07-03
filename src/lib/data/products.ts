@@ -358,7 +358,11 @@ export function getColorVariants(product: Product): Product[] {
 }
 
 export function getDiscountedPrice(product: Product): number {
-  if (!product.promotion || product.promotion.discount_pct === 0) return product.price
+  if (!product.promotion) return product.price
+  if (product.promotion.sale_price && product.promotion.sale_price < product.price) {
+    return product.promotion.sale_price
+  }
+  if (product.promotion.discount_pct === 0) return product.price
   return Math.round(product.price * (1 - product.promotion.discount_pct / 100))
 }
 

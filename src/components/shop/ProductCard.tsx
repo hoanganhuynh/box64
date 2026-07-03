@@ -40,8 +40,12 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
 
   const sold = getSoldCount(product.slug)
-  const flashSold = (isFlashSale && showFlashProgress) ? getFlashSoldCount(product.slug) : 0
-  const flashPct = Math.round((flashSold / FLASH_TOTAL) * 100)
+  const hasRealFlash = isFlashSale && promo!.quantity_limit != null
+  const flashTotal = hasRealFlash ? promo!.quantity_limit! : FLASH_TOTAL
+  const flashSold = (isFlashSale && showFlashProgress)
+    ? (hasRealFlash ? Math.min(promo!.sold_count ?? 0, flashTotal) : getFlashSoldCount(product.slug))
+    : 0
+  const flashPct = Math.round((flashSold / flashTotal) * 100)
 
   const onPointerDown = (e: React.PointerEvent) => {
     pointerStart.current = { x: e.clientX, y: e.clientY }
@@ -193,6 +197,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             <PriceDisplay
               price={product.price}
               discountPct={isActive && promo!.discount_pct > 0 ? promo!.discount_pct : undefined}
+              salePrice={isActive ? promo!.sale_price : undefined}
               dark={dark}
             />
             {product.stock > 0 && product.stock <= 5 && (
@@ -208,8 +213,8 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             style={{ background: '#6B2500' }}
             role="meter"
             aria-valuenow={flashSold}
-            aria-valuemax={FLASH_TOTAL}
-            aria-label={`${flashSold}/${FLASH_TOTAL} slots sold`}
+            aria-valuemax={flashTotal}
+            aria-label={`${flashSold}/${flashTotal} slots sold`}
           >
             <div
               className="absolute inset-y-0 left-0 transition-none"
@@ -222,7 +227,7 @@ export default function ProductCard({ product, variant = 'dark', showFlashProgre
             <div className="relative h-full flex items-center gap-1 px-2.5">
               <Flash size={11} color="#FCD34D" variant="Bold" />
               <span className="text-white text-[10px] font-bold tracking-wide leading-none drop-shadow-sm">
-                {flashSold}/{FLASH_TOTAL} slots sold
+                {flashSold}/{flashTotal} slots sold
               </span>
             </div>
           </div>
