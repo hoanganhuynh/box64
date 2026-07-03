@@ -104,11 +104,23 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                 <p className="text-sm text-[#484858] mt-0.5">{order.shipping?.phone ?? ''}</p>
               </td>
               <td className="px-5 py-4">
-                <p className="text-sm text-[#7A7A90]">{order.items?.length ?? 0} sản phẩm</p>
-                <p className="text-sm text-[#484858] mt-0.5 truncate max-w-[160px]">
-                  {order.items?.[0]?.product_name ?? ''}
-                  {(order.items?.length ?? 0) > 1 ? ` +${order.items.length - 1}` : ''}
-                </p>
+                <div className="flex items-center gap-2.5">
+                  {order.items?.[0]?.image_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={order.items[0].image_url}
+                      alt=""
+                      className="w-9 h-9 rounded-lg object-cover bg-[#16161E] shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm text-[#7A7A90]">{order.items?.length ?? 0} sản phẩm</p>
+                    <p className="text-sm text-[#484858] mt-0.5 truncate max-w-[160px]">
+                      {order.items?.[0]?.product_name ?? ''}
+                      {(order.items?.length ?? 0) > 1 ? ` +${order.items.length - 1}` : ''}
+                    </p>
+                  </div>
+                </div>
               </td>
               <td className="px-5 py-4 font-bold text-[#EEEEF4] whitespace-nowrap tabular-nums">
                 {vnd(order.total)}
