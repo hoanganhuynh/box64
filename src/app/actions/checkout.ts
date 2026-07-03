@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { CartItem } from '@/lib/types'
 import { previewDiscount, commitRedemption } from './promotions'
+import { getActiveFlashPrices, claimFlashStock, releaseFlashStock } from '@/lib/storefront/flash'
+import { flashClaimPlan } from '@/lib/storefront/reprice'
 
 export interface ShippingInput {
   name: string
@@ -31,11 +33,12 @@ function generateOrderId(): string {
 export async function placeOrder(
   shipping: ShippingInput,
   items: CartItem[],
-  subtotal: number,
+  clientSubtotal: number,
   couponCode: string | undefined,
   shippingFee = 0,
   paymentMethod: 'transfer' | 'vietqr' | 'sepay' = 'transfer',
 ): Promise<PlaceOrderResult> {
+  let subtotal = clientSubtotal
   if (!items.length) return { success: false, error: 'No items' }
 
   const orderId = generateOrderId()
@@ -53,6 +56,28 @@ export async function placeOrder(
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Flash-sale prices are server truth: re-resolve live prices, atomically
+  // claim stock per line, and never trust the client's unit_price for flash
+  // items. A failed claim (sold out between cart and checkout) reverts that
+  // line to the product's base price.
+  const flash = await getActiveFlashPrices(items.map(i => i.product_id))
+  const plan = flashClaimPlan(items, flash)
+  const claimedStock: Array<{ itemId: string; qty: number }> = []
+  if (plan.length > 0) {
+    const { data: baseRows } = await supabase
+      .from('products')
+      .select('id, price')
+      .in('id', plan.map(c => items[c.index].product_id))
+    const baseById = new Map((baseRows ?? []).map(r => [r.id, r.price]))
+    for (const c of plan) {
+      const ok = await claimFlashStock(c.itemId, c.qty)
+      const base = baseById.get(items[c.index].product_id) ?? items[c.index].unit_price
+      if (ok) claimedStock.push({ itemId: c.itemId, qty: c.qty })
+      items[c.index] = { ...items[c.index], unit_price: ok ? c.salePrice : base }
+    }
+    subtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0)
+  }
 
   // Discount is never trusted from the client — re-validated here against
   // the code's own rules (scope, expiry, per-user redemption) right before
@@ -103,6 +128,7 @@ export async function placeOrder(
 
   if (error) {
     console.error('placeOrder error:', error)
+    for (const c of claimedStock) await releaseFlashStock(c.itemId, c.qty)
     return { success: false, error: error.message }
   }
 
