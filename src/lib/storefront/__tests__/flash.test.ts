@@ -42,4 +42,32 @@ describe('pickWinningFlashItems', () => {
     const m = pickWinningFlashItems([row({ quantity_limit: null, sold_count: 99999 })])
     expect(m.has('p1')).toBe(true)
   })
+
+  it('breaks an exact price tie deterministically by lowest id', () => {
+    const m = pickWinningFlashItems([
+      row({ id: 'z', sale_price: 100000 }),
+      row({ id: 'a', sale_price: 100000 }),
+    ])
+    expect(m.get('p1')?.id).toBe('a')
+    // Order-independent: reversing the input must not change the winner.
+    const reversed = pickWinningFlashItems([
+      row({ id: 'a', sale_price: 100000 }),
+      row({ id: 'z', sale_price: 100000 }),
+    ])
+    expect(reversed.get('p1')?.id).toBe('a')
+  })
+
+  it('buckets multiple products independently', () => {
+    const m = pickWinningFlashItems([
+      row({ id: 'a', product_id: 'p1', sale_price: 100000 }),
+      row({ id: 'b', product_id: 'p2', sale_price: 200000 }),
+    ])
+    expect(m.size).toBe(2)
+    expect(m.get('p1')?.id).toBe('a')
+    expect(m.get('p2')?.id).toBe('b')
+  })
+
+  it('returns an empty map for empty input', () => {
+    expect(pickWinningFlashItems([]).size).toBe(0)
+  })
 })

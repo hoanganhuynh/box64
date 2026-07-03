@@ -20,12 +20,18 @@ export interface FlashItemRow {
 
 // Pure: given currently-live items (time window already filtered in SQL),
 // pick one winner per product — lowest price wins, sold-out items excluded.
+// Ties break on `id` (deterministic) rather than input order — SQL result
+// order is unspecified here, so an order-dependent tiebreaker could pick a
+// different winning item.id across calls and desync a quoted price from the
+// item that later gets its stock claimed at checkout.
 export function pickWinningFlashItems(rows: FlashItemRow[]): Map<string, FlashItemRow> {
   const map = new Map<string, FlashItemRow>()
   for (const r of rows) {
     if (r.quantity_limit !== null && r.sold_count >= r.quantity_limit) continue
     const cur = map.get(r.product_id)
-    if (!cur || r.sale_price < cur.sale_price) map.set(r.product_id, r)
+    if (!cur || r.sale_price < cur.sale_price || (r.sale_price === cur.sale_price && r.id < cur.id)) {
+      map.set(r.product_id, r)
+    }
   }
   return map
 }
@@ -45,7 +51,13 @@ export async function getActiveFlashPrices(productIds?: string[]): Promise<Map<s
     return new Map()
   }
   const rows: FlashItemRow[] = data.map(r => {
-    const sale = r.flash_sales as unknown as { starts_at: string; ends_at: string }
+    // Supabase's `!inner` join on a to-one relation normally returns an
+    // object, but the client has been known to return an array when FK
+    // disambiguation is ambiguous — unwrap defensively rather than casting
+    // blindly, so a shape change fails loudly instead of quietly producing
+    // undefined dates.
+    const joined = r.flash_sales as unknown
+    const sale = (Array.isArray(joined) ? joined[0] : joined) as { starts_at: string; ends_at: string }
     return {
       id: r.id, product_id: r.product_id, sale_price: r.sale_price,
       quantity_limit: r.quantity_limit, sold_count: r.sold_count,
