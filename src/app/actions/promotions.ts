@@ -69,9 +69,14 @@ function codeApplies(promo: PromoCodeRow, items: CartItem[], subtotal: number): 
   return true
 }
 
-function computeDiscount(promo: PromoCodeRow, subtotal: number): number {
+// Fixed-amount codes are capped at subtotal + shipping (the full order
+// total) rather than just subtotal — a fixed discount is meant to come off
+// the whole order, not silently shrink because shipping isn't "discountable".
+// Percent codes stay based on subtotal only (shipping was never part of the
+// percentage base).
+function computeDiscount(promo: PromoCodeRow, subtotal: number, shippingFee: number): number {
   if (promo.type === 'percent') return Math.round(subtotal * promo.value / 100)
-  return Math.min(promo.value, subtotal)
+  return Math.min(promo.value, subtotal + shippingFee)
 }
 
 export interface ApplicableCode {
@@ -80,7 +85,7 @@ export interface ApplicableCode {
   discount: number
 }
 
-export async function getApplicableCodes(items: CartItem[], subtotal: number): Promise<ApplicableCode[]> {
+export async function getApplicableCodes(items: CartItem[], subtotal: number, shippingFee = 0): Promise<ApplicableCode[]> {
   const user = await getSessionUser()
   if (!user) return []
 
@@ -102,7 +107,7 @@ export async function getApplicableCodes(items: CartItem[], subtotal: number): P
     .map(c => ({
       code: c.code,
       label: c.is_referral ? `Voucher mời bạn — ${formatVndLabel(c.value)}` : c.code,
-      discount: computeDiscount(c, subtotal),
+      discount: computeDiscount(c, subtotal, shippingFee),
     }))
     .sort((a, b) => b.discount - a.discount)
 }
@@ -116,7 +121,7 @@ function formatVndLabel(n: number) {
 // commitRedemption() after the order row exists (redemptions carry an
 // order_id FK, so the order has to be inserted first).
 export async function previewDiscount(
-  userId: string, code: string, items: CartItem[], subtotal: number
+  userId: string, code: string, items: CartItem[], subtotal: number, shippingFee = 0
 ): Promise<{ discount: number; promoCodeId: string | null }> {
   if (!code) return { discount: 0, promoCodeId: null }
 
@@ -135,7 +140,7 @@ export async function previewDiscount(
   if (promo.owner_id && promo.owner_id !== userId) return { discount: 0, promoCodeId: null }
   if (!codeApplies(promo as PromoCodeRow, items, subtotal)) return { discount: 0, promoCodeId: null }
 
-  return { discount: computeDiscount(promo as PromoCodeRow, subtotal), promoCodeId: promo.id }
+  return { discount: computeDiscount(promo as PromoCodeRow, subtotal, shippingFee), promoCodeId: promo.id }
 }
 
 // Manual "enter a code" flow at checkout — resolves the user itself so the
@@ -143,7 +148,7 @@ export async function previewDiscount(
 // failure reason (unlike previewDiscount, which silently returns 0 for any
 // failure since it's only ever used as a final re-check before order insert).
 export async function applyCouponCode(
-  code: string, items: CartItem[], subtotal: number
+  code: string, items: CartItem[], subtotal: number, shippingFee = 0
 ): Promise<{ error?: string; discount?: number }> {
   const user = await getSessionUser()
   if (!user) return { error: 'Vui lòng đăng nhập để dùng mã giảm giá.' }
@@ -168,7 +173,7 @@ export async function applyCouponCode(
     return { error: 'Mã không áp dụng được cho đơn hàng này (đã hết hạn, hết lượt dùng, hoặc chưa đạt giá trị tối thiểu).' }
   }
 
-  return { discount: computeDiscount(promo as PromoCodeRow, subtotal) }
+  return { discount: computeDiscount(promo as PromoCodeRow, subtotal, shippingFee) }
 }
 
 export async function commitRedemption(promoCodeId: string, userId: string, orderId: string): Promise<void> {

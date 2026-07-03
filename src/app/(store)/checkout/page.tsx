@@ -231,13 +231,13 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!isAuthed || items.length === 0) { setApplicableCodes([]); return }
-    getApplicableCodes(items, subtotal).then(codes => {
+    getApplicableCodes(items, subtotal, shippingFee).then(codes => {
       setApplicableCodes(codes)
       // Auto-apply the single best code; let the shopper choose among several.
       setSelectedCode(prev => codes.some(c => c.code === prev) ? prev : (codes[0]?.code ?? ''))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthed, items.length, subtotal])
+  }, [isAuthed, items.length, subtotal, shippingFee])
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -248,7 +248,7 @@ export default function CheckoutPage() {
     if (!code) return
     setManualLoading(true)
     setManualError('')
-    const result = await applyCouponCode(code, items, subtotal)
+    const result = await applyCouponCode(code, items, subtotal, shippingFee)
     setManualLoading(false)
     if (result.error) {
       setManualError(result.error)

@@ -60,7 +60,7 @@ export async function placeOrder(
   let discount = 0
   let promoCodeId: string | null = null
   if (couponCode && user) {
-    const preview = await previewDiscount(user.id, couponCode, items, subtotal)
+    const preview = await previewDiscount(user.id, couponCode, items, subtotal, shippingFee)
     discount = preview.discount
     promoCodeId = preview.promoCodeId
   }
