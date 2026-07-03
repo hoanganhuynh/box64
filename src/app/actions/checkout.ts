@@ -65,14 +65,25 @@ export async function placeOrder(
   const plan = flashClaimPlan(items, flash)
   const claimedStock: Array<{ itemId: string; qty: number }> = []
   if (plan.length > 0) {
-    const { data: baseRows } = await supabase
+    const { data: baseRows, error: baseError } = await supabase
       .from('products')
       .select('id, price')
       .in('id', plan.map(c => items[c.index].product_id))
+    if (baseError) console.error('placeOrder base-price lookup error:', baseError)
     const baseById = new Map((baseRows ?? []).map(r => [r.id, r.price]))
+
+    // A missing base price (query error, or a product deleted since being
+    // added to the sale) must never fall back to the client-supplied
+    // unit_price — that's exactly the value a malicious client controls.
+    for (const c of plan) {
+      if (!baseById.has(items[c.index].product_id)) {
+        return { success: false, error: 'Không xác định được giá sản phẩm, vui lòng thử lại.' }
+      }
+    }
+
     for (const c of plan) {
       const ok = await claimFlashStock(c.itemId, c.qty)
-      const base = baseById.get(items[c.index].product_id) ?? items[c.index].unit_price
+      const base = baseById.get(items[c.index].product_id)!
       if (ok) claimedStock.push({ itemId: c.itemId, qty: c.qty })
       items[c.index] = { ...items[c.index], unit_price: ok ? c.salePrice : base }
     }
