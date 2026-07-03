@@ -93,6 +93,10 @@ export async function upsertFlashSale(input: UpsertFlashSaleInput): Promise<{ er
   const { data: prev } = input.id
     ? await client.from('flash_sales').select('*, flash_sale_items(*)').eq('id', input.id).maybeSingle()
     : { data: null }
+  // An id was given for an edit but no row matched — without this guard the
+  // upsert below would silently INSERT a new row under that id instead of
+  // surfacing that the sale being edited no longer exists.
+  if (input.id && !prev) return { error: 'Đợt flash sale không tồn tại — có thể đã bị xóa.' }
 
   const salePayload = {
     ...(input.id ? { id: input.id } : {}),
