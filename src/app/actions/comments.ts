@@ -77,9 +77,19 @@ export async function postComment(productId: string, content: string): Promise<P
   const { data: wordsData } = await db.from('banned_words').select('word')
   const bannedWords = (wordsData ?? []).map(w => w.word as string)
 
-  const handleViolation = async () => {
+  const handleViolation = async (reason: string) => {
     const nextCount = (moderation?.comment_violations ?? 0) + 1
     const justBanned = nextCount >= MAX_VIOLATIONS_BEFORE_BAN
+    
+    // Ghi log vi phạm
+    await db.from('comment_moderation_logs').insert({
+      user_id: user.id,
+      product_id: productId,
+      content: trimmed,
+      action: 'BLOCKED',
+      reason,
+    })
+
     await db.from('user_moderation').upsert({
       user_id: user.id,
       comment_violations: nextCount,
@@ -90,13 +100,22 @@ export async function postComment(productId: string, content: string): Promise<P
   }
 
   if (containsBannedWord(trimmed, bannedWords)) {
-    return await handleViolation()
+    return await handleViolation('Chứa từ cấm')
   }
 
   const aiResult = await moderateWithAI(trimmed)
   if (aiResult.flagged) {
-    return await handleViolation()
+    return await handleViolation(aiResult.reason || 'AI đánh giá vi phạm (không rõ lý do)')
   }
+
+  // Nếu qua được cả 2 lớp, ghi log cho phép
+  await db.from('comment_moderation_logs').insert({
+    user_id: user.id,
+    product_id: productId,
+    content: trimmed,
+    action: 'ALLOWED',
+    reason: null,
+  })
 
   const userName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? null
   const userAvatar = (user.user_metadata?.avatar_url as string | undefined) ?? null

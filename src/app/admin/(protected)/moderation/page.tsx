@@ -6,7 +6,8 @@ import {
   getBannedUsers, unbanUser, banUserManually,
   getRecentComments, deleteComment,
   getAiConfig, updateAiPrompt,
-  type BannedWordRow, type BannedUserRow, type RecentCommentRow, type AiConfig,
+  getModerationLogs,
+  type BannedWordRow, type BannedUserRow, type RecentCommentRow, type AiConfig, type ModerationLogRow,
 } from './actions'
 
 function timeAgo(iso: string) {
@@ -22,17 +23,19 @@ export default function ModerationPage() {
   const [words, setWords] = useState<BannedWordRow[]>([])
   const [bannedUsers, setBannedUsers] = useState<BannedUserRow[]>([])
   const [comments, setComments] = useState<RecentCommentRow[]>([])
+  const [logs, setLogs] = useState<ModerationLogRow[]>([])
   const [aiConfig, setAiConfig] = useState<AiConfig | null>(null)
   const [aiPrompt, setAiPrompt] = useState('')
   const [savingPrompt, setSavingPrompt] = useState(false)
   const [newWord, setNewWord] = useState('')
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'comments' | 'ai' | 'words' | 'users'>('comments')
+  const [activeTab, setActiveTab] = useState<'comments' | 'ai' | 'words' | 'users' | 'logs'>('comments')
 
   function load() {
-    Promise.all([getBannedWords(), getBannedUsers(), getRecentComments(), getAiConfig()]).then(([w, u, c, ai]) => {
+    Promise.all([getBannedWords(), getBannedUsers(), getRecentComments(), getAiConfig(), getModerationLogs()]).then(([w, u, c, ai, l]) => {
       setWords(w); setBannedUsers(u); setComments(c); 
       setAiConfig(ai)
+      setLogs(l)
       if (ai) setAiPrompt(ai.system_prompt)
       setLoading(false)
     })
@@ -97,6 +100,7 @@ export default function ModerationPage() {
       <div className="flex flex-wrap gap-2 mb-6 border-b border-[#1E1E28] pb-4">
         {[
           { id: 'comments', label: 'Bình luận gần đây' },
+          { id: 'logs', label: 'Nhật ký kiểm duyệt' },
           { id: 'ai', label: 'Cấu hình AI' },
           { id: 'words', label: 'Từ khoá bị cấm' },
           { id: 'users', label: 'Người dùng bị cấm' },
@@ -194,6 +198,63 @@ export default function ModerationPage() {
           </button>
         </div>
         </div>
+      )}
+
+      {activeTab === 'logs' && (
+      <div className="bg-[#111118] border border-[#1E1E28] rounded-2xl p-0 overflow-hidden flex flex-col mb-4">
+        <div className="p-5 pb-4 border-b border-[#1E1E28]">
+          <p className="text-sm font-semibold text-[#484858] uppercase tracking-wide">
+            Nhật ký kiểm duyệt ({logs.length})
+          </p>
+        </div>
+        {logs.length === 0 ? (
+          <div className="p-5">
+            <p className="text-sm text-[#484858]">Chưa có lịch sử kiểm duyệt nào.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[900px]">
+              <thead>
+                <tr className="bg-[#0D0D14]/50 border-b border-[#1E1E28]">
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[15%]">Thời gian</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[15%]">Người dùng</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[40%]">Nội dung</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[10%]">Trạng thái</th>
+                  <th className="py-3 px-5 text-xs font-semibold text-[#484858] uppercase tracking-wider w-[20%]">Lý do</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1A1A22]">
+                {logs.map(log => (
+                  <tr key={log.id} className="hover:bg-[#1A1A22]/50 transition-colors">
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-xs text-[#7A7A90] whitespace-nowrap">{new Date(log.created_at).toLocaleString('vi-VN')}</p>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-sm font-semibold text-[#EEEEF4] truncate">{log.user_name ?? log.user_email ?? 'Ẩn danh'}</p>
+                      <a href={`/shop/${log.product_slug}`} target="_blank" className="text-xs text-[#6366f1] hover:underline mt-1 block truncate">
+                        {log.product_name}
+                      </a>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-sm text-[#EEEEF4] leading-relaxed break-words whitespace-pre-wrap">{log.content}</p>
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      {log.action === 'ALLOWED' ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400">Đã duyệt</span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-500/10 text-red-400">Đã chặn</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-5 align-top">
+                      <p className="text-sm text-[#EEEEF4] break-words">{log.reason || '-'}</p>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
       )}
 
       {activeTab === 'comments' && (

@@ -163,3 +163,46 @@ export async function banUserManually(userId: string): Promise<void> {
   if (error) throw new Error(error.message)
   revalidatePath('/admin/moderation')
 }
+
+export interface ModerationLogRow {
+  id: string
+  user_id: string
+  product_id: string
+  content: string
+  action: 'ALLOWED' | 'BLOCKED'
+  reason: string | null
+  created_at: string
+  user_email: string | null
+  user_name: string | null
+  product_name: string
+  product_slug: string
+}
+
+export async function getModerationLogs(limit = 100): Promise<ModerationLogRow[]> {
+  await requireAdmin()
+  const { data, error } = await db()
+    .from('comment_moderation_logs')
+    .select('id, user_id, product_id, content, action, reason, created_at, products(name, slug)')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error || !data) return []
+  
+  const rows = await Promise.all(data.map(async (row: any) => {
+    const { data: userData } = await db().auth.admin.getUserById(row.user_id)
+    return {
+      id: row.id,
+      user_id: row.user_id,
+      product_id: row.product_id,
+      content: row.content,
+      action: row.action,
+      reason: row.reason,
+      created_at: row.created_at,
+      user_email: userData?.user?.email ?? null,
+      user_name: (userData?.user?.user_metadata?.full_name as string | undefined) ?? null,
+      product_name: row.products?.name ?? 'Sản phẩm không rõ',
+      product_slug: row.products?.slug ?? '',
+    }
+  }))
+  return rows
+}
+
