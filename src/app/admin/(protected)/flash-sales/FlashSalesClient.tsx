@@ -284,7 +284,7 @@ export function FlashSalesClient({ initialSales, products }: {
                           <label className="flex items-center gap-1.5">
                             <span className="text-sm text-[#7A7A90]">Giới hạn</span>
                             <input type="number" min={0} value={item.quantity_limit ?? ''} placeholder="Không giới hạn"
-                              onChange={e => updateItem(item.product_id, { quantity_limit: e.target.value ? parseInt(e.target.value) : null })}
+                              onChange={e => updateItem(item.product_id, { quantity_limit: e.target.value ? (parseInt(e.target.value) || null) : null })}
                               className="w-28 bg-[#111118] border border-[#1E1E28] rounded-lg px-2 h-8 text-sm text-[#EEEEF4] placeholder:text-[#383848] focus:outline-none focus:border-[#6366f1]" />
                           </label>
                         </div>
