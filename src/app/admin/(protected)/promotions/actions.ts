@@ -22,7 +22,7 @@ async function requireAdmin() {
 export interface PromoCodeRow {
   id: string
   code: string
-  type: 'fixed' | 'percent'
+  type: 'fixed' | 'percent' | 'freeship'
   value: number
   scope: 'all' | 'attribute'
   attribute_key: string | null

@@ -31,7 +31,7 @@ async function getSessionUser() {
 interface PromoCodeRow {
   id: string
   code: string
-  type: 'fixed' | 'percent'
+  type: 'fixed' | 'percent' | 'freeship'
   value: number
   scope: 'all' | 'attribute'
   attribute_key: string | null
@@ -76,6 +76,7 @@ function codeApplies(promo: PromoCodeRow, items: CartItem[], subtotal: number): 
 // percentage base).
 function computeDiscount(promo: PromoCodeRow, subtotal: number, shippingFee: number): number {
   if (promo.type === 'percent') return Math.round(subtotal * promo.value / 100)
+  if (promo.type === 'freeship') return Math.round(shippingFee * promo.value / 100)
   return Math.min(promo.value, subtotal + shippingFee)
 }
 

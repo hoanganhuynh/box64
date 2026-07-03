@@ -118,7 +118,7 @@ export default function PromotionsPage() {
                         <span className="font-mono font-bold text-[#EEEEF4]">{c.code}</span>
                       </td>
                       <td className="px-3 py-3.5 text-[#7A7A90]">
-                        {c.type === 'percent' ? `${c.value}%` : vnd(c.value)}
+                        {c.type === 'freeship' ? `Freeship ${c.value}%` : c.type === 'percent' ? `${c.value}%` : vnd(c.value)}
                       </td>
                       <td className="px-3 py-3.5 hidden md:table-cell">
                         {c.scope === 'all' ? (
@@ -176,6 +176,40 @@ export default function PromotionsPage() {
   )
 }
 
+// Quick-pick expiry presets — "0h" = valid through the day before, expires
+// right at the start of the named day.
+function startOfTomorrow(): Date {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+function startOfNextWeek(): Date {
+  const d = new Date()
+  const daysUntilMonday = ((8 - d.getDay()) % 7) || 7
+  d.setDate(d.getDate() + daysUntilMonday)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+function startOfNextMonth(): Date {
+  const d = new Date()
+  d.setMonth(d.getMonth() + 1, 1)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+const EXPIRY_PRESETS = [
+  { label: '0h ngày mai', get: startOfTomorrow },
+  { label: '0h cuối tuần', get: startOfNextWeek },
+  { label: '0h cuối tháng', get: startOfNextMonth },
+]
+
+// datetime-local wants "YYYY-MM-DDTHH:mm" in local time
+function toLocalInput(iso: string): string {
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 function PromoModal({ initial, isNew, onClose, onSaved }: {
   initial: PromoCodeInput
   isNew: boolean
@@ -224,15 +258,34 @@ function PromoModal({ initial, isNew, onClose, onSaved }: {
               <select value={form.type} onChange={e => set('type', e.target.value as PromoCodeInput['type'])} className={SELECT}>
                 <option value="fixed">Số tiền cố định</option>
                 <option value="percent">Phần trăm</option>
+                <option value="freeship">Miễn phí vận chuyển</option>
               </select>
             </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">
-                Giá trị {form.type === 'percent' ? '(%)' : '(VND)'} *
-              </span>
-              <input required type="number" min={0} max={form.type === 'percent' ? 100 : undefined} value={form.value}
-                onChange={e => set('value', parseInt(e.target.value) || 0)} className={INPUT} />
-            </label>
+            {form.type === 'freeship' ? (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">Mức giảm ship *</span>
+                <div className="flex gap-2 h-9">
+                  {[50, 100].map(pct => (
+                    <button key={pct} type="button" onClick={() => set('value', pct)}
+                      className={`flex-1 rounded-lg text-sm font-semibold transition-colors border ${
+                        form.value === pct
+                          ? 'bg-[#6366f1] border-[#6366f1] text-white'
+                          : 'bg-[#0D0D14] border-[#1E1E28] text-[#7A7A90] hover:text-[#EEEEF4]'
+                      }`}>
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
+              </label>
+            ) : (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">
+                  Giá trị {form.type === 'percent' ? '(%)' : '(VND)'} *
+                </span>
+                <input required type="number" min={0} max={form.type === 'percent' ? 100 : undefined} value={form.value}
+                  onChange={e => set('value', parseInt(e.target.value) || 0)} className={INPUT} />
+              </label>
+            )}
           </div>
 
           <label className="flex flex-col gap-1.5">
@@ -274,9 +327,17 @@ function PromoModal({ initial, isNew, onClose, onSaved }: {
           </div>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">Ngày hết hạn *</span>
-            <input required type="date" value={form.expires_at ? form.expires_at.slice(0, 10) : ''}
-              onChange={e => set('expires_at', e.target.value ? new Date(e.target.value + 'T23:59:59').toISOString() : null)}
+            <span className="text-sm font-semibold text-[#7A7A90] uppercase tracking-wide">Ngày & giờ hết hạn *</span>
+            <div className="flex flex-wrap gap-1.5">
+              {EXPIRY_PRESETS.map(p => (
+                <button key={p.label} type="button" onClick={() => set('expires_at', p.get().toISOString())}
+                  className="h-7 px-2.5 rounded-full text-sm bg-[#0D0D14] border border-[#1E1E28] text-[#7A7A90] hover:text-[#EEEEF4] hover:border-[#2A2A38] transition-colors">
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <input required type="datetime-local" value={form.expires_at ? toLocalInput(form.expires_at) : ''}
+              onChange={e => set('expires_at', e.target.value ? new Date(e.target.value).toISOString() : null)}
               className={INPUT} />
           </label>
 
