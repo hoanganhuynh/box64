@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, MapPin, Phone, User, FileText, Building2, Tag } 
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 import { placeOrder } from '@/app/actions/checkout'
-import { getApplicableCodes, type ApplicableCode } from '@/app/actions/promotions'
+import { getApplicableCodes, applyCouponCode, type ApplicableCode } from '@/app/actions/promotions'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 interface GeoItem { code: number; name: string }
@@ -28,7 +28,13 @@ function sortProvinces<T extends { name: string }>(list: T[]): T[] {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items } = useCartStore()
+  const { items: cartItems, deselectedIds } = useCartStore()
+  // Only the items the customer selected on the cart page are checked out —
+  // the rest stay in the cart untouched.
+  const items = useMemo(
+    () => cartItems.filter(i => !deselectedIds.includes(i.id)),
+    [cartItems, deselectedIds],
+  )
   const [mounted, setMounted] = useState(false)
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
@@ -36,6 +42,9 @@ export default function CheckoutPage() {
   const formRef = useRef<HTMLFormElement>(null)
   const [applicableCodes, setApplicableCodes] = useState<ApplicableCode[]>([])
   const [selectedCode, setSelectedCode] = useState<string>('')
+  const [manualCode, setManualCode] = useState('')
+  const [manualLoading, setManualLoading] = useState(false)
+  const [manualError, setManualError] = useState('')
 
   // Address system toggle
   const [addressType, setAddressType] = useState<'new' | 'old'>('new')
@@ -194,8 +203,24 @@ export default function CheckoutPage() {
           setWards(data.wards ?? [])
         } finally { setLoadingWards(false) }
       }
+    } else {
+      // New system has no old→new province code mapping, so match the saved
+      // address by name instead — works whenever the saved order was itself
+      // placed under the new (34-province) system, which stores the same
+      // "Thành phố Đà Nẵng" / "Phường An Thắng" style names we compare here.
+      const prov = dvhcvnProvinces.find(p => p.name === savedAddress.city)
+      if (prov) {
+        setNewWards(prov.wards)
+        const ward = prov.wards.find(w => w.name === savedAddress.ward)
+        setForm(f => ({
+          ...f,
+          city: prov.name,
+          provinceCode: +prov.code,
+          district: '', districtCode: 0,
+          ward: ward?.name ?? '',
+        }))
+      }
     }
-    // For new system: only fill name/phone/address — user re-selects province/ward
   }
 
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0)
@@ -216,6 +241,25 @@ export default function CheckoutPage() {
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
+  }
+
+  async function applyManualCode() {
+    const code = manualCode.trim().toUpperCase()
+    if (!code) return
+    setManualLoading(true)
+    setManualError('')
+    const result = await applyCouponCode(code, items, subtotal)
+    setManualLoading(false)
+    if (result.error) {
+      setManualError(result.error)
+      return
+    }
+    setApplicableCodes(prev => {
+      const withoutDup = prev.filter(c => c.code !== code)
+      return [...withoutDup, { code, label: code, discount: result.discount ?? 0 }]
+    })
+    setSelectedCode(code)
+    setManualCode('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -526,26 +570,44 @@ export default function CheckoutPage() {
               </div>
 
               {/* Promo code */}
-              {applicableCodes.length > 0 && (
-                <div className="border-t border-border pt-4 mb-1">
-                  <label className="flex items-center gap-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1.5">
-                    <Tag size={14} className="text-gold/60" /> Mã giảm giá
-                  </label>
-                  {applicableCodes.length === 1 ? (
-                    <div className="flex items-center justify-between bg-gold/5 border border-gold/25 rounded-lg px-3 py-2">
-                      <span className="font-mono text-xs font-bold text-gold">{applicableCodes[0].code}</span>
-                      <span className="text-xs text-gold">-{formatVND(applicableCodes[0].discount)}</span>
-                    </div>
-                  ) : (
-                    <select value={selectedCode} onChange={e => setSelectedCode(e.target.value)} className={INPUT}>
-                      <option value="">Không dùng mã</option>
-                      {applicableCodes.map(c => (
-                        <option key={c.code} value={c.code}>{c.label} · -{formatVND(c.discount)}</option>
-                      ))}
-                    </select>
-                  )}
+              <div className="border-t border-border pt-4 mb-1">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold text-muted uppercase tracking-wider mb-1.5">
+                  <Tag size={14} className="text-gold/60" /> Mã giảm giá
+                </label>
+
+                {applicableCodes.length === 1 ? (
+                  <div className="flex items-center justify-between bg-gold/5 border border-gold/25 rounded-lg px-3 py-2 mb-2">
+                    <span className="font-mono text-xs font-bold text-gold">{applicableCodes[0].code}</span>
+                    <span className="text-xs text-gold">-{formatVND(applicableCodes[0].discount)}</span>
+                  </div>
+                ) : applicableCodes.length > 1 ? (
+                  <select value={selectedCode} onChange={e => setSelectedCode(e.target.value)} className={`${INPUT} mb-2`}>
+                    <option value="">Không dùng mã</option>
+                    {applicableCodes.map(c => (
+                      <option key={c.code} value={c.code}>{c.label} · -{formatVND(c.discount)}</option>
+                    ))}
+                  </select>
+                ) : null}
+
+                <div className="flex gap-2">
+                  <input
+                    value={manualCode}
+                    onChange={e => { setManualCode(e.target.value); setManualError('') }}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), applyManualCode())}
+                    placeholder="Nhập mã giảm giá"
+                    className={`${INPUT} font-mono uppercase`}
+                  />
+                  <button
+                    type="button"
+                    onClick={applyManualCode}
+                    disabled={manualLoading || !manualCode.trim()}
+                    className="shrink-0 h-10 px-4 rounded-lg border border-border text-xs font-semibold text-primary hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-40"
+                  >
+                    {manualLoading ? '...' : 'Áp dụng'}
+                  </button>
                 </div>
-              )}
+                {manualError && <p className="text-[11px] text-error mt-1.5">{manualError}</p>}
+              </div>
 
               <div className="border-t border-border pt-4 flex flex-col gap-2 text-sm mb-5">
                 <div className="flex justify-between">

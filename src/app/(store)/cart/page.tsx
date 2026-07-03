@@ -1,38 +1,24 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { ShoppingCart, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 import BrandLogo from '@/components/ui/BrandLogo'
 
 export default function CartPage() {
-  const { items, removeItem, updateQty } = useCartStore()
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [mounted, setMounted] = useState(false)
+  const { items, removeItem, updateQty, deselectedIds, toggleSelected, selectAll, deselectAll } = useCartStore()
 
-  useEffect(() => {
-    setMounted(true)
-    setSelected(new Set(items.map(i => i.id)))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Sync selected when items change (e.g. new item added)
-  useEffect(() => {
-    if (!mounted) return
-    setSelected(prev => {
-      const next = new Set(prev)
-      items.forEach(i => { if (!next.has(i.id)) next.add(i.id) })
-      return next
-    })
-  }, [items, mounted])
+  // Absence from deselectedIds means selected — new items are selected by
+  // default with no extra bookkeeping needed on add.
+  const selected = useMemo(
+    () => new Set(items.filter(i => !deselectedIds.includes(i.id)).map(i => i.id)),
+    [items, deselectedIds],
+  )
 
   const count = items.length
-  const toggleItem = (id: string) =>
-    setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
-  const toggleAll = () =>
-    setSelected(selected.size === items.length ? new Set() : new Set(items.map(i => i.id)))
+  const toggleAll = () => (selected.size === items.length ? deselectAll() : selectAll())
 
   const selectedItems = items.filter(i => selected.has(i.id))
   const subtotal = selectedItems.reduce((s, i) => s + i.unit_price * i.quantity, 0)
@@ -109,7 +95,7 @@ export default function CartPage() {
                 {/* Checkbox — only show when multiple items */}
                 {items.length > 1 && (
                   <div className="flex items-start pt-1 shrink-0">
-                    <Checkbox checked={isSelected} onChange={() => toggleItem(item.id)} />
+                    <Checkbox checked={isSelected} onChange={() => toggleSelected(item.id)} />
                   </div>
                 )}
 
@@ -184,9 +170,6 @@ export default function CartPage() {
           <div className="bg-surface border border-border rounded-sm p-6 sticky top-24">
             <h2 className="font-jakarta font-bold text-primary text-base mb-5">Order Summary</h2>
 
-            {/* Coupon */}
-            <CouponInput />
-
             <div className="flex flex-col gap-3 text-sm mb-5">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal ({selectedCount} items)</span>
@@ -228,53 +211,6 @@ export default function CartPage() {
       </div>
     </div>
     </>
-  )
-}
-
-function CouponInput() {
-  const [code, setCode] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle')
-  const [message, setMessage] = useState('')
-
-  async function apply() {
-    if (!code.trim()) return
-    setStatus('loading')
-    // Placeholder — wire to real API later
-    await new Promise(r => setTimeout(r, 600))
-    if (code.trim().toUpperCase() === 'FIGBOX10') {
-      setStatus('ok')
-      setMessage('Coupon applied — 10% off!')
-    } else {
-      setStatus('error')
-      setMessage('Invalid or expired coupon code.')
-    }
-  }
-
-  return (
-    <div className="mb-5">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={code}
-          onChange={e => { setCode(e.target.value); setStatus('idle'); setMessage('') }}
-          onKeyDown={e => e.key === 'Enter' && apply()}
-          placeholder="Coupon code"
-          className="flex-1 h-10 px-3 rounded-sm bg-bg border border-border text-sm text-primary placeholder:text-faint focus:outline-none focus:border-gold/60 transition-colors"
-        />
-        <button
-          onClick={apply}
-          disabled={status === 'loading' || !code.trim()}
-          className="h-10 px-4 rounded-sm bg-surface border border-border text-xs font-semibold text-primary hover:border-gold/40 hover:text-gold transition-colors disabled:opacity-40 shrink-0"
-        >
-          {status === 'loading' ? '...' : 'Apply'}
-        </button>
-      </div>
-      {message && (
-        <p className={`text-[11px] mt-1.5 ${status === 'ok' ? 'text-success' : 'text-error'}`}>
-          {message}
-        </p>
-      )}
-    </div>
   )
 }
 

@@ -138,6 +138,39 @@ export async function previewDiscount(
   return { discount: computeDiscount(promo as PromoCodeRow, subtotal), promoCodeId: promo.id }
 }
 
+// Manual "enter a code" flow at checkout — resolves the user itself so the
+// client never has to know its own user id. Distinct error messages per
+// failure reason (unlike previewDiscount, which silently returns 0 for any
+// failure since it's only ever used as a final re-check before order insert).
+export async function applyCouponCode(
+  code: string, items: CartItem[], subtotal: number
+): Promise<{ error?: string; discount?: number }> {
+  const user = await getSessionUser()
+  if (!user) return { error: 'Vui lòng đăng nhập để dùng mã giảm giá.' }
+
+  const normalized = code.trim().toUpperCase()
+  if (!normalized) return { error: 'Vui lòng nhập mã.' }
+
+  const db = adminDb()
+  const { data: promo } = await db.from('promo_codes').select('*').eq('code', normalized).maybeSingle()
+  if (!promo) return { error: 'Mã không tồn tại.' }
+
+  const { data: existing } = await db
+    .from('promo_code_redemptions')
+    .select('id')
+    .eq('promo_code_id', promo.id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (existing) return { error: 'Bạn đã dùng mã này rồi.' }
+
+  if (promo.owner_id && promo.owner_id !== user.id) return { error: 'Mã không hợp lệ.' }
+  if (!codeApplies(promo as PromoCodeRow, items, subtotal)) {
+    return { error: 'Mã không áp dụng được cho đơn hàng này (đã hết hạn, hết lượt dùng, hoặc chưa đạt giá trị tối thiểu).' }
+  }
+
+  return { discount: computeDiscount(promo as PromoCodeRow, subtotal) }
+}
+
 export async function commitRedemption(promoCodeId: string, userId: string, orderId: string): Promise<void> {
   const db = adminDb()
   const { error } = await db.from('promo_code_redemptions').insert({ promo_code_id: promoCodeId, user_id: userId, order_id: orderId })
