@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -37,13 +38,21 @@ export async function addBannedWord(word: string): Promise<void> {
   if (!w) return
   const { error } = await db().from('banned_words').insert({ word: w })
   if (error && !error.message.includes('duplicate')) throw new Error(error.message)
+  await logAdminAction({
+    action: 'create', entityType: 'moderation', entityLabel: `Từ cấm: ${w}`, after: { word: w },
+  })
   revalidatePath('/admin/moderation')
 }
 
 export async function deleteBannedWord(id: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('banned_words').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('banned_words').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'moderation',
+    entityLabel: `Từ cấm: ${prev?.word ?? id}`, before: prev ?? null,
+  })
   revalidatePath('/admin/moderation')
 }
 
@@ -88,6 +97,10 @@ export async function unbanUser(userId: string): Promise<void> {
     comment_banned_at: null,
   }).eq('user_id', userId)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'moderation',
+    entityLabel: `User ${userId}`, after: { comment_banned: false },
+  })
   revalidatePath('/admin/moderation')
 }
 
@@ -126,8 +139,13 @@ export async function getRecentComments(limit = 50): Promise<RecentCommentRow[]>
 
 export async function deleteComment(id: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('product_comments').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('product_comments').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'moderation',
+    entityLabel: `Bình luận của ${prev?.user_name ?? 'user'}`, before: prev ?? null,
+  })
   revalidatePath('/admin/moderation')
 }
 
@@ -148,8 +166,13 @@ export async function getAiConfig(): Promise<AiConfig | null> {
 
 export async function updateAiPrompt(prompt: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('ai_moderation_config').select('system_prompt').eq('id', true).maybeSingle()
   const { error } = await db().from('ai_moderation_config').update({ system_prompt: prompt }).eq('id', true)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'moderation', entityLabel: 'AI moderation prompt',
+    before: { prompt: prev?.system_prompt }, after: { prompt },
+  })
   revalidatePath('/admin/moderation')
 }
 export async function banUserManually(userId: string): Promise<void> {
@@ -161,6 +184,10 @@ export async function banUserManually(userId: string): Promise<void> {
     comment_banned_at: new Date().toISOString()
   })
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'moderation',
+    entityLabel: `User ${userId}`, after: { comment_banned: true },
+  })
   revalidatePath('/admin/moderation')
 }
 

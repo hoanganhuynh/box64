@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { hashPassword, COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -35,6 +36,11 @@ export async function changePassword(
     .upsert({ id: 1, password_hash: hashPassword(next), updated_at: new Date().toISOString() }, { onConflict: 'id' })
 
   if (error) return { error: 'Lưu thất bại, thử lại.' }
+  await logAdminAction({
+    action: 'update', entityType: 'settings',
+    entityLabel: 'Đổi mật khẩu admin',
+    before: { password: '[redacted]' }, after: { password: '[redacted]' },
+  })
   return {}
 }
 

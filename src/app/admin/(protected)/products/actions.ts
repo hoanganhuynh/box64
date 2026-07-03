@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { DUMMY_PRODUCTS } from '@/lib/data/products'
 import type { ProductVariant } from '@/lib/types'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -73,18 +74,33 @@ export async function getProducts(): Promise<ProductRow[]> {
 }
 
 export async function upsertProduct(row: Omit<ProductRow, 'created_at'>): Promise<void> {
+  const { data: prev } = await db().from('products').select('*').eq('id', row.id).maybeSingle()
   const { error } = await db()
     .from('products')
     .upsert(row, { onConflict: 'id' })
-  if (error) throw new Error(error.message)
+  if (error) {
+    if (error.code === '23505' && error.message.includes('products_sku_unique')) {
+      throw new Error(`SKU "${row.sku}" đã được dùng cho sản phẩm khác. Hãy đổi SKU khác.`)
+    }
+    throw new Error(error.message)
+  }
+  await logAdminAction({
+    action: prev ? 'update' : 'create', entityType: 'product', entityId: row.id,
+    entityLabel: row.name, before: prev ?? null, after: row,
+  })
 }
 
 export async function deleteProduct(id: string): Promise<void> {
+  const { data: prev } = await db().from('products').select('*').eq('id', id).maybeSingle()
   const { error } = await db()
     .from('products')
     .delete()
     .eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'product', entityId: id,
+    entityLabel: prev?.name ?? id, before: prev ?? null,
+  })
 }
 
 export async function setPublished(id: string, published: boolean): Promise<void> {
@@ -93,6 +109,11 @@ export async function setPublished(id: string, published: boolean): Promise<void
     .update({ published })
     .eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'product', entityId: id,
+    entityLabel: `Sản phẩm ${id}`,
+    before: { published: !published }, after: { published },
+  })
 }
 
 // ─── Bulk actions ─────────────────────────────────────────────────────────────
@@ -100,19 +121,35 @@ export async function setPublished(id: string, published: boolean): Promise<void
 export async function bulkDelete(ids: string[]): Promise<void> {
   const { error } = await db().from('products').delete().in('id', ids)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'product', entityId: null,
+    entityLabel: `Xóa hàng loạt ${ids.length} sản phẩm`, before: { ids },
+  })
 }
 
 export async function bulkSetPublished(ids: string[], published: boolean): Promise<void> {
   const { error } = await db().from('products').update({ published }).in('id', ids)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'product', entityId: null,
+    entityLabel: `Cập nhật hàng loạt ${ids.length} sản phẩm`, before: { ids }, after: { published },
+  })
 }
 
 export async function bulkSetStatus(ids: string[], status: string): Promise<void> {
   const { error } = await db().from('products').update({ status }).in('id', ids)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'product', entityId: null,
+    entityLabel: `Cập nhật hàng loạt ${ids.length} sản phẩm`, before: { ids }, after: { status },
+  })
 }
 
 export async function bulkSetType(ids: string[], type: string): Promise<void> {
   const { error } = await db().from('products').update({ type }).in('id', ids)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'product', entityId: null,
+    entityLabel: `Cập nhật hàng loạt ${ids.length} sản phẩm`, before: { ids }, after: { type },
+  })
 }

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -42,14 +43,25 @@ export async function getCustomRequests(): Promise<CustomRequestRow[]> {
 
 export async function updateRequestStatus(id: string, status: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('custom_requests').select('status').eq('id', id).maybeSingle()
   const { error } = await db().from('custom_requests').update({ status }).eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'custom_request', entityId: id,
+    entityLabel: `Yêu cầu ${id}`,
+    before: { status: prev?.status }, after: { status },
+  })
   revalidatePath('/admin/requests')
 }
 
 export async function deleteCustomRequest(id: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('custom_requests').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('custom_requests').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'custom_request', entityId: id,
+    entityLabel: `Yêu cầu ${id}`, before: prev ?? null,
+  })
   revalidatePath('/admin/requests')
 }

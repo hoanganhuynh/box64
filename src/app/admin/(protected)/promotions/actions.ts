@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -69,20 +70,30 @@ export type PromoCodeInput = Omit<PromoCodeRow, 'created_at' | 'used_count' | 'i
 
 export async function upsertPromoCode(row: PromoCodeInput): Promise<{ error?: string }> {
   await requireAdmin()
+  const { data: prev } = await db().from('promo_codes').select('*').eq('id', row.id).maybeSingle()
   const { error } = await db().from('promo_codes').upsert({
     ...row,
     code: row.code.trim().toUpperCase(),
     is_referral: false,
   }, { onConflict: 'id' })
   if (error) return { error: error.message }
+  await logAdminAction({
+    action: prev ? 'update' : 'create', entityType: 'promo_code', entityId: row.id,
+    entityLabel: row.code.trim().toUpperCase(), before: prev ?? null, after: row,
+  })
   revalidatePath('/admin/promotions')
   return {}
 }
 
 export async function deletePromoCode(id: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('promo_codes').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('promo_codes').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'promo_code', entityId: id,
+    entityLabel: prev?.code ?? id, before: prev ?? null,
+  })
   revalidatePath('/admin/promotions')
 }
 
@@ -90,5 +101,9 @@ export async function togglePromoCodeActive(id: string, active: boolean): Promis
   await requireAdmin()
   const { error } = await db().from('promo_codes').update({ active }).eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'promo_code', entityId: id,
+    entityLabel: `Mã ${id}`, before: { active: !active }, after: { active },
+  })
   revalidatePath('/admin/promotions')
 }

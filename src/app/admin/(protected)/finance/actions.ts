@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
+import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
   return createClient(
@@ -56,8 +57,17 @@ export async function getFinanceSettings(): Promise<FinanceSettings> {
 
 export async function updateFinanceSettings(settings: FinanceSettings): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db()
+    .from('finance_settings')
+    .select('print_cost_per_unit, protect_box_cost_per_unit, partner_splits')
+    .eq('id', 1)
+    .maybeSingle()
   const { error } = await db().from('finance_settings').upsert({ id: 1, ...settings, updated_at: new Date().toISOString() })
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'finance', entityId: '1',
+    entityLabel: 'Cài đặt tài chính', before: prev ?? null, after: settings,
+  })
   revalidatePath('/admin/finance')
 }
 
@@ -86,6 +96,11 @@ export async function addFinanceEntry(input: {
     source: 'external',
   })
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'create', entityType: 'finance',
+    entityLabel: `Bút toán ${input.customer_name} · ${input.month}`,
+    after: { ...input, source: 'external' },
+  })
   revalidatePath('/admin/finance')
 }
 
@@ -93,6 +108,7 @@ export async function updateFinanceEntry(id: string, input: {
   customer_name: string; quantity: number; revenue: number; note?: string
 }): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('finance_entries').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('finance_entries').update({
     customer_name: input.customer_name,
     quantity: input.quantity,
@@ -100,13 +116,24 @@ export async function updateFinanceEntry(id: string, input: {
     note: input.note || null,
   }).eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'update', entityType: 'finance', entityId: id,
+    entityLabel: `Bút toán ${input.customer_name}`,
+    before: prev ?? null, after: input,
+  })
   revalidatePath('/admin/finance')
 }
 
 export async function deleteFinanceEntry(id: string): Promise<void> {
   await requireAdmin()
+  const { data: prev } = await db().from('finance_entries').select('*').eq('id', id).maybeSingle()
   const { error } = await db().from('finance_entries').delete().eq('id', id)
   if (error) throw new Error(error.message)
+  await logAdminAction({
+    action: 'delete', entityType: 'finance', entityId: id,
+    entityLabel: `Bút toán ${prev?.customer_name ?? id}`,
+    before: prev ?? null,
+  })
   revalidatePath('/admin/finance')
 }
 
@@ -154,8 +181,13 @@ export async function syncOnlineOrders(month: string): Promise<{ added: number }
 
   const { error: insertError } = await db().from('finance_entries').insert(toInsert)
   if (insertError) throw new Error(insertError.message)
+  const result = { added: toInsert.length }
+  await logAdminAction({
+    action: 'create', entityType: 'finance',
+    entityLabel: `Đồng bộ đơn online tháng ${month}`, after: { month, added: result.added },
+  })
   revalidatePath('/admin/finance')
-  return { added: toInsert.length }
+  return result
 }
 
 export async function getAvailableMonths(): Promise<string[]> {
