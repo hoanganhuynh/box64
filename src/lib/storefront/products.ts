@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Product, ProductVariant, Promotion } from '@/lib/types'
 import { getActiveFlashPrices } from './flash'
+import { getDiscountedPrice } from '@/lib/data/products'
 
 function db() {
   return createClient(
@@ -107,6 +108,23 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   const product = toProduct(data as DbRow)
   const [withFlash] = await attachFlashPromotions([product])
   return withFlash
+}
+
+// Current effective price per product id (base price, discounted by an
+// active flash sale if any) — used to re-sync prices already-snapshotted
+// into a customer's cart when an admin edits a product's price.
+export async function getCurrentPrices(productIds: string[]): Promise<Record<string, number>> {
+  const uniqueIds = [...new Set(productIds)]
+  if (uniqueIds.length === 0) return {}
+  const { data, error } = await db()
+    .from('products')
+    .select('*')
+    .in('id', uniqueIds)
+  if (error || !data) return {}
+  const withFlash = await attachFlashPromotions((data as DbRow[]).map(toProduct))
+  const out: Record<string, number> = {}
+  for (const p of withFlash) out[p.id] = getDiscountedPrice(p)
+  return out
 }
 
 export async function getAllSlugs(): Promise<string[]> {

@@ -8,6 +8,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 import { placeOrder } from '@/app/actions/checkout'
 import { getApplicableCodes, applyCouponCode, type ApplicableCode } from '@/app/actions/promotions'
+import { getCartPrices } from '@/app/actions/prices'
 import { createSupabaseClient } from '@/lib/supabase/client'
 
 interface GeoItem { code: number; name: string }
@@ -28,7 +29,7 @@ function sortProvinces<T extends { name: string }>(list: T[]): T[] {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items: cartItems, deselectedIds } = useCartStore()
+  const { items: cartItems, deselectedIds, syncPrices } = useCartStore()
   // Only the items the customer selected on the cart page are checked out —
   // the rest stay in the cart untouched.
   const items = useMemo(
@@ -77,6 +78,11 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true)
+
+    // Cart lines carry a unit_price snapshot from add-to-cart time — refresh
+    // it against current admin-set prices before the customer pays.
+    const priceIds = cartItems.filter(i => !i.variant_key).map(i => i.product_id)
+    if (priceIds.length > 0) getCartPrices(priceIds).then(syncPrices)
 
     // Returning from SePay's hosted checkout after a cancel or error
     const sp = new URLSearchParams(window.location.search)

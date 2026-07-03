@@ -1,14 +1,16 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { ShoppingCart, Trash2, ArrowRight, ShoppingBag, Truck } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
+import { getCartPrices } from '@/app/actions/prices'
 import BrandLogo from '@/components/ui/BrandLogo'
 
 export default function CartPage() {
-  const { items, removeItem, updateQty, deselectedIds, toggleSelected, selectAll, deselectAll } = useCartStore()
+  const { items, removeItem, updateQty, deselectedIds, toggleSelected, selectAll, deselectAll, syncPrices } = useCartStore()
+  const [priceUpdated, setPriceUpdated] = useState(false)
 
   // Absence from deselectedIds means selected — new items are selected by
   // default with no extra bookkeeping needed on add.
@@ -16,6 +18,18 @@ export default function CartPage() {
     () => new Set(items.filter(i => !deselectedIds.includes(i.id)).map(i => i.id)),
     [items, deselectedIds],
   )
+
+  // Cart items carry a unit_price snapshot from add-to-cart time — refresh
+  // it against the product's current price on every visit, so an admin
+  // price edit reaches carts that already hold that product.
+  useEffect(() => {
+    const ids = items.filter(i => !i.variant_key).map(i => i.product_id)
+    if (ids.length === 0) return
+    getCartPrices(ids).then(priceById => {
+      if (syncPrices(priceById).length > 0) setPriceUpdated(true)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const count = items.length
   const toggleAll = () => (selected.size === items.length ? deselectAll() : selectAll())
@@ -66,6 +80,12 @@ export default function CartPage() {
 
         {/* ── Items list (2/3) ── */}
         <div className="lg:col-span-2 flex flex-col gap-3">
+
+          {priceUpdated && (
+            <p className="text-xs text-gold bg-gold/5 border border-gold/20 rounded-sm px-3 py-2">
+              Giá một số sản phẩm đã được cập nhật theo giá mới nhất.
+            </p>
+          )}
 
           {/* Select all — only show when multiple items */}
           {items.length > 1 && (

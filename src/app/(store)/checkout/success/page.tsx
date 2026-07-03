@@ -101,17 +101,22 @@ function SuccessContent() {
   const params = useSearchParams()
   const orderId = params.get('order') ?? '—'
   const [order, setOrder] = useState<LastOrder | null>(null)
-  const clearCart = useCartStore(s => s.clearCart)
+  const removeItems = useCartStore(s => s.removeItems)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('lastOrder')
     if (raw) {
-      try { setOrder(JSON.parse(raw)) } catch {}
+      try {
+        const parsed: LastOrder = JSON.parse(raw)
+        setOrder(parsed)
+        // Reaching this page means SePay confirmed (or is confirming) the
+        // payment — safe to remove the ordered items here rather than before
+        // redirecting. Only the items that were actually ordered are removed;
+        // anything left unselected on the cart page stays in the cart.
+        removeItems(parsed.items.map(i => i.id))
+      } catch {}
     }
-    // Reaching this page means SePay confirmed (or is confirming) the
-    // payment — safe to clear the cart here rather than before redirecting.
-    clearCart()
-  }, [clearCart])
+  }, [removeItems])
 
   const subtotal = order?.items.reduce((s, i) => s + i.unit_price * i.quantity, 0) ?? 0
   const shippingFee = order?.shippingFee ?? 0

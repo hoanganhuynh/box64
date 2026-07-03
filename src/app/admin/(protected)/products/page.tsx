@@ -757,14 +757,17 @@ export default function ProductsPage() {
     const newId = `fb-${nanoid()}`
     const { created_at: _, ...rest } = p
     void _
-    await upsertProduct({
-      ...rest,
-      id: newId,
-      name: `${p.name} Copy`,
-      slug: `${p.slug}-copy`,
-      published: false,
-    })
-    startTransition(load)
+    try {
+      await upsertProduct({
+        ...rest,
+        id: newId,
+        name: `${p.name} Copy`,
+        slug: `${p.slug}-copy`,
+        sku: null, // SKU is unique — the copy must not inherit the original's
+        published: false,
+      })
+      startTransition(load)
+    } catch (e: unknown) { alert((e as Error).message) }
   }
 
   async function handleTogglePublished(p: ProductRow) {

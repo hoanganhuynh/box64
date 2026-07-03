@@ -12,10 +12,19 @@ export interface FlyEvent {
 
 interface CartStore {
   items: CartItem[]
+  // Tracks items the customer unchecked on the cart page — absence from this
+  // list means selected, so new/existing items are selected by default with
+  // no extra bookkeeping on add.
+  deselectedIds: string[]
   addItem: (product: Product, qty?: number, variant?: ProductVariant) => void
   removeItem: (id: string) => void
+  removeItems: (ids: string[]) => void
   updateQty: (id: string, qty: number) => void
   clearCart: () => void
+  toggleSelected: (id: string) => void
+  selectAll: () => void
+  deselectAll: () => void
+  syncPrices: (priceById: Record<string, number>) => Array<{ id: string; from: number; to: number }>
   totalItems: () => number
   subtotal: () => number
   flyEvent: FlyEvent | null
@@ -27,6 +36,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      deselectedIds: [],
 
       addItem: (product, qty = 1, variant) => {
         // A product with variants gets one cart line per variant — so a
@@ -65,7 +75,16 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeItem: (id) =>
-        set(s => ({ items: s.items.filter(i => i.id !== id) })),
+        set(s => ({
+          items: s.items.filter(i => i.id !== id),
+          deselectedIds: s.deselectedIds.filter(d => d !== id),
+        })),
+
+      removeItems: (ids) =>
+        set(s => ({
+          items: s.items.filter(i => !ids.includes(i.id)),
+          deselectedIds: s.deselectedIds.filter(d => !ids.includes(d)),
+        })),
 
       updateQty: (id, qty) => {
         if (qty < 1) { get().removeItem(id); return }
@@ -74,7 +93,36 @@ export const useCartStore = create<CartStore>()(
         }))
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], deselectedIds: [] }),
+
+      toggleSelected: (id) =>
+        set(s => ({
+          deselectedIds: s.deselectedIds.includes(id)
+            ? s.deselectedIds.filter(d => d !== id)
+            : [...s.deselectedIds, id],
+        })),
+
+      selectAll: () => set({ deselectedIds: [] }),
+
+      deselectAll: () => set(s => ({ deselectedIds: s.items.map(i => i.id) })),
+
+      // Re-syncs base-product cart lines against current admin-set prices —
+      // called on cart/checkout mount, since unit_price is otherwise a
+      // snapshot from add-to-cart time. Variant-priced lines are skipped:
+      // variant.price is its own fixed quote, not the product's base price.
+      syncPrices: (priceById) => {
+        const changed: Array<{ id: string; from: number; to: number }> = []
+        set(s => ({
+          items: s.items.map(i => {
+            if (i.variant_key) return i
+            const next = priceById[i.product_id]
+            if (next == null || next === i.unit_price) return i
+            changed.push({ id: i.id, from: i.unit_price, to: next })
+            return { ...i, unit_price: next }
+          }),
+        }))
+        return changed
+      },
 
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 
@@ -86,6 +134,6 @@ export const useCartStore = create<CartStore>()(
         set({ flyEvent: { id: Date.now(), imgSrc, startRect } }),
       clearFly: () => set({ flyEvent: null }),
     }),
-    { name: 'box64-cart', partialize: (s) => ({ items: s.items }) }
+    { name: 'box64-cart', partialize: (s) => ({ items: s.items, deselectedIds: s.deselectedIds }) }
   )
 )
