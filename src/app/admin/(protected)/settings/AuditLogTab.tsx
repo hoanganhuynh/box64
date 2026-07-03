@@ -65,7 +65,7 @@ export function AuditLogTab() {
   const [entityType, setEntityType] = useState('')
   const [action, setAction] = useState('')
   const [page, setPage] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
 
