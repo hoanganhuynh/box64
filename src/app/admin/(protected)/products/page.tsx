@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useTransition } from 'react'
-import Image from 'next/image'
+
 import { Plus, Pencil, Trash2, X, ChevronDown, AlertTriangle, Upload, Loader2, Eye, FileDown, FileUp, CheckCircle2, Copy, Search } from 'lucide-react'
 import BrandLogo from '@/components/ui/BrandLogo'
 import {
@@ -934,7 +934,7 @@ export default function ProductsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#1A1A22] shrink-0">
                           {p.images[0] && (
-                            <Image src={p.images[0]} alt={p.name} width={40} height={40}
+                            <img src={p.images[0]} alt={p.name}
                               className="w-full h-full object-cover" />
                           )}
                         </div>
