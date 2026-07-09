@@ -33,9 +33,10 @@ interface PromoCodeRow {
   code: string
   type: 'fixed' | 'percent' | 'freeship'
   value: number
-  scope: 'all' | 'attribute'
+  scope: 'all' | 'attribute' | 'product'
   attribute_key: string | null
   attribute_value: string | null
+  product_id: string | null
   max_uses: number | null
   used_count: number
   min_order_amount: number
@@ -56,26 +57,43 @@ function cartItemAttr(item: CartItem, key: string): string | undefined {
   }
 }
 
+// Line total of the items a scoped code actually targets. Scope 'all'
+// covers the whole subtotal.
+function matchedLineTotal(promo: PromoCodeRow, items: CartItem[], subtotal: number): number {
+  if (promo.scope === 'attribute' && promo.attribute_key && promo.attribute_value) {
+    const target = promo.attribute_value.toLowerCase()
+    return items.reduce(
+      (sum, i) => (cartItemAttr(i, promo.attribute_key!) ?? '').toLowerCase() === target
+        ? sum + i.unit_price * i.quantity : sum,
+      0,
+    )
+  }
+  if (promo.scope === 'product' && promo.product_id) {
+    return items.reduce(
+      (sum, i) => i.product_id === promo.product_id ? sum + i.unit_price * i.quantity : sum,
+      0,
+    )
+  }
+  return subtotal
+}
+
 function codeApplies(promo: PromoCodeRow, items: CartItem[], subtotal: number): boolean {
   if (!promo.active) return false
   if (promo.expires_at && new Date(promo.expires_at) < new Date()) return false
   if (promo.max_uses !== null && promo.used_count >= promo.max_uses) return false
   if (subtotal < promo.min_order_amount) return false
-  if (promo.scope === 'attribute' && promo.attribute_key && promo.attribute_value) {
-    const target = promo.attribute_value.toLowerCase()
-    const matches = items.some(i => (cartItemAttr(i, promo.attribute_key!) ?? '').toLowerCase() === target)
-    if (!matches) return false
-  }
+  if (promo.scope !== 'all' && matchedLineTotal(promo, items, subtotal) <= 0) return false
   return true
 }
 
 // Fixed-amount codes are capped at subtotal + shipping (the full order
 // total) rather than just subtotal — a fixed discount is meant to come off
 // the whole order, not silently shrink because shipping isn't "discountable".
-// Percent codes stay based on subtotal only (shipping was never part of the
-// percentage base).
-function computeDiscount(promo: PromoCodeRow, subtotal: number, shippingFee: number): number {
-  if (promo.type === 'percent') return Math.round(subtotal * promo.value / 100)
+// Percent codes apply to the SCOPED items only ("giảm 10% Porsche" discounts
+// the Porsche lines, not the entire cart); scope 'all' keeps the old
+// whole-subtotal behavior.
+function computeDiscount(promo: PromoCodeRow, items: CartItem[], subtotal: number, shippingFee: number): number {
+  if (promo.type === 'percent') return Math.round(matchedLineTotal(promo, items, subtotal) * promo.value / 100)
   if (promo.type === 'freeship') return Math.round(shippingFee * promo.value / 100)
   return Math.min(promo.value, subtotal + shippingFee)
 }
@@ -108,7 +126,7 @@ export async function getApplicableCodes(items: CartItem[], subtotal: number, sh
     .map(c => ({
       code: c.code,
       label: c.is_referral ? `Voucher mời bạn — ${formatVndLabel(c.value)}` : c.code,
-      discount: computeDiscount(c, subtotal, shippingFee),
+      discount: computeDiscount(c, items, subtotal, shippingFee),
     }))
     .sort((a, b) => b.discount - a.discount)
 }
@@ -141,7 +159,7 @@ export async function previewDiscount(
   if (promo.owner_id && promo.owner_id !== userId) return { discount: 0, promoCodeId: null }
   if (!codeApplies(promo as PromoCodeRow, items, subtotal)) return { discount: 0, promoCodeId: null }
 
-  return { discount: computeDiscount(promo as PromoCodeRow, subtotal, shippingFee), promoCodeId: promo.id }
+  return { discount: computeDiscount(promo as PromoCodeRow, items, subtotal, shippingFee), promoCodeId: promo.id }
 }
 
 // Manual "enter a code" flow at checkout — resolves the user itself so the
@@ -174,7 +192,7 @@ export async function applyCouponCode(
     return { error: 'Mã không áp dụng được cho đơn hàng này (đã hết hạn, hết lượt dùng, hoặc chưa đạt giá trị tối thiểu).' }
   }
 
-  return { discount: computeDiscount(promo as PromoCodeRow, subtotal, shippingFee) }
+  return { discount: computeDiscount(promo as PromoCodeRow, items, subtotal, shippingFee) }
 }
 
 export async function commitRedemption(promoCodeId: string, userId: string, orderId: string): Promise<void> {

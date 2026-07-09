@@ -5,6 +5,7 @@ import type { CartItem } from '@/lib/types'
 import { previewDiscount, commitRedemption } from './promotions'
 import { getActiveFlashPrices, claimFlashStock, releaseFlashStock } from '@/lib/storefront/flash'
 import { flashClaimPlan } from '@/lib/storefront/reprice'
+import { computeBadgeDiscount } from '@/lib/gamification/game'
 
 export interface ShippingInput {
   name: string
@@ -21,6 +22,10 @@ export interface ShippingInput {
 export interface PlaceOrderResult {
   success: boolean
   orderId?: string
+  // Server-computed order total (after flash re-pricing, coupon AND badge
+  // discounts). The client must use this for the payment amount — its own
+  // arithmetic can drift from server truth.
+  total?: number
   error?: string
 }
 
@@ -100,6 +105,18 @@ export async function placeOrder(
     discount = preview.discount
     promoCodeId = preview.promoCodeId
   }
+
+  // Badge (Porsche Lover) discount: derived server-side from the user's own
+  // paid-order history — folded into `discount` so every downstream reader
+  // (admin, CSV export, finance sync) keeps working unchanged.
+  if (user) {
+    try {
+      const badge = await computeBadgeDiscount(user.id, items)
+      discount += badge.discount
+    } catch (e) {
+      console.error('computeBadgeDiscount failed:', e) // never block checkout
+    }
+  }
   const total = subtotal + shippingFee - discount
 
   const orderItems = items.map(i => ({
@@ -176,5 +193,5 @@ export async function placeOrder(
     }
   }
 
-  return { success: true, orderId }
+  return { success: true, orderId, total }
 }

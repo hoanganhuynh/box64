@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, MapPin, Phone, User, FileText, Building2, Tag } 
 import { useCartStore } from '@/lib/store/cart'
 import { formatVND } from '@/lib/utils/format'
 import { placeOrder } from '@/app/actions/checkout'
+import { getBadgeDiscountPreview } from '@/app/actions/gamification'
 import { getApplicableCodes, applyCouponCode, type ApplicableCode } from '@/app/actions/promotions'
 import { getCartPrices } from '@/app/actions/prices'
 import { createSupabaseClient } from '@/lib/supabase/client'
@@ -46,6 +47,7 @@ export default function CheckoutPage() {
   const [manualCode, setManualCode] = useState('')
   const [manualLoading, setManualLoading] = useState(false)
   const [manualError, setManualError] = useState('')
+  const [badgePreview, setBadgePreview] = useState<{ discount: number; label: string | null }>({ discount: 0, label: null })
 
   // Address system toggle
   const [addressType, setAddressType] = useState<'new' | 'old'>('new')
@@ -236,12 +238,14 @@ export default function CheckoutPage() {
   const discount = selected?.discount ?? 0
 
   useEffect(() => {
-    if (!isAuthed || items.length === 0) { setApplicableCodes([]); return }
+    if (!isAuthed || items.length === 0) { setApplicableCodes([]); setBadgePreview({ discount: 0, label: null }); return }
     getApplicableCodes(items, subtotal, shippingFee).then(codes => {
       setApplicableCodes(codes)
       // Auto-apply the single best code; let the shopper choose among several.
       setSelectedCode(prev => codes.some(c => c.code === prev) ? prev : (codes[0]?.code ?? ''))
     })
+    // Preview only — placeOrder recomputes the badge discount server-side.
+    getBadgeDiscountPreview(items).then(setBadgePreview).catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthed, items.length, subtotal, shippingFee])
 
@@ -300,7 +304,9 @@ export default function CheckoutPage() {
       return
     }
 
-    const total = subtotal + shippingFee - discount
+    // Server truth: placeOrder already applied flash re-pricing, coupon and
+    // badge discounts — never re-derive the payable amount client-side.
+    const total = result.total ?? (subtotal + shippingFee - discount - badgePreview.discount)
     sessionStorage.setItem('lastOrder', JSON.stringify({
       orderId: result.orderId,
       items,
@@ -633,9 +639,15 @@ export default function CheckoutPage() {
                     <span className="text-success font-medium">-{formatVND(discount)}</span>
                   </div>
                 )}
+                {badgePreview.discount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gold">🏆 {badgePreview.label}</span>
+                    <span className="text-success font-medium">-{formatVND(badgePreview.discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-border pt-2 mt-1">
                   <span className="font-bold text-primary">Tổng cộng</span>
-                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal + shippingFee - discount)}</span>
+                  <span className="font-extrabold text-gold text-base">{formatVND(subtotal + shippingFee - discount - badgePreview.discount)}</span>
                 </div>
               </div>
 

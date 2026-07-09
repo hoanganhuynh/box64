@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { CheckCircle2, Package, ArrowRight, Copy, Check, Loader2 } from 'lucide-react'
 import { formatVND } from '@/lib/utils/format'
 import { useCartStore } from '@/lib/store/cart'
+import { getPendingSpinCount } from '@/app/actions/gamification'
 import type { CartItem } from '@/lib/types'
 
 interface LastOrder {
@@ -32,6 +33,36 @@ function CopyButton({ text }: { text: string }) {
 }
 
 type PaymentStatus = 'checking' | 'paid' | 'pending'
+
+// The spin is granted by a DB trigger the moment the order flips to paid —
+// poll a few times so the CTA appears as soon as the IPN lands.
+function SpinCta() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    let attempts = 0
+    async function poll() {
+      attempts += 1
+      try {
+        const c = await getPendingSpinCount()
+        if (cancelled) return
+        if (c > 0) { setCount(c); return }
+      } catch {}
+      if (!cancelled && attempts < 6) setTimeout(poll, 3000)
+    }
+    poll()
+    return () => { cancelled = true }
+  }, [])
+
+  if (count === 0) return null
+  return (
+    <Link href="/spin" className="w-full flex items-center justify-between gap-3 rounded-xl border border-gold/30 bg-gold/5 px-5 py-4 hover:bg-gold/10 transition-colors">
+      <p className="text-sm font-bold text-gold text-left">🎡 Bạn có {count} lượt quay may mắn!</p>
+      <span className="text-xs font-semibold text-gold shrink-0">Quay ngay →</span>
+    </Link>
+  )
+}
 
 // SePay already showed the VietQR and captured the payment on its own
 // hosted checkout page before redirecting here — we just poll our own
@@ -146,6 +177,9 @@ function SuccessContent() {
 
       {/* Payment status */}
       {isSepay && orderId !== '—' && <PaymentStatusCard orderId={orderId} />}
+
+      {/* Lucky spin CTA — appears once the paid trigger grants the spin */}
+      <SpinCta />
 
       {/* Order ID */}
       <div className="w-full bg-surface border border-border rounded-xl px-5 py-4">

@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Tag,
   Lightning,
+  GameController,
 } from '@phosphor-icons/react'
 import { cn } from '@/lib/cn'
 import { Modal } from './Modal'
@@ -45,6 +46,7 @@ const mainNav: NavItem[] = [
   { label: 'Yêu cầu mẫu', href: '/admin/requests',   icon: Envelope },
   { label: 'Khuyến mãi', href: '/admin/promotions',  icon: Tag },
   { label: 'Flash sale',  href: '/admin/flash-sales', icon: Lightning },
+  { label: 'Trò chơi',   href: '/admin/game',        icon: GameController },
   { label: 'Tài chính',  href: '/admin/finance',     icon: Wallet },
   { label: 'Kiểm duyệt', href: '/admin/moderation',  icon: ShieldCheck },
   { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },

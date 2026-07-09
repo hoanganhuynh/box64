@@ -2,16 +2,20 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Check, AlertTriangle, Package } from 'lucide-react'
+import { User as UserIcon, MapPin, Check, AlertTriangle, Package, Trophy, Copy, Sparkles } from 'lucide-react'
 import { createSupabaseClient } from '@/lib/supabase/client'
 import { getMyAddresses, type OrderShipping } from '@/app/actions/orders'
+import { getMyGameStatus, type MyGameStatus } from '@/app/actions/gamification'
+import { formatVND } from '@/lib/utils/format'
 
 export default function AccountPage() {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [addresses, setAddresses] = useState<OrderShipping[] | null>(null)
+  const [game, setGame] = useState<MyGameStatus | null>(null)
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -26,8 +30,9 @@ export default function AccountPage() {
       }
       setUser(data.user)
       setName((data.user.user_metadata?.full_name as string | undefined) ?? '')
-      const list = await getMyAddresses()
+      const [list, gameStatus] = await Promise.all([getMyAddresses(), getMyGameStatus()])
       setAddresses(list)
+      setGame(gameStatus)
     })
   }, [router])
 
@@ -108,6 +113,85 @@ export default function AccountPage() {
           </button>
         </form>
       </div>
+
+      {/* Badge + quests */}
+      {game && (
+        <div className="mb-6">
+          <p className="flex items-center gap-1.5 text-[11px] text-muted uppercase tracking-widest font-bold mb-3">
+            <Trophy size={13} className="text-gold" /> Huy hiệu &amp; nhiệm vụ
+          </p>
+
+          {/* Porsche Lover badge */}
+          <div className={`rounded-xl border px-5 py-4 mb-2.5 ${
+            game.badge.active ? 'bg-gold/5 border-gold/30' : 'bg-surface border-border'
+          }`}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className={`text-sm font-bold ${game.badge.active ? 'text-gold' : 'text-primary'}`}>
+                  🏆 {game.badge.brand.charAt(0).toUpperCase() + game.badge.brand.slice(1)} Lover
+                </p>
+                <p className="text-xs text-muted mt-0.5">
+                  {game.badge.active
+                    ? `Đang giảm ${game.badge.discountPct}% mọi sản phẩm ${game.badge.brand} · duy trì bằng cách tiếp tục mua trong ${game.badge.windowDays} ngày`
+                    : `Mua ${game.badge.threshold} box ${game.badge.brand} trong ${game.badge.windowDays} ngày để mở khoá giảm ${game.badge.discountPct}%`}
+                </p>
+              </div>
+              <span className={`shrink-0 text-sm font-extrabold tabular-nums ${game.badge.active ? 'text-gold' : 'text-muted'}`}>
+                {Math.min(game.badge.count, game.badge.threshold)}/{game.badge.threshold}
+              </span>
+            </div>
+            <div className="mt-2.5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${game.badge.active ? 'bg-gold' : 'bg-gold/40'}`}
+                style={{ width: `${Math.min(100, (game.badge.count / game.badge.threshold) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Hidden quests */}
+          <div className="flex flex-col gap-2.5 mb-2.5">
+            {game.quests.map(q => (
+              <div key={q.key} className={`rounded-xl border px-5 py-4 ${
+                q.achieved ? 'bg-gold/5 border-gold/30' : 'bg-surface border-border'
+              }`}>
+                {q.achieved ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gold">✨ {q.title}</p>
+                      <p className="text-xs text-muted mt-0.5">{q.description}</p>
+                      {q.code && (
+                        <p className="flex items-center gap-1.5 text-xs mt-1.5">
+                          <span className="font-mono font-bold text-primary">{q.code}</span>
+                          <button onClick={() => navigator.clipboard.writeText(q.code!)} aria-label="Copy" className="text-muted hover:text-gold transition-colors">
+                            <Copy size={11} />
+                          </button>
+                        </p>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-sm font-extrabold text-gold">+{formatVND(q.rewardValue)}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <Sparkles size={16} className="text-white/20 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white/30">Nhiệm vụ ẩn</p>
+                      <p className="text-xs text-white/20 mt-0.5 italic">{q.hint}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Spin CTA */}
+          {game.pendingSpins > 0 && (
+            <Link href="/spin" className="flex items-center justify-between gap-3 rounded-xl border border-gold/30 bg-gold/5 px-5 py-4 hover:bg-gold/10 transition-colors">
+              <p className="text-sm font-bold text-gold">🎡 Bạn có {game.pendingSpins} lượt quay may mắn!</p>
+              <span className="text-xs font-semibold text-gold shrink-0">Quay ngay →</span>
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* Saved addresses */}
       <div>

@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import { updateOrderStatus as dbUpdateStatus, updatePaymentStatus as dbUpdatePaymentStatus } from '@/lib/admin/queries'
 import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/admin/audit'
+import { checkAndAwardQuests } from '@/lib/gamification/game'
 
 function db() {
   return createClient(
@@ -43,6 +44,16 @@ export async function updatePaymentStatus(orderId: string, paymentStatus: string
     entityLabel: `Đơn hàng ${orderId}`,
     before: { payment_status: prev?.payment_status }, after: { payment_status: paymentStatus },
   })
+
+  // Manual confirm is a payment-confirmation path too — sweep quests for the
+  // order's owner (spin grant is handled by the DB trigger).
+  if (paymentStatus === 'paid') {
+    const { data: order } = await db().from('orders').select('user_id').eq('id', orderId).maybeSingle()
+    if (order?.user_id) {
+      try { await checkAndAwardQuests(order.user_id) } catch (e) { console.error('quest check failed:', e) }
+    }
+  }
+
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${orderId}`)
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkAndAwardQuests } from '@/lib/gamification/game'
 
 function adminDb() {
   return createClient(
@@ -30,10 +31,18 @@ export async function POST(req: NextRequest) {
   const orderId = body.order?.order_invoice_number
 
   if (body.notification_type === 'ORDER_PAID' && orderId) {
-    await adminDb()
+    const { data: updated } = await adminDb()
       .from('orders')
       .update({ payment_status: 'paid', status: 'printing' })
       .eq('id', orderId)
+      .select('user_id')
+      .maybeSingle()
+
+    // Spin grant happens in the DB trigger; quests are app-side. Best-effort —
+    // a quest failure must never make SePay retry the whole IPN.
+    if (updated?.user_id) {
+      try { await checkAndAwardQuests(updated.user_id) } catch (e) { console.error('quest check failed:', e) }
+    }
   }
 
   return NextResponse.json({ success: true })
