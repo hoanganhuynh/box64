@@ -37,20 +37,45 @@ interface NavItem {
   icon: React.ElementType
 }
 
-const mainNav: NavItem[] = [
-  { label: 'Tổng quan',   href: '/admin/dashboard',  icon: ChartPieSlice },
-  { label: 'Đơn hàng',   href: '/admin/orders',      icon: ShoppingCart },
-  { label: 'Khách hàng', href: '/admin/customers',   icon: UsersThree },
-  { label: 'Sản phẩm',   href: '/admin/products',    icon: Package },
-  { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
-  { label: 'Yêu cầu mẫu', href: '/admin/requests',   icon: Envelope },
-  { label: 'Khuyến mãi', href: '/admin/promotions',  icon: Tag },
-  { label: 'Flash sale',  href: '/admin/flash-sales', icon: Lightning },
-  { label: 'Trò chơi',   href: '/admin/game',        icon: GameController },
-  { label: 'Tài chính',  href: '/admin/finance',     icon: Wallet },
-  { label: 'Kiểm duyệt', href: '/admin/moderation',  icon: ShieldCheck },
-  { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
-  { label: 'Cài đặt',   href: '/admin/settings',    icon: GearSix },
+interface NavGroup {
+  title: string
+  items: NavItem[]
+}
+
+const navGroups: NavGroup[] = [
+  {
+    title: 'Bán hàng',
+    items: [
+      { label: 'Tổng quan',   href: '/admin/dashboard',  icon: ChartPieSlice },
+      { label: 'Đơn hàng',   href: '/admin/orders',      icon: ShoppingCart },
+      { label: 'Khách hàng', href: '/admin/customers',   icon: UsersThree },
+      { label: 'Yêu cầu mẫu', href: '/admin/requests',   icon: Envelope },
+    ],
+  },
+  {
+    title: 'Sản phẩm',
+    items: [
+      { label: 'Sản phẩm',   href: '/admin/products',    icon: Package },
+      { label: 'Danh mục',   href: '/admin/categories',  icon: GridFour },
+    ],
+  },
+  {
+    title: 'Marketing',
+    items: [
+      { label: 'Khuyến mãi', href: '/admin/promotions',  icon: Tag },
+      { label: 'Flash sale',  href: '/admin/flash-sales', icon: Lightning },
+      { label: 'Trò chơi',   href: '/admin/game',        icon: GameController },
+    ],
+  },
+  {
+    title: 'Hệ thống',
+    items: [
+      { label: 'Tài chính',  href: '/admin/finance',     icon: Wallet },
+      { label: 'Kiểm duyệt', href: '/admin/moderation',  icon: ShieldCheck },
+      { label: 'Thanh toán', href: '/admin/payment',     icon: CreditCard },
+      { label: 'Cài đặt',   href: '/admin/settings',    icon: GearSix },
+    ],
+  },
 ]
 
 function NavLink({
@@ -194,27 +219,37 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className={cn('flex-1 overflow-y-auto py-4', collapsed ? 'px-2' : 'px-3')}>
-        {!collapsed && (
-          <p className="mb-2 px-3 text-sm font-medium uppercase tracking-widest text-muted">
-            Menu
-          </p>
-        )}
-        <div className="space-y-0.5">
-          {mainNav.map((item, i) =>
-            animated ? (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.05 + i * 0.04, duration: 0.22, ease: 'easeOut' }}
-              >
-                <NavLink item={item} collapsed={collapsed} onClick={onNavClick} isActive={isActive(item.href)} />
-              </motion.div>
-            ) : (
-              <NavLink key={item.href} item={item} collapsed={collapsed} onClick={onNavClick} isActive={isActive(item.href)} />
-            )
-          )}
-        </div>
+        {(() => {
+          let flatIndex = 0
+          return navGroups.map((group, gi) => (
+            <div key={group.title} className={gi > 0 ? 'mt-5' : undefined}>
+              {collapsed ? (
+                gi > 0 && <div aria-hidden="true" className="mx-2 mb-2 -mt-2.5 h-px bg-border" />
+              ) : (
+                <p className="mb-2 px-3 text-sm font-medium uppercase tracking-widest text-muted">
+                  {group.title}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map(item => {
+                  const i = flatIndex++
+                  return animated ? (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 + i * 0.04, duration: 0.22, ease: 'easeOut' }}
+                    >
+                      <NavLink item={item} collapsed={collapsed} onClick={onNavClick} isActive={isActive(item.href)} />
+                    </motion.div>
+                  ) : (
+                    <NavLink key={item.href} item={item} collapsed={collapsed} onClick={onNavClick} isActive={isActive(item.href)} />
+                  )
+                })}
+              </div>
+            </div>
+          ))
+        })()}
       </nav>
 
       {/* Bottom: Log out */}
