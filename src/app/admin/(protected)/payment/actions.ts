@@ -1,6 +1,8 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
+import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
@@ -11,6 +13,12 @@ function db() {
   )
 }
 
+async function requireAdmin() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  if (!token || !verifyToken(token)) throw new Error('Unauthorized')
+}
+
 export interface BankSettings {
   bank_id: string
   account_number: string
@@ -18,6 +26,7 @@ export interface BankSettings {
 }
 
 export async function getBankSettings(): Promise<BankSettings> {
+  await requireAdmin()
   const { data } = await db()
     .from('bank_settings')
     .select('bank_id, account_number, account_name')
@@ -33,6 +42,7 @@ export async function getBankSettings(): Promise<BankSettings> {
 export async function updateBankSettings(
   settings: Partial<BankSettings>,
 ): Promise<{ error?: string }> {
+  await requireAdmin()
   const { data: prev } = await db()
     .from('bank_settings')
     .select('bank_id, account_number, account_name')

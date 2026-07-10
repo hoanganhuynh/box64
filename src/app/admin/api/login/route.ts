@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createToken, hashPassword, COOKIE_NAME, MAX_AGE } from '@/lib/admin-auth'
+import { createToken, hashPassword, safeEqual, COOKIE_NAME, MAX_AGE } from '@/lib/admin-auth'
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS ?? '')
   .split(',').map(e => e.trim()).filter(Boolean)
@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
   let passwordOk = false
   const { data } = await db().from('admin_settings').select('password_hash').eq('id', 1).single()
   if (data?.password_hash) {
-    passwordOk = hashPassword(password) === data.password_hash
+    passwordOk = safeEqual(hashPassword(password), data.password_hash)
   } else {
     // Fallback: plain-text env var (initial setup before password is ever changed)
-    passwordOk = !!process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD
+    passwordOk = !!process.env.ADMIN_PASSWORD && safeEqual(password, process.env.ADMIN_PASSWORD)
   }
 
   if (!passwordOk) {

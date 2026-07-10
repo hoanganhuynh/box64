@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkAndAwardQuests } from '@/lib/gamification/game'
+import { safeEqual } from '@/lib/admin-auth'
 
 function adminDb() {
   return createClient(
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
   // IPN auth type = SECRET_KEY, configured in my.sepay.vn — SePay sends it back
   // on every callback so we can confirm the request really came from them.
   const secretHeader = req.headers.get('x-secret-key')
-  if (!process.env.SEPAY_IPN_SECRET || secretHeader !== process.env.SEPAY_IPN_SECRET) {
+  if (!process.env.SEPAY_IPN_SECRET || !secretHeader || !safeEqual(secretHeader, process.env.SEPAY_IPN_SECRET)) {
     return NextResponse.json({ error: 'Invalid secret key' }, { status: 401 })
   }
 

@@ -11,6 +11,14 @@ export function hashPassword(password: string): string {
   return crypto.createHmac('sha256', secret()).update(password).digest('hex')
 }
 
+// Constant-time string comparison. Hashing both sides to a fixed length first
+// means unequal lengths don't leak via timingSafeEqual's length requirement.
+export function safeEqual(a: string, b: string): boolean {
+  const ha = crypto.createHash('sha256').update(a).digest()
+  const hb = crypto.createHash('sha256').update(b).digest()
+  return crypto.timingSafeEqual(ha, hb)
+}
+
 export function createToken(email: string): string {
   const payload = Buffer.from(email).toString('base64url')
   const sig = crypto.createHmac('sha256', secret()).update(payload).digest('base64url')

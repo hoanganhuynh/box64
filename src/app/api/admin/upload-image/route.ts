@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 
 const MAX_BYTES = 5 * 1024 * 1024 // 5 MB
 const BUCKET = 'product-images'
@@ -14,6 +16,11 @@ function adminDb() {
 }
 
 export async function POST(req: NextRequest) {
+  const cookieStore = await cookies()
+  if (!verifyToken(cookieStore.get(COOKIE_NAME)?.value ?? '')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const form = await req.formData()
   const file = form.get('file') as File | null
   if (!file) return NextResponse.json({ error: 'No file' }, { status: 400 })

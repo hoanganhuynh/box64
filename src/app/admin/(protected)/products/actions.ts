@@ -1,7 +1,9 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 import { DUMMY_PRODUCTS } from '@/lib/data/products'
 import type { ProductVariant } from '@/lib/types'
+import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
@@ -10,6 +12,12 @@ function db() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } },
   )
+}
+
+async function requireAdmin() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  if (!token || !verifyToken(token)) throw new Error('Unauthorized')
 }
 
 export interface ProductRow {
@@ -38,6 +46,7 @@ export interface ProductRow {
 }
 
 export async function getProducts(): Promise<ProductRow[]> {
+  await requireAdmin()
   const { data, error } = await db()
     .from('products')
     .select('*')
@@ -74,6 +83,7 @@ export async function getProducts(): Promise<ProductRow[]> {
 }
 
 export async function upsertProduct(row: Omit<ProductRow, 'created_at'>): Promise<void> {
+  await requireAdmin()
   const { data: prev } = await db().from('products').select('*').eq('id', row.id).maybeSingle()
   const { error } = await db()
     .from('products')
@@ -91,6 +101,7 @@ export async function upsertProduct(row: Omit<ProductRow, 'created_at'>): Promis
 }
 
 export async function deleteProduct(id: string): Promise<void> {
+  await requireAdmin()
   const { data: prev } = await db().from('products').select('*').eq('id', id).maybeSingle()
   const { error } = await db()
     .from('products')
@@ -104,6 +115,7 @@ export async function deleteProduct(id: string): Promise<void> {
 }
 
 export async function setPublished(id: string, published: boolean): Promise<void> {
+  await requireAdmin()
   const { error } = await db()
     .from('products')
     .update({ published })
@@ -119,6 +131,7 @@ export async function setPublished(id: string, published: boolean): Promise<void
 // ─── Bulk actions ─────────────────────────────────────────────────────────────
 
 export async function bulkDelete(ids: string[]): Promise<void> {
+  await requireAdmin()
   const { error } = await db().from('products').delete().in('id', ids)
   if (error) throw new Error(error.message)
   await logAdminAction({
@@ -128,6 +141,7 @@ export async function bulkDelete(ids: string[]): Promise<void> {
 }
 
 export async function bulkSetPublished(ids: string[], published: boolean): Promise<void> {
+  await requireAdmin()
   const { error } = await db().from('products').update({ published }).in('id', ids)
   if (error) throw new Error(error.message)
   await logAdminAction({
@@ -137,6 +151,7 @@ export async function bulkSetPublished(ids: string[], published: boolean): Promi
 }
 
 export async function bulkSetStatus(ids: string[], status: string): Promise<void> {
+  await requireAdmin()
   const { error } = await db().from('products').update({ status }).in('id', ids)
   if (error) throw new Error(error.message)
   await logAdminAction({
@@ -146,6 +161,7 @@ export async function bulkSetStatus(ids: string[], status: string): Promise<void
 }
 
 export async function bulkSetType(ids: string[], type: string): Promise<void> {
+  await requireAdmin()
   const { error } = await db().from('products').update({ type }).in('id', ids)
   if (error) throw new Error(error.message)
   await logAdminAction({

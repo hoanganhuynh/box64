@@ -1,5 +1,7 @@
 'use server'
 import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import { COOKIE_NAME, verifyToken } from '@/lib/admin-auth'
 import { logAdminAction } from '@/lib/admin/audit'
 
 function db() {
@@ -8,6 +10,12 @@ function db() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } },
   )
+}
+
+async function requireAdmin() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  if (!token || !verifyToken(token)) throw new Error('Unauthorized')
 }
 
 export interface CategoryRow {
@@ -21,6 +29,7 @@ export interface CategoryRow {
 }
 
 export async function getCategories(): Promise<CategoryRow[]> {
+  await requireAdmin()
   const { data, error } = await db()
     .from('categories')
     .select('*')
@@ -30,6 +39,7 @@ export async function getCategories(): Promise<CategoryRow[]> {
 }
 
 export async function upsertCategory(row: Omit<CategoryRow, 'created_at'>): Promise<void> {
+  await requireAdmin()
   const { data: prev } = await db().from('categories').select('*').eq('id', row.id).maybeSingle()
   const { error } = await db()
     .from('categories')
@@ -42,6 +52,7 @@ export async function upsertCategory(row: Omit<CategoryRow, 'created_at'>): Prom
 }
 
 export async function deleteCategory(id: string): Promise<void> {
+  await requireAdmin()
   const { data: prev } = await db().from('categories').select('*').eq('id', id).maybeSingle()
   const { error } = await db()
     .from('categories')
@@ -55,6 +66,7 @@ export async function deleteCategory(id: string): Promise<void> {
 }
 
 export async function getProductCountByCategory(): Promise<Record<string, number>> {
+  await requireAdmin()
   const { data } = await db()
     .from('products')
     .select('type')
